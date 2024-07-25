@@ -16,20 +16,70 @@ def ensure_stopwords_downloaded():
     except LookupError:
         nltk.download('stopwords')
 
-## THE  FOLLOWING NEEDS FIXING AT SOME POINT
-                # if len(list(set(pair_data['V1']) & set(pair_data['V2']))) != 0:
-                #     pair_data['V1'] = [
-                #         f"{partition_pair[0]}{join_token}{x}" for x in pair_data['V1']]
-                #     pair_data['V2'] = [
-                #         f"{partition_pair[0]}{join_token}{x}" for x in pair_data['V2']]
-                #     pair_data['P1'] = partition_pair[0]
-                #     pair_data['P2'] = partition_pair[1]
-## THE DREAM IS TO BE ABLE TO TELL IF TWO COLUMNS ARE THE SAME PARTIITON OR NOT ?? 
-
 
 def build_graph(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
+    """
+    Create a graph from a list of tables and relationships. 
+
+    Parameters  
+    ----------  
+    tables : list of pandas.DataFrame  
+        The list of tables. 
+    relationships : list of lists   
+        The list of relationships. Each relationship is a list of two lists, 
+        each of which contains the names of the columns in the corresponding table.
+    dynamic_col : list of str   
+        The list of dynamic columns.
+    weight_col : list of str    
+        The list of weight columns.
+    join_token : str    
+        The token used to join the names of the partitions and the names of the nodes.  
+
+    Returns 
+    ------- 
+    A : scipy.sparse.csr_matrix   
+        The adjacency matrix of the graph.  
+    attributes : list of lists  
+        The attributes of the nodes. The first list contains the attributes 
+        of the nodes in the rows. The second list contains 
+        the attributes of the nodes in the columns.
+    """
+    return _build_graph_from_tables(tables, relationships, multipartite = False, dynamic_col, weight_col, join_token)
+
+def build_multipartite_graph(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
     """ 
-    Create a multipartite graph from a list of tables and relationships.
+    Create a multipartite graph from a list of tables and relationships.    
+    
+    Parameters  
+    ----------  
+    tables : list of pandas.DataFrame  
+        The list of tables. 
+    relationships : list of lists   
+        The list of relationships. Each relationship is a list of two lists, 
+        each of which contains the names of the columns in the corresponding table. 
+    dynamic_col : list of str   
+        The list of dynamic columns.
+    weight_col : list of str    
+        The list of weight columns.
+    join_token : str    
+        The token used to join the names of the partitions and the names of the nodes.
+
+    Returns 
+    ------- 
+    A : scipy.sparse.csr_matrix   
+        The adjacency matrix of the graph.  
+    attributes : list of lists  
+        The attributes of the nodes. The first list contains the attributes 
+        of the nodes in the rows. The second list contains 
+        the attributes of the nodes in the columns.
+    """
+    
+    return _build_graph_from_tables(tables, relationships, multipartite = True, dynamic_col, weight_col, join_token)
+
+
+def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic_col=None, weight_col=None, join_token='::'):
+    """ 
+    Create a graph from a list of tables and relationships.
 
     Parameters  
     ----------  
@@ -38,6 +88,8 @@ def build_graph(tables, relationships, dynamic_col=None, weight_col=None, join_t
     relationships : list of lists
         The list of relationships. Either: Each relationship is a list of two lists, 
         each of which contains the names of the columns in the corresponding table. Or, a list of lists and each pair is looked for in each table.
+    multipartite : bool 
+        Whether the graph is multipartite or not.
     dynamic_col : list of str   
         The list of dynamic columns.
     weight_col : list of str    
@@ -78,13 +130,13 @@ def build_graph(tables, relationships, dynamic_col=None, weight_col=None, join_t
         weight_col = weight_col * len(tables)
 
     edge_list = _create_edge_list(
-        tables, relationships, dynamic_col, join_token, weight_col)
+        tables, relationships, multipartite, dynamic_col, join_token, weight_col)
     nodes, partitions, times, node_ids, time_ids = extract_node_time_info(
         edge_list, join_token)
 
-    edge_list = transform_edge_data(edge_list, node_ids, time_ids, len(nodes))
-    A = create_adjacency_matrix(edge_list, len(nodes), len(times), weight_col)
-    attributes = create_node_attributes(
+    edge_list = _transform_edge_data(edge_list, node_ids, time_ids, len(nodes))
+    A = _create_adjacency_matrix(edge_list, len(nodes), len(times), weight_col)
+    attributes = _create_node_attributes(
         nodes, partitions, times, len(nodes), len(times))
 
     return A.tocsr(), attributes
@@ -137,24 +189,19 @@ def _create_edge_list(tables, relationships, dynamic_col, join_token, weight_col
 
                 pair_data.columns = colnames
 
-                if len(list(set(pair_data['V1']) & set(pair_data['V2']))) != 0:
-                    pair_data['V1'] = [
-                        f"{partition_pair[0]}{join_token}{x}" for x in pair_data['V1']]
-                    pair_data['V2'] = [
-                        f"{partition_pair[1]}{join_token}{x}" for x in pair_data['V2']]
-                    pair_data['P1'] = partition_pair[0]
-                    pair_data['P2'] = partition_pair[1]
+                if multipartite:
+                    p1 = partition_pair[0]
+                    p2 = partition_pair[1]
+                else: 
+                    p1 = p2 = partition_pair[0]
+                pair_data['V1'] = [
+                    f"{p1}{join_token}{x}" for x in pair_data['V1']]
+                pair_data['V2'] = [
+                    f"{p2}{join_token}{x}" for x in pair_data['V2']]
+                pair_data['P1'] = partition_pair[0]
+                pair_data['P2'] = partition_pair[1]
 
-                    edge_list.append(pair_data)
-                else:
-                    pair_data['V1'] = [
-                        f"{partition_pair[0]}{join_token}{x}" for x in pair_data['V1']]
-                    pair_data['V2'] = [
-                        f"{partition_pair[1]}{join_token}{x}" for x in pair_data['V2']]
-                    pair_data['P1'] = partition_pair[0]
-                    pair_data['P2'] = partition_pair[1]
-
-                    edge_list.append(pair_data)
+                edge_list.append(pair_data)
                 print(partition_pair)
     return pd.concat(edge_list)
 
