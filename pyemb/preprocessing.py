@@ -17,7 +17,7 @@ def ensure_stopwords_downloaded():
         nltk.download('stopwords')
 
 
-def build_graph(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
+def build_matrix_and_attributes(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
     """
     Create a graph from a list of tables and relationships. 
 
@@ -46,7 +46,7 @@ def build_graph(tables, relationships, dynamic_col=None, weight_col=None, join_t
     """
     return _build_graph_from_tables(tables, relationships, multipartite = False, dynamic_col, weight_col, join_token)
 
-def build_multipartite_graph(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
+def build_relational_matrix_and_attributes(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
     """ 
     Create a multipartite graph from a list of tables and relationships.    
     
