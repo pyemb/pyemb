@@ -4,7 +4,10 @@ A package providing tools to explore complex data, including embedding, (hierarc
 
 Please read the documentation here. 
 
-To install the package: pip install git+https://git@github.com/anniegray52/pyemb.git
+To install the package: 
+```bash
+pip install git+https://git@github.com/anniegray52/pyemb.git
+```
 
 ## Citation
 
