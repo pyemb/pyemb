@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import networkx as nx
 import nltk
 from re import sub, compile
+from textblob import Word
 from copy import deepcopy
 
 from ._utils import  _symmetric_dilation, _count_based_on_keys
@@ -17,67 +18,8 @@ def ensure_stopwords_downloaded():
         nltk.download('stopwords')
 
 
-def build_matrix_and_attributes(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
-    """
-    Create a graph from a list of tables and relationships. 
 
-    Parameters  
-    ----------  
-    tables : list of pandas.DataFrame  
-        The list of tables. 
-    relationships : list of lists   
-        The list of relationships. Each relationship is a list of two lists, 
-        each of which contains the names of the columns in the corresponding table.
-    dynamic_col : list of str   
-        The list of dynamic columns.
-    weight_col : list of str    
-        The list of weight columns.
-    join_token : str    
-        The token used to join the names of the partitions and the names of the nodes.  
-
-    Returns 
-    ------- 
-    A : scipy.sparse.csr_matrix   
-        The adjacency matrix of the graph.  
-    attributes : list of lists  
-        The attributes of the nodes. The first list contains the attributes 
-        of the nodes in the rows. The second list contains 
-        the attributes of the nodes in the columns.
-    """
-    return _build_graph_from_tables(tables, relationships, multipartite = False, dynamic_col, weight_col, join_token)
-
-def build_relational_matrix_and_attributes(tables, relationships, dynamic_col=None, weight_col=None, join_token='::'):
-    """ 
-    Create a multipartite graph from a list of tables and relationships.    
-    
-    Parameters  
-    ----------  
-    tables : list of pandas.DataFrame  
-        The list of tables. 
-    relationships : list of lists   
-        The list of relationships. Each relationship is a list of two lists, 
-        each of which contains the names of the columns in the corresponding table. 
-    dynamic_col : list of str   
-        The list of dynamic columns.
-    weight_col : list of str    
-        The list of weight columns.
-    join_token : str    
-        The token used to join the names of the partitions and the names of the nodes.
-
-    Returns 
-    ------- 
-    A : scipy.sparse.csr_matrix   
-        The adjacency matrix of the graph.  
-    attributes : list of lists  
-        The attributes of the nodes. The first list contains the attributes 
-        of the nodes in the rows. The second list contains 
-        the attributes of the nodes in the columns.
-    """
-    
-    return _build_graph_from_tables(tables, relationships, multipartite = True, dynamic_col, weight_col, join_token)
-
-
-def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic_col=None, weight_col=None, join_token='::'):
+def matrix_and_attributes(tables, relationship_cols, same_attribute = False, dynamic_col=None, weight_col=None, join_token='::'):
     """ 
     Create a graph from a list of tables and relationships.
 
@@ -85,11 +27,11 @@ def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic
     ----------  
     tables : list of pandas.DataFrame  
         The list of tables. 
-    relationships : list of lists
+    relationship_cols : list of lists
         The list of relationships. Either: Each relationship is a list of two lists, 
         each of which contains the names of the columns in the corresponding table. Or, a list of lists and each pair is looked for in each table.
-    multipartite : bool 
-        Whether the graph is multipartite or not.
+    same_attribute : bool 
+        Whether the entities in the columns are from the same attribute.
     dynamic_col : list of str   
         The list of dynamic columns.
     weight_col : list of str    
@@ -106,14 +48,14 @@ def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic
         of the nodes in the rows. The second list contains 
         the attributes of the nodes in the columns.
     """
-    # Ensure data and relationships are in list format
+    # Ensure data and relationship_cols are in list format
     # add valueerror if not in the correct format
     if not isinstance(tables, list):
         tables = [tables]
-    if isinstance(relationships[0], str):
-        relationships = [relationships]
-    if not isinstance(relationships[0][0], list):
-        relationships = [relationships] * len(tables)
+    if isinstance(relationship_cols[0], str):
+        relationship_cols = [relationship_cols]
+    if not isinstance(relationship_cols[0][0], list):
+        relationship_cols = [relationship_cols] * len(tables)
     # Handle the case when dynamic_col is None
     if dynamic_col is None:
         dynamic_col = [None] * len(tables)
@@ -130,8 +72,8 @@ def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic
         weight_col = weight_col * len(tables)
 
     edge_list = _create_edge_list(
-        tables, relationships, multipartite, dynamic_col, join_token, weight_col)
-    nodes, partitions, times, node_ids, time_ids = extract_node_time_info(
+        tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col)
+    nodes, partitions, times, node_ids, time_ids = _extract_node_time_info(
         edge_list, join_token)
 
     edge_list = _transform_edge_data(edge_list, node_ids, time_ids, len(nodes))
@@ -143,7 +85,7 @@ def _build_graph_from_tables(tables, relationships, multipartite = True, dynamic
 
 
 
-def _create_edge_list(tables, relationships, dynamic_col, join_token, weight_col):
+def _create_edge_list(tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col):
     """ 
     Create an edge list from a list of tables and relationships.    
 
@@ -151,7 +93,7 @@ def _create_edge_list(tables, relationships, dynamic_col, join_token, weight_col
     ----------  
     tables : list of pandas.DataFrame   
         The list of tables.
-    relationships : list of lists   
+    relationship_cols : list of lists   
         The list of relationships. Each relationship is a list of two lists,
         each of which contains the names of the columns in the corresponding table. 
     dynamic_col : list of str   
@@ -168,8 +110,8 @@ def _create_edge_list(tables, relationships, dynamic_col, join_token, weight_col
     """
 
     edge_list = []
-    for data0, relationships0, dynamic_col0, weight_col0 in zip(tables, relationships, dynamic_col, weight_col):
-        for partition_pair in relationships0:
+    for data0, relationship_cols0, dynamic_col0, weight_col0 in zip(tables, relationship_cols, dynamic_col, weight_col):
+        for partition_pair in relationship_cols0:
             if set(partition_pair).issubset(data0.columns):
 
                 cols = deepcopy(partition_pair)
@@ -189,7 +131,7 @@ def _create_edge_list(tables, relationships, dynamic_col, join_token, weight_col
 
                 pair_data.columns = colnames
 
-                if multipartite:
+                if not same_attribute:
                     p1 = partition_pair[0]
                     p2 = partition_pair[1]
                 else: 
@@ -358,7 +300,7 @@ def find_connected_components(A, attributes, n_components=None):
     """
 
     A_dilation = _symmetric_dilation(A)
-    _, cc = csgraph.connected_components(A_dilation)
+    _, cc = sparse.csgraph.connected_components(A_dilation)
     print(f"Number of connected components: {_}")
     cc = [cc[:A.shape[0]], cc[A.shape[0]:]]
     if n_components == None:
@@ -437,7 +379,7 @@ def to_networkx(A, attributes, symmetric=None):
     return G_nx
 
 
-def matrix_from_time_series(data, time_col, drop_nas=True):
+def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     """ 
     Create a matrix from a time series. 
 
@@ -474,7 +416,7 @@ def matrix_from_time_series(data, time_col, drop_nas=True):
     return Y, attributes
 
 
-def matrix_from_text(data, column_name, remove_stopwords=True, clean_text=True,
+def text_matrix_and_attributes(data, column_name, remove_stopwords=True, clean_text=True,
                      remove_email_addresses=False, update_stopwords=None,
                      **kwargs):
     """
