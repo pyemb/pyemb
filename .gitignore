@@ -1,3 +1,6 @@
 __pycache__/
 venv/
 general.ipynb
+build/
+dist/
+*.egg-info/
