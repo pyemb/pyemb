@@ -11,7 +11,7 @@ from copy import deepcopy
 from ._utils import  _symmetric_dilation, _count_based_on_keys
 
 
-def ensure_stopwords_downloaded():
+def _ensure_stopwords_downloaded():
     try:
         nltk.data.find('corpora/stopwords')
     except LookupError:
@@ -449,7 +449,7 @@ def text_matrix_and_attributes(data, column_name, remove_stopwords=True, clean_t
         the attributes of the nodes in the columns. 
     """
 
-    ensure_stopwords_downloaded()
+    _ensure_stopwords_downloaded()
 
     # gets rid of email addresses  in data
     if remove_email_addresses:
