@@ -7,6 +7,7 @@ import nltk
 from re import sub, compile
 from textblob import Word
 from copy import deepcopy
+from tqdm import tqdm
 
 from ._utils import  _symmetric_dilation, _count_based_on_keys
 
@@ -110,7 +111,7 @@ def _create_edge_list(tables, relationship_cols, same_attribute, dynamic_col, jo
     """
 
     edge_list = []
-    for data0, relationship_cols0, dynamic_col0, weight_col0 in zip(tables, relationship_cols, dynamic_col, weight_col):
+    for data0, relationship_cols0, dynamic_col0, weight_col0 in tqdm(zip(tables, relationship_cols, dynamic_col, weight_col)):
         for partition_pair in relationship_cols0:
             if set(partition_pair).issubset(data0.columns):
 
@@ -144,7 +145,7 @@ def _create_edge_list(tables, relationship_cols, same_attribute, dynamic_col, jo
                 pair_data['P2'] = partition_pair[1]
 
                 edge_list.append(pair_data)
-                print(partition_pair)
+                # print(partition_pair)
     return pd.concat(edge_list)
 
 def _extract_node_time_info(edge_list, join_token):
@@ -475,6 +476,8 @@ def text_matrix_and_attributes(data, column_name, remove_stopwords=True, clean_t
     col_attrs = [{'term': i} for i in vectorizer.get_feature_names_out()]
 
     return Y, [row_attrs, col_attrs]
+
+
 
 
 def _del_email_address(text):
