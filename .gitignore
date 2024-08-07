@@ -4,3 +4,4 @@ general.ipynb
 build/
 dist/
 *.egg-info/
+test.ipynb

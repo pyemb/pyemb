@@ -14,22 +14,37 @@ import matplotlib.pyplot as plt
 
 class DotProductAgglomerativeClustering:
     """ 
-    Perform agglomerative clustering using dot product as the distance metric.  
-    Parameters  
-    ----------  
-    metric : str    
-        The metric to use. Options are 'dot_product' or any metric supported by scikit-learn.
-    linkage : str   
-        The linkage criterion to use. Options are 'ward', 'complete', 'average', 'single'.
-    distance_threshold : float  
-        The linkage distance threshold above which, clusters will not be merged.
-    n_clusters : int    
-        The number of clusters to form. 
+    Perform hierarchical clustering using dot product as the metric.    
     
-    Returns 
-    ------- 
-    model : sklearn.cluster.AgglomerativeClustering 
-        The fitted model.   
+    Parameters: 
+    ----------  
+    metric : str, optional  
+        The metric to use for clustering.   
+    linkage : str, optional 
+        The linkage criterion to use.
+    distance_threshold : float, optional    
+        The linkage distance threshold above which, clusters will not be merged.
+    n_clusters : int, optional  
+        The number of clusters to find.
+        
+    Attributes: 
+    ----------  
+    distances_ : ndarray    
+        The distances between the clusters. 
+    children_ : ndarray 
+        The children of each non-leaf node.
+    labels_ : ndarray   
+        The labels of each point.
+    n_clusters_ : int   
+        The number of clusters.
+    n_connected_components_ : int   
+        The number of connected components. 
+    n_leaves_ : int 
+        The number of leaves.
+    n_features_in_ : int    
+        The number of features seen during fit.
+    n_clusters_ : int   
+        The number of clusters.
     """
     def __init__(self, metric='dot_product', linkage='average', distance_threshold=0, n_clusters=None):
         self.metric = metric
@@ -37,37 +52,41 @@ class DotProductAgglomerativeClustering:
         self.distance_threshold = distance_threshold
         self.n_clusters = n_clusters
         self.model = None
+        
 
     def fit(self, X):
-        if self.metric == 'dot_product':
-            metric = self._ip_metric
-        else:
-            metric = self.metric
-
-        self.model = AgglomerativeClustering(
-            metric='precomputed' if self.metric == 'dot_product' else self.metric,
+        model = AgglomerativeClustering(
+            metric=self._ip_metric if self.metric == 'dot_product' else self.metric,
             linkage=self.linkage,
             distance_threshold=self.distance_threshold,
             n_clusters=self.n_clusters
         )
-        
-        # If using dot product, we need to precompute the distance matrix
-        if self.metric == 'dot_product':
-            distance_matrix = self._ip_metric(X)
-            self.model.fit(distance_matrix)
-        else:
-            self.model.fit(X)
+        model.fit(X)
         
         # If distances_ attribute is available, adjust it as specified
-        if hasattr(self.model, 'distances_'):
-            self.model.distances_ = -self.model.distances_
+        if hasattr(model, 'distances_'):
+            self.distances_ = -model.distances_
+        if hasattr(model, 'distances_'):
+            self.children_ = model.children_
+        if hasattr(model, 'labels_'):
+            self.labels_ = model.labels_    
+        if hasattr(model, 'n_clusters_'):
+            self.n_clusters_ = model.n_clusters_
+        if hasattr(model, 'n_connected_components_'):   
+            self.n_connected_components_ = model.n_connected_components_    
+        if hasattr(model, 'n_leaves_'): 
+            self.n_leaves_ = model.n_leaves_    
+        if hasattr(model, 'n_features_in_'):    
+            self.n_features_in_ = model.n_features_in_  
+        if hasattr(model, 'n_clusters_'):   
+            self.n_clusters_ = model.n_clusters_    
         
-        return self.model
+        self = model
+        return self
 
     @staticmethod
     def _ip_metric(X):
         return -(X @ X.T)
-    
 def get_ranking(model):
     """ 
     Get the ranking of the samples. 
