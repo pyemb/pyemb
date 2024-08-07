@@ -58,7 +58,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
 
 
-def embed(Y, d=10, version='sqrt', right_embedding=False, make_laplacian=False, regulariser=0):
+def embed(Y, d=50, version='sqrt', right_embedding=False, make_laplacian=False, regulariser=0):
     """ 
     Embed a matrix.   
 
