@@ -215,7 +215,10 @@ def plot_embedding_snapshots(
             subplot = axs[t_row, t_col]
 
         subplot.scatter(
-            emb[t, :, 0], emb[t, :, 1], c=pd.factorize(node_labels)[0], cmap="tab20"
+            emb[t, :, 0],
+            emb[t, :, 1],
+            c=pd.factorize(node_labels)[0],
+            cmap="tab20",
         )
 
         if len(point_labels) > 0:
