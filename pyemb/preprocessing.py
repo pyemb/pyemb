@@ -15,7 +15,7 @@ from ._utils import  _symmetric_dilation, _count_based_on_keys
 def _ensure_stopwords_downloaded():
     try:
         nltk.data.find('corpora/stopwords')
-    except LookupError:
+    except LookupErrorx:
         nltk.download('stopwords')
 
 
