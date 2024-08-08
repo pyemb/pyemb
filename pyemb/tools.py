@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 from scipy import linalg
@@ -133,7 +134,7 @@ def degree_correction(X):
     return Y
 
 
-def plot_embedding(ya, n, T, node_labels, return_df=False, title=None):
+def plot_dyn_embedding(ya, n, T, node_labels, return_df=False, title=None):
     """
     Produces an animated plot of a dynamic embedding ya
 
@@ -183,3 +184,47 @@ def plot_embedding(ya, n, T, node_labels, return_df=False, title=None):
     fig.show()
     if return_df:
         return yadf
+
+
+def plot_embedding_snapshots(
+    emb, n, node_labels, points_of_interest, point_labels=[], max_cols=4
+):
+
+    # Subplot for each time point
+    num_cols = min(len(points_of_interest), max_cols)
+    num_rows = (len(points_of_interest) + num_cols - 1) // num_cols
+    fig, axs = plt.subplots(
+        figsize=(5 * num_cols, 5 * num_rows),
+        sharex=True,
+        sharey=True,
+        ncols=num_cols,
+        nrows=num_rows,
+    )
+
+    if len(emb.shape) == 2:
+        T = emb.shape[0] // n
+        emb = emb.reshape(T, n, emb.shape[1])
+
+    for t_idx, t in enumerate(points_of_interest):
+
+        if num_rows == 1:
+            subplot = axs[t_idx]
+        else:
+            t_row = t_idx // num_cols
+            t_col = t_idx % num_cols
+            subplot = axs[t_row, t_col]
+
+        subplot.scatter(
+            emb[t, :, 0], emb[t, :, 1], c=pd.factorize(node_labels)[0], cmap="tab20"
+        )
+
+        if len(point_labels) > 0:
+            subplot.set_title(point_labels[t_idx])
+        else:
+            subplot.set_title(f"Time {t}")
+
+        subplot.grid(alpha=0.2)
+        subplot.set_xticklabels([])
+        subplot.set_yticklabels([])
+
+    return fig

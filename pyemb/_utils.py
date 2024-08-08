@@ -3,7 +3,7 @@ from scipy import sparse
 import numpy as np
 
 
-def zero_matrix(m, n=None):
+def _zero_matrix(m, n=None):
     """
     Create a zero matrix.
     """
@@ -19,7 +19,7 @@ def _symmetric_dilation(M):
     """
     m, n = M.shape
     D = sparse.vstack(
-        [sparse.hstack([zero_matrix(m), M]), sparse.hstack([M.T, zero_matrix(n)])]
+        [sparse.hstack([_zero_matrix(m), M]), sparse.hstack([M.T, _zero_matrix(n)])]
     )
     return D
 
