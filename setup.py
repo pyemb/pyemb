@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(name='pyemb',
-      version='1.0.0a0',
+      version='1.0.0a2',
       author='Annie Gray',
       author_email='annie.gray@bristol.ac.uk',
       description='EDA for complex data',
       long_description=open('README.md').read(),
       long_description_content_type='text/markdown',
       url='https://github.com/pyemb/pyemb',
-      # packages=find_packages(),
+      packages=['pyemb'],
       classifiers=[
           'Programming Language :: Python :: 3',
           'License :: OSI Approved :: MIT License',
