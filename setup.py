@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pyemb',
-      version='1.0.0a2',
+      version='1.0.0a3',
       author='Annie Gray',
       author_email='annie.gray@bristol.ac.uk',
       description='EDA for complex data',
