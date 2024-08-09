@@ -12,6 +12,7 @@ def _zero_matrix(m, n=None):
     M = sparse.coo_matrix(([], ([], [])), shape=(m, n))
     return M
 
+
 def _symmetric_dilation(M):
     """
     Dilate a matrix to a symmetric matrix.
@@ -19,7 +20,9 @@ def _symmetric_dilation(M):
     m, n = M.shape
     D = sparse.vstack([sparse.hstack([_zero_matrix(m), M]),
                       sparse.hstack([M.T, _zero_matrix(n)])])
+
     return D
+
 
 def _count_based_on_keys(list_of_dicts, selected_keys):
     if isinstance(selected_keys, str):
@@ -27,9 +30,9 @@ def _count_based_on_keys(list_of_dicts, selected_keys):
     elif len(selected_keys) == 1:
         counts = Counter(d[selected_keys[0]] for d in list_of_dicts)
     else:
-        counts = Counter(tuple(d[key] for key in selected_keys)
-                         for d in list_of_dicts)
+        counts = Counter(tuple(d[key] for key in selected_keys) for d in list_of_dicts)
     return counts
+
 
 def _safe_inv_sqrt(a, tol=1e-12):
     """
@@ -40,4 +43,3 @@ def _safe_inv_sqrt(a, tol=1e-12):
     b[np.isinf(b)] = 0
     b[a < tol] = 0
     return b
-
