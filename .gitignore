@@ -5,3 +5,5 @@ build/
 dist/
 *.egg-info/
 *.pyc
+test.ipynb
+pyemb/__pycache__/

@@ -18,9 +18,9 @@ def _symmetric_dilation(M):
     Dilate a matrix to a symmetric matrix.
     """
     m, n = M.shape
-    D = sparse.vstack(
-        [sparse.hstack([_zero_matrix(m), M]), sparse.hstack([M.T, _zero_matrix(n)])]
-    )
+    D = sparse.vstack([sparse.hstack([_zero_matrix(m), M]),
+                      sparse.hstack([M.T, _zero_matrix(n)])])
+
     return D
 
 
