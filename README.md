@@ -6,7 +6,7 @@ Please read the documentation here.
 
 To install the package: 
 ```bash
-pip install git+https://git@github.com/anniegray52/pyemb.git
+pip install pyemb
 ```
 
 ## Citation

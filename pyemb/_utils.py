@@ -3,13 +3,22 @@ from scipy import sparse
 import numpy as np
 
 
+def _zero_matrix(m, n=None):
+    """
+    Create a zero matrix.
+    """
+    if n == None:
+        n = m
+    M = sparse.coo_matrix(([], ([], [])), shape=(m, n))
+    return M
+
 def _symmetric_dilation(M):
     """
     Dilate a matrix to a symmetric matrix.
     """
     m, n = M.shape
-    D = sparse.vstack([sparse.hstack([zero_matrix(m), M]),
-                      sparse.hstack([M.T, zero_matrix(n)])])
+    D = sparse.vstack([sparse.hstack([_zero_matrix(m), M]),
+                      sparse.hstack([M.T, _zero_matrix(n)])])
     return D
 
 def _count_based_on_keys(list_of_dicts, selected_keys):
