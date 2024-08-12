@@ -3,4 +3,4 @@
 
 
 ## ==== Annie 
-- go through dynamic code with ed to eliminate: (1) repeated code (safe_inv_sqrt, to_laplacian), (2) any functions that shouldn't be in documentation need _ (3) consistent in our input arguments: return_left (4) redundancy in the UASE/embed function? 
+- go through dynamic code with ed to eliminate: (1) repeated code (safe_inv_sqrt, to_laplacian), (2) any functions that shouldn't be in documentation need _ (3) consistent in our input arguments: return_left (4) redundancy in the UASE/embed function? (5) animation in lyon  (6) should plotting be in its own module? all _ function in utils? 
