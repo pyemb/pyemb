@@ -9,44 +9,50 @@ from textblob import Word
 from copy import deepcopy
 from tqdm import tqdm
 
-from ._utils import  _symmetric_dilation, _count_based_on_keys
+from ._utils import _symmetric_dilation, _count_based_on_keys
 
 
 def _ensure_stopwords_downloaded():
     try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        nltk.download('stopwords')
+        nltk.data.find("corpora/stopwords")
+    except LookupErrorx:
+        nltk.download("stopwords")
 
 
-
-def matrix_and_attributes(tables, relationship_cols, same_attribute = False, dynamic_col=None, weight_col=None, join_token='::'):
-    """ 
+def matrix_and_attributes(
+    tables,
+    relationship_cols,
+    same_attribute=False,
+    dynamic_col=None,
+    weight_col=None,
+    join_token="::",
+):
+    """
     Create a graph from a list of tables and relationships.
 
-    Parameters  
-    ----------  
-    tables : list of pandas.DataFrame  
-        The list of tables. 
+    Parameters
+    ----------
+    tables : list of pandas.DataFrame
+        The list of tables.
     relationship_cols : list of lists
-        The list of relationships. Either: Each relationship is a list of two lists, 
+        The list of relationships. Either: Each relationship is a list of two lists,
         each of which contains the names of the columns in the corresponding table. Or, a list of lists and each pair is looked for in each table.
-    same_attribute : bool 
+    same_attribute : bool
         Whether the entities in the columns are from the same attribute.
-    dynamic_col : list of str   
+    dynamic_col : list of str
         The list of dynamic columns.
-    weight_col : list of str    
+    weight_col : list of str
         The list of weight columns.
-    join_token : str    
-        The token used to join the names of the partitions and the names of the nodes.    
+    join_token : str
+        The token used to join the names of the partitions and the names of the nodes.
 
-    Returns 
-    ------- 
-    A : scipy.sparse.csr_matrix 
+    Returns
+    -------
+    A : scipy.sparse.csr_matrix
         The adjacency matrix of the graph.
-    attributes : list of lists  
-        The attributes of the nodes. The first list contains the attributes 
-        of the nodes in the rows. The second list contains 
+    attributes : list of lists
+        The attributes of the nodes. The first list contains the attributes
+        of the nodes in the rows. The second list contains
         the attributes of the nodes in the columns.
     """
     # Ensure data and relationship_cols are in list format
@@ -73,88 +79,112 @@ def matrix_and_attributes(tables, relationship_cols, same_attribute = False, dyn
         weight_col = weight_col * len(tables)
 
     edge_list = _create_edge_list(
-        tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col)
+        tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col
+    )
     nodes, partitions, times, node_ids, time_ids = _extract_node_time_info(
-        edge_list, join_token)
+        edge_list, join_token
+    )
 
     edge_list = _transform_edge_data(edge_list, node_ids, time_ids, len(nodes))
     A = _create_adjacency_matrix(edge_list, len(nodes), len(times), weight_col)
     attributes = _create_node_attributes(
-        nodes, partitions, times, len(nodes), len(times))
+        nodes, partitions, times, len(nodes), len(times)
+    )
 
     return A.tocsr(), attributes
 
 
+def unfolded_to_list(A):
+    """
+    Takes a (n x nT) unfolded matrix and splits it into a T-length list of (n x n) adjacency matrices.
 
-def _create_edge_list(tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col):
-    """ 
-    Create an edge list from a list of tables and relationships.    
+    Parameters
+    ----------
+    A : scipy.sparse.csr_matrix (n, n*T)
+        The unfolded adjacency matrix.
 
-    Parameters  
-    ----------  
-    tables : list of pandas.DataFrame   
+    Returns
+    -------
+    As : list of scipy.sparse.csr_matrix
+        The list of adjacency matrices.
+    """
+    n, nT = A.shape
+    T = nT // n
+    As = [A[:, i * n : (i + 1) * n] for i in range(T)]
+    return As
+
+
+def _create_edge_list(
+    tables, relationship_cols, same_attribute, dynamic_col, join_token, weight_col
+):
+    """
+    Create an edge list from a list of tables and relationships.
+
+    Parameters
+    ----------
+    tables : list of pandas.DataFrame
         The list of tables.
-    relationship_cols : list of lists   
+    relationship_cols : list of lists
         The list of relationships. Each relationship is a list of two lists,
-        each of which contains the names of the columns in the corresponding table. 
-    dynamic_col : list of str   
+        each of which contains the names of the columns in the corresponding table.
+    dynamic_col : list of str
         The list of dynamic columns.
     join_token : str
         The token used to join the names of the partitions and the names of the nodes.
-    weight_col : list of str    
+    weight_col : list of str
         The list of weight columns.
 
-    Returns 
-    ------- 
-    edge_list : pandas.DataFrame    
+    Returns
+    -------
+    edge_list : pandas.DataFrame
         The edge list.
     """
 
     edge_list = []
-    for data0, relationship_cols0, dynamic_col0, weight_col0 in tqdm(zip(tables, relationship_cols, dynamic_col, weight_col)):
+    for data0, relationship_cols0, dynamic_col0, weight_col0 in tqdm(
+        zip(tables, relationship_cols, dynamic_col, weight_col)
+    ):
         for partition_pair in relationship_cols0:
             if set(partition_pair).issubset(data0.columns):
 
                 cols = deepcopy(partition_pair)
-                colnames = ['V1', 'V2']
+                colnames = ["V1", "V2"]
 
                 if dynamic_col0:
                     cols.append(dynamic_col0)
                 if weight_col0:
                     cols.append(weight_col0)
-                    colnames.append('W')
+                    colnames.append("W")
 
-                pair_data = deepcopy(
-                    data0[cols].drop_duplicates())
+                pair_data = deepcopy(data0[cols].drop_duplicates())
                 if not dynamic_col0:
-                    pair_data['T'] = np.nan
-                colnames.append('T')
+                    pair_data["T"] = np.nan
+                colnames.append("T")
 
                 pair_data.columns = colnames
 
                 if not same_attribute:
                     p1 = partition_pair[0]
                     p2 = partition_pair[1]
-                else: 
+                else:
                     p1 = p2 = partition_pair[0]
-                pair_data['V1'] = [
-                    f"{p1}{join_token}{x}" for x in pair_data['V1']]
-                pair_data['V2'] = [
-                    f"{p2}{join_token}{x}" for x in pair_data['V2']]
-                pair_data['P1'] = partition_pair[0]
-                pair_data['P2'] = partition_pair[1]
+                pair_data["V1"] = [f"{p1}{join_token}{x}" for x in pair_data["V1"]]
+                pair_data["V2"] = [f"{p2}{join_token}{x}" for x in pair_data["V2"]]
+                pair_data["P1"] = partition_pair[0]
+                pair_data["P2"] = partition_pair[1]
 
                 edge_list.append(pair_data)
                 # print(partition_pair)
     return pd.concat(edge_list)
 
+
 def _extract_node_time_info(edge_list, join_token):
     """
     Not used by the user.
     """
-    nodes = sorted(set(edge_list['V1']).union(edge_list['V2']))
+    nodes = sorted(set(edge_list["V1"]).union(edge_list["V2"]))
     partitions = [node.split(join_token)[0] for node in nodes]
-    times = sorted(set(edge_list['T'].unique()))
+    times = sorted(set(edge_list["T"].unique()))
     # times = sorted(set(edge_list['T']))
     node_ids = {node: idx for idx, node in enumerate(nodes)}
     time_ids = {time: idx for idx, time in enumerate(times)}
@@ -165,11 +195,11 @@ def _transform_edge_data(edge_list, node_ids, time_ids, n_nodes):
     """
     Not used by the user.
     """
-    edge_list['V_ID1'] = edge_list['V1'].map(node_ids)
-    edge_list['V_ID2'] = edge_list['V2'].map(node_ids)
-    edge_list['T_ID'] = edge_list['T'].map(time_ids)
-    edge_list['X_ID1'] = edge_list['T_ID'] * n_nodes + edge_list['V_ID1']
-    edge_list['X_ID2'] = edge_list['T_ID'] * n_nodes + edge_list['V_ID2']
+    edge_list["V_ID1"] = edge_list["V1"].map(node_ids)
+    edge_list["V_ID2"] = edge_list["V2"].map(node_ids)
+    edge_list["T_ID"] = edge_list["T"].map(time_ids)
+    edge_list["X_ID1"] = edge_list["T_ID"] * n_nodes + edge_list["V_ID1"]
+    edge_list["X_ID2"] = edge_list["T_ID"] * n_nodes + edge_list["V_ID2"]
     return edge_list
 
 
@@ -177,13 +207,15 @@ def _create_adjacency_matrix(edge_list, n_nodes, n_times, weight_col):
     """
     Not used by the user.
     """
-    row_indices = pd.concat([edge_list['V_ID1'], edge_list['V_ID2']])
-    col_indices = pd.concat([edge_list['X_ID2'], edge_list['X_ID1']])
+    row_indices = pd.concat([edge_list["V_ID1"], edge_list["V_ID2"]])
+    col_indices = pd.concat([edge_list["X_ID2"], edge_list["X_ID1"]])
     if weight_col[0]:
-        values = pd.concat([edge_list['W'], edge_list['W']])
+        values = pd.concat([edge_list["W"], edge_list["W"]])
     else:
         values = np.ones(2 * len(edge_list))
-    return sparse.coo_matrix((values, (row_indices, col_indices)), shape=(n_nodes, n_nodes * n_times))
+    return sparse.coo_matrix(
+        (values, (row_indices, col_indices)), shape=(n_nodes, n_nodes * n_times)
+    )
 
 
 def _create_node_attributes(nodes, partitions, times, n_nodes, n_times):
@@ -192,13 +224,18 @@ def _create_node_attributes(nodes, partitions, times, n_nodes, n_times):
     """
     time_attrs = np.repeat(times, n_nodes)
     attributes = [
-        [{'name': name, 'partition': partition, 'time': np.nan}
-            for name, partition in zip(nodes, partitions)],
-        [{'name': name, 'partition': partition, 'time': time} for name, partition,
-            time in zip(nodes * n_times, partitions * n_times, time_attrs)]
+        [
+            {"name": name, "partition": partition, "time": np.nan}
+            for name, partition in zip(nodes, partitions)
+        ],
+        [
+            {"name": name, "partition": partition, "time": time}
+            for name, partition, time in zip(
+                nodes * n_times, partitions * n_times, time_attrs
+            )
+        ],
     ]
     return attributes
-
 
 
 def find_subgraph(A, attributes, subgraph_attributes):
@@ -258,7 +295,9 @@ def find_subgraph(A, attributes, subgraph_attributes):
             if matched:
                 subgraph_node_indices_col.append(node_idx)
 
-    subgraph_A, subgraph_attributes = _subgraph_idx(A, attributes, subgraph_node_indices_row, subgraph_node_indices_col)
+    subgraph_A, subgraph_attributes = _subgraph_idx(
+        A, attributes, subgraph_node_indices_row, subgraph_node_indices_col
+    )
 
     return subgraph_A, subgraph_attributes
 
@@ -270,7 +309,7 @@ def _subgraph_idx(A, attributes, idx0, idx1):
     subgraph_A = A[np.ix_(idx0, idx1)]
     subgraph_attributes = [
         [attributes[0][i] for i in idx0],
-        [attributes[1][i] for i in idx1]
+        [attributes[1][i] for i in idx1],
     ]
     return subgraph_A, subgraph_attributes
 
@@ -303,7 +342,7 @@ def find_connected_components(A, attributes, n_components=None):
     A_dilation = _symmetric_dilation(A)
     _, cc = sparse.csgraph.connected_components(A_dilation)
     print(f"Number of connected components: {_}")
-    cc = [cc[:A.shape[0]], cc[A.shape[0]:]]
+    cc = [cc[: A.shape[0]], cc[A.shape[0] :]]
     if n_components == None:
         n_components = _
     cc_As = []
@@ -315,8 +354,7 @@ def find_connected_components(A, attributes, n_components=None):
         for i in range(n_components):
             idx0 = np.where(cc[0] == i)[0]
             idx1 = np.where(cc[1] == i)[0]
-            store_cc_A, store_cc_attributes = _subgraph_idx(
-                A, attributes, idx0, idx1)
+            store_cc_A, store_cc_attributes = _subgraph_idx(A, attributes, idx0, idx1)
             cc_As.append(store_cc_A)
             cc_attributes.append(store_cc_attributes)
 
@@ -324,8 +362,8 @@ def find_connected_components(A, attributes, n_components=None):
 
 
 def largest_cc_of(A, attributes, partition, dynamic=False):
-    """ 
-    Find the connected component containing the most nodes from a partition.    
+    """
+    Find the connected component containing the most nodes from a partition.
 
     Parameters
     ----------
@@ -355,12 +393,13 @@ def largest_cc_of(A, attributes, partition, dynamic=False):
     else:
         attrs = [att[1] for att in cc_attributes]
 
-    counts = [_count_based_on_keys(att, 'partition') for att in attrs]
+    counts = [_count_based_on_keys(att, "partition") for att in attrs]
     select_idx = np.argmax([c.get(partition, 0) for c in counts])
     return cc_As[select_idx], cc_attributes[select_idx]
 
+
 def to_networkx(A, attributes, symmetric=None):
-    """ 
+    """
     Convert a multipartite graph to a networkx graph.
     """
     if symmetric is None:
@@ -375,79 +414,83 @@ def to_networkx(A, attributes, symmetric=None):
         G_nx = nx.Graph(_symmetric_dilation(A))
         nx.set_node_attributes(G_nx, {i: a for i, a in enumerate(attributes[0])})
         nx.set_node_attributes(G_nx, {i + n0: a for i, a in enumerate(attributes[1])})
-        nx.set_node_attributes(G_nx, {i: {'bipartite': 0} for i in range(n0)})
-        nx.set_node_attributes(G_nx, {i + n0: {'bipartite': 1} for i in range(n1)})
+        nx.set_node_attributes(G_nx, {i: {"bipartite": 0} for i in range(n0)})
+        nx.set_node_attributes(G_nx, {i + n0: {"bipartite": 1} for i in range(n1)})
     return G_nx
 
 
 def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
-    """ 
-    Create a matrix from a time series. 
+    """
+    Create a matrix from a time series.
 
-    Parameters  
-    ----------  
-    data : pandas.DataFrame  
-        The data to be used to create the matrix.   
-    time_col : str  
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The data to be used to create the matrix.
+    time_col : str
         The name of the column containing the time information.
-    drop_nas : bool 
+    drop_nas : bool
         Whether to drop rows with missing values.
 
-    Returns 
-    ------- 
-    Y : numpy.ndarray   
+    Returns
+    -------
+    Y : numpy.ndarray
         The matrix created from the time series.
-    attributes : list of lists  
+    attributes : list of lists
         The attributes of the nodes. The first list contains the attributes
         of the nodes in rows. The second list contains
         the attributes of the nodes in the columns.
     """
     data = data.sort_values(by=time_col)
     if drop_nas:
-        data = data.dropna(axis=1, how='any')
+        data = data.dropna(axis=1, how="any")
 
     times = list(data[time_col])
     data.drop([time_col], axis=1, inplace=True)
     ids = list(data.columns)
 
     Y = np.array(data).T
-    attributes = [
-        [{'name': i} for i in ids], [{'time': i} for i in times]
-    ]
+    attributes = [[{"name": i} for i in ids], [{"time": i} for i in times]]
     return Y, attributes
 
 
-def text_matrix_and_attributes(data, column_name, remove_stopwords=True, clean_text=True,
-                     remove_email_addresses=False, update_stopwords=None,
-                     **kwargs):
+def text_matrix_and_attributes(
+    data,
+    column_name,
+    remove_stopwords=True,
+    clean_text=True,
+    remove_email_addresses=False,
+    update_stopwords=None,
+    **kwargs,
+):
     """
-    Create a matrix from a column of text data. 
+    Create a matrix from a column of text data.
 
-    Parameters  
-    ----------  
-    data : pandas.DataFrame  
-        The data to be used to create the matrix.   
-    column_name : str   
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        The data to be used to create the matrix.
+    column_name : str
         The name of the column containing the text data.
-    remove_stopwords : bool 
+    remove_stopwords : bool
         Whether to remove stopwords.
-    clean_text : bool   
-        Whether to clean the text data.     
-    remove_email_addresses : bool   
-        Whether to remove email addresses.  
-    update_stopwords : list of str  
-        The list of additional stopwords to be removed.    
-    kwargs : dict   
-        Other arguments to be passed to sklearn.feature_extraction.text.TfidfVectorizer.    
+    clean_text : bool
+        Whether to clean the text data.
+    remove_email_addresses : bool
+        Whether to remove email addresses.
+    update_stopwords : list of str
+        The list of additional stopwords to be removed.
+    kwargs : dict
+        Other arguments to be passed to sklearn.feature_extraction.text.TfidfVectorizer.
 
-    Returns 
-    ------- 
-    Y : numpy.ndarray   
-        The matrix created from the text data.  
-    attributes : list of lists  
+    Returns
+    -------
+    Y : numpy.ndarray
+        The matrix created from the text data.
+    attributes : list of lists
         The attributes of the nodes. The first list contains the attributes
         of the nodes in rows. The second list contains
-        the attributes of the nodes in the columns. 
+        the attributes of the nodes in the columns.
     """
 
     _ensure_stopwords_downloaded()
@@ -472,24 +515,26 @@ def text_matrix_and_attributes(data, column_name, remove_stopwords=True, clean_t
     Y = vectorizer.fit_transform(data[column_name])
 
     # attributes
-    row_attrs = [{'document': i} for i in data.index]
-    col_attrs = [{'term': i} for i in vectorizer.get_feature_names_out()]
+    row_attrs = [{"document": i} for i in data.index]
+    col_attrs = [{"term": i} for i in vectorizer.get_feature_names_out()]
 
     return Y, [row_attrs, col_attrs]
-
-
 
 
 def _del_email_address(text):
     """
     Not used by user."""
-    e = '\S*@\S*\s?'
+    e = "\S*@\S*\s?"
     pattern = compile(e)
-    return pattern.sub('', text)
+    return pattern.sub("", text)
 
 
 def _clean_text_(text):
     """
     Not used by user."""
-    return " ".join([Word(word).lemmatize() for word in sub("[^A-Za-z0-9]+", " ", text).lower().split()])
-
+    return " ".join(
+        [
+            Word(word).lemmatize()
+            for word in sub("[^A-Za-z0-9]+", " ", text).lower().split()
+        ]
+    )

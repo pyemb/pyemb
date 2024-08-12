@@ -1,0 +1,1 @@
+- [ ] Warning thrown when embedding the school data bc there's more than one connected component - is this warning always needed?
