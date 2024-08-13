@@ -101,8 +101,11 @@ def embed(
         A = Y[0]
         T = len(Y)
         for t in range(1, T):
-            A = sparse.hstack((A, Y[t]))
+            A = np.hstack((A, Y[t]))
         Y = A
+
+    if Y.dtype != float:
+        Y = Y.astype(float)
 
     else:
         num_components = sparse.csgraph.connected_components(
@@ -138,7 +141,9 @@ def embed(
                 YA = np.zeros((T, n, d))
                 for t in range(T):
                     YA[t, :, :] = right_embedding[n * t : n * (t + 1), :]
+
                 right_embedding = YA
+
         return left_embedding, right_embedding
     else:
         return left_embedding
@@ -472,6 +477,12 @@ def dyn_embed(
     Exception
         If the specified method is not recognized.
     """
+
+    # Make sure each is float
+    for t in range(len(As)):
+        if As[t].dtype != float:
+            As[t] = As[t].astype(float)
+
     # Check if As is sparse
     if sparse.issparse(As[0]):
         sparse_matrix = True

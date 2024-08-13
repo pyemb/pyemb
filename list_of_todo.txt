@@ -1,6 +1,18 @@
+## ==== Ed
+
+** Quality of life
 - [ ] Warning thrown when embedding the school data bc there's more than one connected component - is this warning always needed?
 
-- [ ] Fix the mistake with the school labels! Legend has the wrong colours for labels
+** Bugs
+- [ ] School legend has the wrong colours for labels
+- [ ] dyn_embed returns the wrong shape when flat=False and when using any method that called embed()
+- [X] embed() errors when given a matrix of ints
+
+** Testing
+- [ ] Add in a test for each bug 
+
+** To implement
+- [ ] A load of Ian's network generation functions from spectral_embedding
 
 
 
