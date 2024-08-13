@@ -3,18 +3,20 @@ import plotly.express as px
 import numpy as np
 import pandas as pd
 
-def quick_plot(ya, n, T = 1, node_labels = None, return_df=False, **kwargs):
+
+def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
     """
-    Produces an animated plot of a dynamic embedding ya
+    Produces an interactive plot an embedding.
+    If the embedding is dynamic (i.e. T > 1), then the embedding will be animated over time.
 
     Parameters
     ----------
-    ya : numpy.ndarray (n*T, d) or (T, n, d)
+    embedding : numpy.ndarray (n*T, d) or (T, n, d)
         The dynamic embedding.
     n : int
         The number of nodes.
     T : int
-        The number of time points.
+        The number of time points (> 1 animates the embedding).
     node_labels : list of length n
         The labels of the nodes (time-invariant).
     return_df : bool (optional)
@@ -22,47 +24,62 @@ def quick_plot(ya, n, T = 1, node_labels = None, return_df=False, **kwargs):
     title : str (optional)
         The title of the plot.
 
-    Returns
-    -------
-    yadf : pandas.DataFrame (optional)
-        The plotting dataframe
-
     """
-    if len(ya.shape) == 3:
-        ya = ya.reshape((n * T, -1))
-        
+    if len(embedding.shape) == 3:
+        embedding = embedding.reshape((n * T, -1))
+
     if node_labels is None:
         node_labels = np.ones((n,))
 
-    yadf = pd.DataFrame(ya[:, 0:2])
-    yadf.columns = ["Dimension {}".format(i + 1) for i in range(yadf.shape[1])]
-    yadf["Time"] = np.repeat([t for t in range(T)], n)
-    yadf["Label"] = list(node_labels) * T
-    yadf["Label"] = yadf["Label"].astype(str)
-    pad_x = (max(ya[:, 0]) - min(ya[:, 0])) / 50
-    pad_y = (max(ya[:, 1]) - min(ya[:, 1])) / 50
+    embeddingdf = pd.DataFrame(embedding[:, 0:2])
+    embeddingdf.columns = [
+        "Dimension {}".format(i + 1) for i in range(embeddingdf.shape[1])
+    ]
+    embeddingdf["Time"] = np.repeat([t for t in range(T)], n)
+    embeddingdf["Label"] = list(node_labels) * T
+    embeddingdf["Label"] = embeddingdf["Label"].astype(str)
+    pad_x = (max(embedding[:, 0]) - min(embedding[:, 0])) / 50
+    pad_y = (max(embedding[:, 1]) - min(embedding[:, 1])) / 50
     fig = px.scatter(
-        yadf,
+        embeddingdf,
         x="Dimension 1",
         y="Dimension 2",
         color="Label",
         animation_frame="Time",
-        range_x=[min(ya[:, 0]) - pad_x, max(ya[:, 0]) + pad_x],
-        range_y=[min(ya[:, 1]) - pad_y, max(ya[:, 1]) + pad_y],
-        **kwargs
+        range_x=[min(embedding[:, 0]) - pad_x, max(embedding[:, 0]) + pad_x],
+        range_y=[min(embedding[:, 1]) - pad_y, max(embedding[:, 1]) + pad_y],
+        **kwargs,
     )
 
     fig.show()
-    if return_df:
-        return yadf
 
-
-import matplotlib.pyplot as plt
-import pandas as pd
 
 def snapshot_plot(
-    emb, n, node_labels, points_of_interest, point_labels=[], max_cols=4, **kwargs
+    embedding, n, node_labels, points_of_interest, point_labels=[], max_cols=4, **kwargs
 ):
+    """
+    Plots the selected embedding snapshots as a grid of scatter plots.
+
+    Parameters
+    ----------
+    embedding : numpy.ndarray (T, n, d) or (n*T, d)
+        The dynamic embedding.
+    n : int
+        The number of nodes.
+    node_labels : list of length n
+        The labels of the nodes (time-invariant).
+    points_of_interest : list of int
+        The time point indices to plot.
+    point_labels : list of str (optional)
+        The labels of the points of interest.
+    max_cols : int (optional)
+        The maximum number of columns in the scatter plot grid.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure object.
+    """
 
     # Subplot for each time point
     num_cols = min(len(points_of_interest), max_cols)
@@ -75,9 +92,9 @@ def snapshot_plot(
         nrows=num_rows,
     )
 
-    if len(emb.shape) == 2:
-        T = emb.shape[0] // n
-        emb = emb.reshape(T, n, emb.shape[1])
+    if len(embedding.shape) == 2:
+        T = embedding.shape[0] // n
+        embedding = embedding.reshape(T, n, embedding.shape[1])
 
     for t_idx, t in enumerate(points_of_interest):
         if num_rows == 1:
@@ -88,10 +105,10 @@ def snapshot_plot(
             subplot = axs[t_row, t_col]
 
         subplot.scatter(
-            emb[t, :, 0],
-            emb[t, :, 1],
+            embedding[t, :, 0],
+            embedding[t, :, 1],
             c=pd.factorize(node_labels)[0],
-            **kwargs
+            **kwargs,
         )
 
         if len(point_labels) > 0:
@@ -109,5 +126,3 @@ def snapshot_plot(
             fig.delaxes(axs.flatten()[idx])
 
     return fig
-
-
