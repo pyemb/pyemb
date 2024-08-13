@@ -4,8 +4,9 @@ from scipy import sparse
 import warnings
 import logging
 import numba as nb
+import ot
 
-from ._utils import _symmetric_dilation
+from ._utils import _symmetric_dilation, _form_omni_matrix_sparse, _form_omni_matrix
 from .tools import to_laplacian
 
 
@@ -31,8 +32,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     try:
         import ot
     except ModuleNotFoundError:
-        logging.error("ot not found, pip install pot")
-    print("tensorflow warnings are seemingly a bug in ot, ignore them")
+        logging.error("ot not found, please install ot package with 'pip install pot'")
 
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
@@ -51,31 +51,31 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     S = np.flip(S)
     Vt = np.flip(Vt, axis=0)
     Ws = []
-    for dim in dims:
+    for dim in tqdm(dims):
         M = ot.dist((Y1 @ Vt.T[:, :dim]) @ Vt[:dim, :], Y2, metric="euclidean")
         Ws.append(ot.emd2(np.repeat(1 / n1, n1), np.repeat(1 / n2, n2), M))
 
-    print(
-        f"Recommended dimension: {dim:np.argmin(Ws)}, Wasserstein distance {np.min(Ws):.5f}"
-    )
+    print(f"Recommended dimension: {np.argmin(Ws)}, Wasserstein distance {Ws[dim]:.5f}")
     return Ws
 
 
 
-def embed(Y, d=50, version='sqrt', right_embedding=False, make_laplacian=False, regulariser=0):
+def embed(Y, d=50, version='sqrt', return_right=False, flat = True, make_laplacian=False, regulariser=0):
     """ 
     Embed a matrix.   
 
     Parameters
     ----------
-    Y : numpy.ndarray
-        The array of matrices.
+    Y : numpy.ndarray or list of numpy.ndarray
+        The matrix to embed. 
     d : int
         The number of dimensions to embed into.
     version : str
         The version of the embedding. Options are 'full' or 'sqrt' (default).
-    right_embedding : bool
+    return_right : bool
         Whether to return the right embedding.
+    flat : bool 
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d).
     make_laplacian : bool
         Whether to use the Laplacian matrix.
     regulariser : float
@@ -85,17 +85,23 @@ def embed(Y, d=50, version='sqrt', right_embedding=False, make_laplacian=False, 
     -------
     left_embedding : numpy.ndarray
         The left embedding.
-    right_embedding : numpy.ndarray
-        The right embedding. (only returned if right_embedding=True)
+    right_embedding : numpy.ndarray 
+        The right embedding.  
     """
-
-    # Check if there is more than one connected component
-    num_components = sparse.csgraph.connected_components(
-        _symmetric_dilation(Y), directed=False
-    )[0]
-
-    if num_components > 1:
-        warnings.warn("Warning: More than one connected component in the graph.")
+    
+    if isinstance(Y, list) or (isinstance(Y, np.ndarray) and len(Y.shape) == 3):
+        is_series = True
+        A = Y[0]
+        T = len(Y)
+        for t in range(1, T):
+            A = sparse.hstack((A, Y[t]))
+        Y = A
+        
+    else:
+        num_components = sparse.csgraph.connected_components(
+        _symmetric_dilation(Y), directed=False)[0]
+        if num_components > 1:
+            warnings.warn("Warning: More than one connected component in the graph.")
 
     if version not in ["full", "sqrt"]:
         raise ValueError("version must be full or sqrt (default)")
@@ -116,8 +122,15 @@ def embed(Y, d=50, version='sqrt', right_embedding=False, make_laplacian=False, 
     o = np.argsort(s[::-1])
     left_embedding = u[:, o] @ np.diag(S)
 
-    if right_embedding == True:
+    if return_right == True:
         right_embedding = vT.T[:, o] @ np.diag(S)
+        if is_series:
+            if not flat:
+                n = Y[0].shape[0]
+                YA = np.zeros((T, n, d))
+                for t in range(T):
+                    YA[t, :, :] = right_embedding[n * t : n * (t + 1), :]
+                right_embedding = YA
         return left_embedding, right_embedding
     else:
         return left_embedding
@@ -283,30 +296,6 @@ def UASE(As, d, flat=True, sparse_matrix=False, return_left=False):
         return XA, YA
 
 
-def safe_inv_sqrt(a, tol=1e-12):
-    """Computes the inverse square root, but returns zero if the result is either infinity
-    or below a tolerance"""
-    with np.errstate(divide="ignore"):
-        b = 1 / np.sqrt(a)
-    b[np.isinf(b)] = 0
-    b[a < tol] = 0
-    return b
-
-
-def to_laplacian(A, regulariser=0, verbose=False):
-    """Constructs the (regularised) symmetric Laplacian."""
-    left_degrees = np.reshape(np.asarray(A.sum(axis=1)), (-1,))
-    right_degrees = np.reshape(np.asarray(A.sum(axis=0)), (-1,))
-    if regulariser == "auto":
-        regulariser = np.mean(np.concatenate((left_degrees, right_degrees)))
-        if verbose:
-            print("Auto regulariser: {}".format(regulariser))
-    left_degrees_inv_sqrt = safe_inv_sqrt(left_degrees + regulariser)
-    right_degrees_inv_sqrt = safe_inv_sqrt(right_degrees + regulariser)
-    L = sparse.diags(left_degrees_inv_sqrt) @ A @ sparse.diags(right_degrees_inv_sqrt)
-    return L
-
-
 def regularised_ULSE(
     As,
     d,
@@ -360,70 +349,6 @@ def regularised_ULSE(
         return XA, YA
 
 
-@nb.njit()
-def form_omni_matrix(As, n, T):
-    """
-    Forms the embedding matrix for the omnibus embedding
-    """
-    A = np.zeros((T * n, T * n))
-
-    for t1 in range(T):
-        for t2 in range(T):
-            if t1 == t2:
-                A[t1 * n : (t1 + 1) * n, t1 * n : (t1 + 1) * n] = As[t1]
-            else:
-                A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] = (As[t1] + As[t2]) / 2
-
-    return A
-
-
-def form_omni_matrix_sparse_old(As, n, T, verbose=False):
-    """
-    Forms embedding matrix for the omnibus embedding using sparse matrices
-    """
-    A = sparse.lil_matrix((T * n, T * n))
-
-    if verbose:
-        for t1 in tqdm(range(T)):
-            for t2 in range(T):
-                if t1 == t2:
-                    A[t1 * n : (t1 + 1) * n, t1 * n : (t1 + 1) * n] = As[t1]
-                else:
-                    A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] = (
-                        As[t1] + As[t2]
-                    ) / 2
-
-    else:
-        for t1 in range(T):
-            for t2 in range(T):
-                if t1 == t2:
-                    A[t1 * n : (t1 + 1) * n, t1 * n : (t1 + 1) * n] = As[t1]
-                else:
-                    A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] = (
-                        As[t1] + As[t2]
-                    ) / 2
-
-    return A
-
-
-def form_omni_matrix_sparse(As, n, T, verbose=False):
-    """
-    Forms embedding matrix for the omnibus embedding using sparse matrices
-    """
-    A = sparse.lil_matrix((T * n, T * n))
-
-    for t1 in tqdm(range(T)) if verbose else range(T):
-        for t2 in range(T):
-            if t1 == t2:
-                A[t1 * n : (t1 + 1) * n, t1 * n : (t1 + 1) * n] = As[t1]
-            else:
-                # Perform the averaging operation in-place
-                A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] = As[t1]
-                A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] += As[t2]
-                A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] /= 2
-
-    return A
-
 
 def OMNI(As, d, flat=True, sparse_matrix=False):
     """
@@ -446,9 +371,9 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
 
     # Construct omnibus matrices
     if sparse_matrix:
-        A = form_omni_matrix_sparse(As, n, T)
+        A = _form_omni_matrix_sparse(As, n, T)
     else:
-        A = form_omni_matrix(As, n, T)
+        A = _form_omni_matrix(As, n, T)
 
     # Compute spectral embedding
     UA, SA, _ = sparse.linalg.svds(A, d)
@@ -469,7 +394,7 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
 
 def dyn_embed(
     As,
-    d,
+    d = 50,
     method="UASE",
     regulariser="auto",
     flat=True,
@@ -487,16 +412,16 @@ def dyn_embed(
     elif method.upper() == "ISE PROCRUSTES":
         YA = ISE(As, d, procrustes=True, flat=flat)
     elif method.upper() == "UASE":
-        YA = UASE(As, d, sparse_matrix=sparse_matrix, flat=flat)
+        _, YA = embed(As, d, return_right = True, flat=flat)
     elif method.upper() == "OMNI":
         YA = OMNI(As, d, sparse_matrix=sparse_matrix, flat=flat)
     elif method.upper() == "ULSE":
-        YA = regularised_ULSE(
-            As, d, regulariser=0, sparse_matrix=sparse_matrix, flat=flat
+        _, YA = embed(
+            As, d, return_right=True, regulariser=0, flat=flat, make_laplacian=True
         )
     elif method.upper() == "URLSE":
-        YA = regularised_ULSE(
-            As, d, regulariser=regulariser, sparse_matrix=sparse_matrix, flat=flat
+        _, YA = embed(
+            As, d, return_right=True, regulariser=regulariser, flat=flat, make_laplacian=True
         )
     elif method.upper() == "RANDOM":
         if flat:

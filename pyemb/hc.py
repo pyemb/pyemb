@@ -12,6 +12,8 @@ from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
 
 
+## ========= Dot product based hierarchical clustering ========= ##
+
 class DotProductAgglomerativeClustering:
     """ 
     Perform hierarchical clustering using dot product as the metric.    
@@ -87,6 +89,46 @@ class DotProductAgglomerativeClustering:
     @staticmethod
     def _ip_metric(X):
         return -(X @ X.T)
+    
+## ======= linkage matrix and Kendall's tau similarity ======= ##
+
+def linkage_matrix(model):
+    """ 
+    Convert a hierarchical clustering model to a linkage matrix.    
+    
+    Parameters: 
+    ----------  
+    model : AgglomerativeClustering
+        The fitted model.   
+    get_heights : bool, optional    
+        Whether to return heights or counts.
+    max_height : float, optional    
+        The maximum height of the tree.
+        
+    Returns:    
+    ------- 
+    ndarray
+        The linkage matrix.
+    """ 
+    counts = np.zeros(model.children_.shape[0])
+    n_samples = model.children_.shape[0] + 1
+    for i, merge in enumerate(model.children_):
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
+
+    linkage_matrix = np.column_stack(
+        [model.children_, model.distances_, counts]
+    ).astype(float)
+
+    linkage_matrix[:,:2] = linkage_matrix[:,:2].astype(int)
+    return linkage_matrix
+
+    
 def get_ranking(model):
     """ 
     Get the ranking of the samples. 
@@ -101,7 +143,7 @@ def get_ranking(model):
     mh_rank : numpy.ndarray 
         The ranking of the samples.
     """
-    lm = linkage_matrix(model, rescale=False)
+    lm = linkage_matrix(model)
     cophenetic_dists = squareform(cophenet(lm))
     mh_rank = np.array([rankdata(cophenetic_dists[i], method='dense')
                        for i in range(cophenetic_dists.shape[0])])
@@ -137,163 +179,88 @@ def kendalltau_similarity(model, true_ranking):
     return np.mean(kt)
 
 
-def varimax(Phi, gamma=1, q=20, tol=1e-6):
-    """ 
-    Perform varimax rotation.   
-    
-    Parameters  
-    ----------  
-    Phi : numpy.ndarray 
-        The matrix to rotate.
-    gamma : float, optional 
-        The gamma parameter.
-    q : int, optional   
-        The number of iterations.
-    tol : float, optional   
-        The tolerance.
-        
-    Returns 
-    ------- 
-    numpy.ndarray   
-        The rotated matrix.
-    """ 
-    
-    p, k = Phi.shape
-    R = np.eye(k)
-    d = 0
-    for i in range(q):
-        d_old = d
-        Lambda = np.dot(Phi, R)
-        u, s, vh = np.linalg.svd(np.dot(Phi.T, np.asarray(Lambda)**3 - (gamma/p)
-                                        * np.dot(Lambda, np.diag(np.diag(np.dot(Lambda.T, Lambda))))))
-        R = np.dot(u, vh)
-        d = np.sum(s)
-        if d/d_old < tol:
-            break
-    return np.dot(Phi, R)
 
 
-def plot_HC_clustering(model, node_colours=None, no_merges=None, labels=None, plot_labels=None, internal_node_colour='black',
-                       linewidths=None, edgecolors=None, leaf_node_size=20, fontsize=10, internal_node_size=1, figsize=(10, 10)):
-    """ 
-    Plot the hierarchical clustering tree.    
+# def plot_HC_clustering(model, node_colours=None, no_merges=None, labels=None, plot_labels=None, internal_node_colour='black',
+#                        linewidths=None, edgecolors=None, leaf_node_size=20, fontsize=10, internal_node_size=1, figsize=(10, 10)):
+#     """ 
+#     Plot the hierarchical clustering tree.    
 
-    Parameters  
-    ----------  
-    model : AgglomerativeClustering 
-        The fitted model.   
-    node_colours : array-like, shape (n_samples,)   
-        The colour of the nodes.
-    no_merges : int, optional
-        The number of merges to plot. If None, plot all merges.
-    labels : array-like, shape (n_samples,) 
-        The labels of the samples.
-    plot_labels : bool, optional    
-        Whether to plot the labels.
-    internal_node_colour : str, optional    
-        The colour of the internal nodes.   
-    linewidths : float, optional    
-        The width of the lines. 
-    edgecolors : str, optional  
-        The colour of the edges.
-    leaf_node_size : int, optional  
-        The size of the leaf nodes. 
-    fontsize : int, optional
-        The size of the font.
-    internal_node_size : int, optional  
-        The size of the internal nodes.
-    figsize : tuple, optional   
-        The size of the figure.
+#     Parameters  
+#     ----------  
+#     model : AgglomerativeClustering 
+#         The fitted model.   
+#     node_colours : array-like, shape (n_samples,)   
+#         The colour of the nodes.
+#     no_merges : int, optional
+#         The number of merges to plot. If None, plot all merges.
+#     labels : array-like, shape (n_samples,) 
+#         The labels of the samples.
+#     plot_labels : bool, optional    
+#         Whether to plot the labels.
+#     internal_node_colour : str, optional    
+#         The colour of the internal nodes.   
+#     linewidths : float, optional    
+#         The width of the lines. 
+#     edgecolors : str, optional  
+#         The colour of the edges.
+#     leaf_node_size : int, optional  
+#         The size of the leaf nodes. 
+#     fontsize : int, optional
+#         The size of the font.
+#     internal_node_size : int, optional  
+#         The size of the internal nodes.
+#     figsize : tuple, optional   
+#         The size of the figure.
 
-    Returns 
-    ------- 
-    None    
-    """
+#     Returns 
+#     ------- 
+#     None    
+#     """
 
-    if no_merges is None:
-        no_merges = model.children_.shape[0]
-    if node_colours is None:
-        node_colours = np.repeat('skyblue', model.n_leaves_)
-    if labels is None:
-        labels = np.repeat('', model.children_.shape[0] + model.n_leaves_)
+#     if no_merges is None:
+#         no_merges = model.children_.shape[0]
+#     if node_colours is None:
+#         node_colours = np.repeat('skyblue', model.n_leaves_)
+#     if labels is None:
+#         labels = np.repeat('', model.children_.shape[0] + model.n_leaves_)
 
-    data = model.children_[:no_merges, :]
-    n = model.n_leaves_
+#     data = model.children_[:no_merges, :]
+#     n = model.n_leaves_
 
-    G = nx.Graph()
+#     G = nx.Graph()
 
-    for i in range(data.shape[0]):
-        idx = i + n
-        to_merge = data[i]
-        G.add_edge(to_merge[0], idx)
-        G.add_edge(to_merge[1], idx)
+#     for i in range(data.shape[0]):
+#         idx = i + n
+#         to_merge = data[i]
+#         G.add_edge(to_merge[0], idx)
+#         G.add_edge(to_merge[1], idx)
 
-    node_colours_ = {}
-    node_sizes = {}
-    node_names = {}
-    for node in G.nodes():
-        if node < n:
-            node_colours_[node] = node_colours[node]
-            node_sizes[node] = leaf_node_size
-            node_names[node] = labels[node]
-        else:
-            node_colours_[node] = internal_node_colour
-            node_sizes[node] = internal_node_size
-            node_names[node] = ''
+#     node_colours_ = {}
+#     node_sizes = {}
+#     node_names = {}
+#     for node in G.nodes():
+#         if node < n:
+#             node_colours_[node] = node_colours[node]
+#             node_sizes[node] = leaf_node_size
+#             node_names[node] = labels[node]
+#         else:
+#             node_colours_[node] = internal_node_colour
+#             node_sizes[node] = internal_node_size
+#             node_names[node] = ''
 
-    # Draw the graph with node sizes and names
-    plt.figure(figsize=figsize)  # Adjust figure size
+#     # Draw the graph with node sizes and names
+#     plt.figure(figsize=figsize)  # Adjust figure size
 
-    positions = nx.nx_agraph.graphviz_layout(G, prog="sfdp")
-    nx.draw(G, positions, with_labels=False, node_size=[
-            node_sizes[node] for node in G.nodes()], node_color=[
-            node_colours_[node] for node in G.nodes()], edgecolors=edgecolors, linewidths=linewidths)
+#     positions = nx.nx_agraph.graphviz_layout(G, prog="sfdp")
+#     nx.draw(G, positions, with_labels=False, node_size=[
+#             node_sizes[node] for node in G.nodes()], node_color=[
+#             node_colours_[node] for node in G.nodes()], edgecolors=edgecolors, linewidths=linewidths)
 
-    nx.draw_networkx_labels(
-        G, positions, labels=node_names, font_size=fontsize)
-    plt.show()
+#     nx.draw_networkx_labels(
+#         G, positions, labels=node_names, font_size=fontsize)
+#     plt.show()
 
-## SORT OUT 
-def linkage_matrix(model, rescale=False):
-    """ 
-    Get the linkage matrix of the model.    
-    
-    Parameters  
-    ----------  
-    model : AgglomerativeClustering 
-        The fitted model.
-    rescale : bool, optional    
-        Whether to rescale the distances.
-        
-    Returns 
-    ------- 
-    linkage_matrix : numpy.ndarray  
-        The linkage matrix.
-    """ 
-    
-    counts = np.zeros(model.children_.shape[0])
-    n_samples = len(model.labels_)
-    for i, merge in enumerate(model.children_):
-        current_count = 0
-        for child_idx in merge:
-            if child_idx < n_samples:
-                current_count += 1  # leaf node
-            else:
-                current_count += counts[child_idx - n_samples]
-        counts[i] = current_count
-
-    if rescale == True:
-        d_max = np.max(model.distances_)
-        d_min = np.min(model.distances_)
-        distances = (model.distances_ - d_min) / (d_max - d_min)
-    else:
-        distances = model.distances_
-
-    linkage_matrix = np.column_stack(
-        [model.children_, distances, counts]
-    ).astype(float)
-
-    return linkage_matrix
 
 
 def sample_hyperbolicity(data, metric='dot_products', num_samples=5000):

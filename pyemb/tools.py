@@ -1,7 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.express as px
 from scipy import linalg
 from copy import deepcopy
 from scipy import sparse
@@ -134,100 +132,38 @@ def degree_correction(X):
     return Y
 
 
-def plot_dyn_embedding(ya, n, T, node_labels, return_df=False, title=None):
-    """
-    Produces an animated plot of a dynamic embedding ya
+def varimax(Phi, gamma=1, q=20, tol=1e-6):
+    """ 
+    Perform varimax rotation.   
+    
+    Parameters  
+    ----------  
+    Phi : numpy.ndarray 
+        The matrix to rotate.
+    gamma : float, optional 
+        The gamma parameter.
+    q : int, optional   
+        The number of iterations.
+    tol : float, optional   
+        The tolerance.
+        
+    Returns 
+    ------- 
+    numpy.ndarray   
+        The rotated matrix.
+    """ 
+    
+    p, k = Phi.shape
+    R = np.eye(k)
+    d = 0
+    for i in range(q):
+        d_old = d
+        Lambda = np.dot(Phi, R)
+        u, s, vh = np.linalg.svd(np.dot(Phi.T, np.asarray(Lambda)**3 - (gamma/p)
+                                        * np.dot(Lambda, np.diag(np.diag(np.dot(Lambda.T, Lambda))))))
+        R = np.dot(u, vh)
+        d = np.sum(s)
+        if d/d_old < tol:
+            break
+    return np.dot(Phi, R)
 
-    Parameters
-    ----------
-    ya : numpy.ndarray (n*T, d) or (T, n, d)
-        The dynamic embedding.
-    n : int
-        The number of nodes.
-    T : int
-        The number of time points.
-    node_labels : list of length n
-        The labels of the nodes (time-invariant).
-    return_df : bool (optional)
-        Option to return the plotting dataframe.
-    title : str (optional)
-        The title of the plot.
-
-    Returns
-    -------
-    yadf : pandas.DataFrame (optional)
-        The plotting dataframe
-
-    """
-    if len(ya.shape) == 3:
-        ya = ya.reshape((n * T, -1))
-
-    yadf = pd.DataFrame(ya[:, 0:2])
-    yadf.columns = ["Dimension {}".format(i + 1) for i in range(yadf.shape[1])]
-    yadf["Time"] = np.repeat([t for t in range(T)], n)
-    yadf["Label"] = list(node_labels) * T
-    yadf["Label"] = yadf["Label"].astype(str)
-    pad_x = (max(ya[:, 0]) - min(ya[:, 0])) / 50
-    pad_y = (max(ya[:, 1]) - min(ya[:, 1])) / 50
-    fig = px.scatter(
-        yadf,
-        x="Dimension 1",
-        y="Dimension 2",
-        color="Label",
-        animation_frame="Time",
-        range_x=[min(ya[:, 0]) - pad_x, max(ya[:, 0]) + pad_x],
-        range_y=[min(ya[:, 1]) - pad_y, max(ya[:, 1]) + pad_y],
-    )
-    if title:
-        fig.update_layout(title=title)
-
-    fig.show()
-    if return_df:
-        return yadf
-
-
-def plot_embedding_snapshots(
-    emb, n, node_labels, points_of_interest, point_labels=[], max_cols=4
-):
-
-    # Subplot for each time point
-    num_cols = min(len(points_of_interest), max_cols)
-    num_rows = (len(points_of_interest) + num_cols - 1) // num_cols
-    fig, axs = plt.subplots(
-        figsize=(5 * num_cols, 5 * num_rows),
-        sharex=True,
-        sharey=True,
-        ncols=num_cols,
-        nrows=num_rows,
-    )
-
-    if len(emb.shape) == 2:
-        T = emb.shape[0] // n
-        emb = emb.reshape(T, n, emb.shape[1])
-
-    for t_idx, t in enumerate(points_of_interest):
-
-        if num_rows == 1:
-            subplot = axs[t_idx]
-        else:
-            t_row = t_idx // num_cols
-            t_col = t_idx % num_cols
-            subplot = axs[t_row, t_col]
-
-        subplot.scatter(
-            emb[t, :, 0],
-            emb[t, :, 1],
-            c=pd.factorize(node_labels)[0],
-            cmap="tab20",
-        )
-
-        if len(point_labels) > 0:
-            subplot.set_title(point_labels[t_idx])
-        else:
-            subplot.set_title(f"Time {t}")
-
-        subplot.grid(alpha=0.2)
-        subplot.set_xticklabels([])
-        subplot.set_yticklabels([])
-
-    return fig
