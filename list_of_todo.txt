@@ -1,15 +1,28 @@
 - [ ] Warning thrown when embedding the school data bc there's more than one connected component - is this warning always needed?
 
+- [ ] Fix the mistake with the school labels! Legend has the wrong colours for labels
+
 
 
 ## ==== Annie 
 - go through dynamic code with ed to eliminate: 
-  (1) repeated code (safe_inv_sqrt, to_laplacian), 
+
   (2) any functions that shouldn't be in documentation need _ 
+all non-user functions in _utils, check hc 
+
+
+
   (3) consistent in our input arguments: return_left 
   (4) redundancy in the UASE/embed function? 
+one function ???? 
+check embedding that it works ? ? ? -- sparse okay? 
+
   (5) animation in lyon  
-  (6) should plotting be in its own module? all _ function in utils? should we keep submodules or just have it all load in import 
+try and see 
+  (6) should plotting be in its own module? all _ function in utils? should we keep submodules or just have it all load in import
+yes 
   (7) how to change the current function to produce As needed for dyn embedding 
+check works
   (8) function names
+
   (9) static plotting? 
