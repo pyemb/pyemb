@@ -6,7 +6,12 @@ import logging
 import numba as nb
 import ot
 
-from ._utils import _symmetric_dilation, _form_omni_matrix_sparse, _form_omni_matrix
+from ._utils import (
+    _symmetric_dilation,
+    _form_omni_matrix_sparse,
+    _form_omni_matrix,
+    _unfold_from_snapshots,
+)
 from .tools import to_laplacian
 
 
@@ -96,18 +101,29 @@ def embed(
         The right embedding.
     """
 
-    if isinstance(Y, list) or (isinstance(Y, np.ndarray) and len(Y.shape) == 3):
-        is_series = True
-        A = Y[0]
-        T = len(Y)
-        for t in range(1, T):
-            A = np.hstack((A, Y[t]))
-        Y = A
+    # CHECKS -------------------------------------------
+    if not isinstance(d, int) or d <= 0:
+        raise ValueError("d must be a positive integer")
 
-    if Y.dtype != float:
-        Y = Y.astype(float)
+    # check d is smaller than the number of nodes
+    if isinstance(Y, list):
+        n = Y[0].shape[0]
+    else:
+        n = Y.shape[0]
+
+    if d > n:
+        raise ValueError("d must be smaller than the number of nodes")
+
+
+    if isinstance(Y, list) or (isinstance(Y, np.ndarray) and sparse.issparse(Y[0])) or (isinstance(Y, np.ndarray) and len(Y.shape) == 3):
+        is_series = True
+        T = len(Y)
+        Y = _unfold_from_snapshots(Y)
 
     else:
+        if Y.dtype != float:
+            Y = Y.astype(float)
+
         num_components = sparse.csgraph.connected_components(
             _symmetric_dilation(Y), directed=False
         )[0]
@@ -116,6 +132,8 @@ def embed(
 
     if version not in ["full", "sqrt"]:
         raise ValueError("version must be full or sqrt (default)")
+
+    # --------------------------------------------------
 
     if make_laplacian == True:
         L = to_laplacian(Y, regulariser)
@@ -477,6 +495,14 @@ def dyn_embed(
     Exception
         If the specified method is not recognized.
     """
+
+    if not isinstance(d, int) or d <= 0:
+        raise ValueError("d must be a positive integer")
+
+    # check d is smaller than the number of nodes
+    n = As[0].shape[0]
+    if d > n:
+        raise ValueError("d must be smaller than the number of nodes")
 
     # Make sure each is float
     for t in range(len(As)):
