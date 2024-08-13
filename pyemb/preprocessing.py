@@ -3,23 +3,12 @@ import numpy as np
 from scipy import sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 import networkx as nx
-import nltk
-from re import sub, compile
-from textblob import Word
 from copy import deepcopy
 from tqdm import tqdm
 
-from ._utils import _symmetric_dilation, _count_based_on_keys
+from ._utils import *
 
-
-def _ensure_stopwords_downloaded():
-    try:
-        nltk.data.find("corpora/stopwords")
-    except LookupErrorx:
-        nltk.download("stopwords")
-
-
-def matrix_and_attributes(
+def graph_from_dataframes(
     tables,
     relationship_cols,
     same_attribute=False,
@@ -91,27 +80,8 @@ def matrix_and_attributes(
         nodes, partitions, times, len(nodes), len(times)
     )
 
-    return A.tocsr(), attributes
+    return _unfolded_to_list(A.tocsr()), attributes
 
-
-def unfolded_to_list(A):
-    """
-    Takes a (n x nT) unfolded matrix and splits it into a T-length list of (n x n) adjacency matrices.
-
-    Parameters
-    ----------
-    A : scipy.sparse.csr_matrix (n, n*T)
-        The unfolded adjacency matrix.
-
-    Returns
-    -------
-    As : list of scipy.sparse.csr_matrix
-        The list of adjacency matrices.
-    """
-    n, nT = A.shape
-    T = nT // n
-    As = [A[:, i * n : (i + 1) * n] for i in range(T)]
-    return As
 
 
 def _create_edge_list(
@@ -176,66 +146,6 @@ def _create_edge_list(
                 edge_list.append(pair_data)
                 # print(partition_pair)
     return pd.concat(edge_list)
-
-
-def _extract_node_time_info(edge_list, join_token):
-    """
-    Not used by the user.
-    """
-    nodes = sorted(set(edge_list["V1"]).union(edge_list["V2"]))
-    partitions = [node.split(join_token)[0] for node in nodes]
-    times = sorted(set(edge_list["T"].unique()))
-    # times = sorted(set(edge_list['T']))
-    node_ids = {node: idx for idx, node in enumerate(nodes)}
-    time_ids = {time: idx for idx, time in enumerate(times)}
-    return nodes, partitions, times, node_ids, time_ids
-
-
-def _transform_edge_data(edge_list, node_ids, time_ids, n_nodes):
-    """
-    Not used by the user.
-    """
-    edge_list["V_ID1"] = edge_list["V1"].map(node_ids)
-    edge_list["V_ID2"] = edge_list["V2"].map(node_ids)
-    edge_list["T_ID"] = edge_list["T"].map(time_ids)
-    edge_list["X_ID1"] = edge_list["T_ID"] * n_nodes + edge_list["V_ID1"]
-    edge_list["X_ID2"] = edge_list["T_ID"] * n_nodes + edge_list["V_ID2"]
-    return edge_list
-
-
-def _create_adjacency_matrix(edge_list, n_nodes, n_times, weight_col):
-    """
-    Not used by the user.
-    """
-    row_indices = pd.concat([edge_list["V_ID1"], edge_list["V_ID2"]])
-    col_indices = pd.concat([edge_list["X_ID2"], edge_list["X_ID1"]])
-    if weight_col[0]:
-        values = pd.concat([edge_list["W"], edge_list["W"]])
-    else:
-        values = np.ones(2 * len(edge_list))
-    return sparse.coo_matrix(
-        (values, (row_indices, col_indices)), shape=(n_nodes, n_nodes * n_times)
-    )
-
-
-def _create_node_attributes(nodes, partitions, times, n_nodes, n_times):
-    """
-    Not used by the user.
-    """
-    time_attrs = np.repeat(times, n_nodes)
-    attributes = [
-        [
-            {"name": name, "partition": partition, "time": np.nan}
-            for name, partition in zip(nodes, partitions)
-        ],
-        [
-            {"name": name, "partition": partition, "time": time}
-            for name, partition, time in zip(
-                nodes * n_times, partitions * n_times, time_attrs
-            )
-        ],
-    ]
-    return attributes
 
 
 def find_subgraph(A, attributes, subgraph_attributes):
@@ -453,7 +363,6 @@ def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     attributes = [[{"name": i} for i in ids], [{"time": i} for i in times]]
     return Y, attributes
 
-
 def text_matrix_and_attributes(
     data,
     column_name,
@@ -511,7 +420,7 @@ def text_matrix_and_attributes(
         stopwords = None
 
     # make matrix from text using TfidfVectorizer
-    vectorizer = TfidfVectorizer(stop_words=stopwords, **kwargs)
+    vectorizer = TfidfVectorizer(stop_words=list(stopwords), **kwargs)
     Y = vectorizer.fit_transform(data[column_name])
 
     # attributes
@@ -520,21 +429,3 @@ def text_matrix_and_attributes(
 
     return Y, [row_attrs, col_attrs]
 
-
-def _del_email_address(text):
-    """
-    Not used by user."""
-    e = "\S*@\S*\s?"
-    pattern = compile(e)
-    return pattern.sub("", text)
-
-
-def _clean_text_(text):
-    """
-    Not used by user."""
-    return " ".join(
-        [
-            Word(word).lemmatize()
-            for word in sub("[^A-Za-z0-9]+", " ", text).lower().split()
-        ]
-    )
