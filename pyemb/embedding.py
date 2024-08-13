@@ -137,7 +137,7 @@ def embed(
         right_embedding = vT.T[:, o] @ np.diag(S)
         if is_series:
             if not flat:
-                n = Y[0].shape[0]
+                n = Y.shape[0]
                 YA = np.zeros((T, n, d))
                 for t in range(T):
                     YA[t, :, :] = right_embedding[n * t : n * (t + 1), :]

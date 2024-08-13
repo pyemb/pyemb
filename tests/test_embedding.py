@@ -1,15 +1,37 @@
-# %%
-import pyemb as eb
-
-# %%
-from pyemb.simulation import iid_SBM
-
-n = 200
-T = 2
-As, labels = iid_SBM(n, T)
+import numpy as np
+from pyemb.embedding import dyn_embed
 
 
-eb.quick_plot(eb.dyn_embed(As, 2, "ISE"), n, T, labels)
+def test_dyn_embed_ISE_basic():
+    As = np.random.rand(5, 10, 10)
+    d = 3
+    embedding = dyn_embed(As, d, method="ISE")
+    assert embedding.shape == (50, d)
 
 
-# %%
+def test_dyn_embed_ISE_flat_false():
+    As = np.random.rand(5, 10, 10)
+    d = 3
+    embedding = dyn_embed(As, d, method="ISE", flat=False)
+    assert embedding.shape == (5, 10, d)
+
+
+def test_dyn_embed_ISE_procrustes():
+    As = np.random.rand(5, 10, 10)
+    d = 3
+    embedding = dyn_embed(As, d, method="ISE PROCRUSTES")
+    assert embedding.shape == (50, d)
+
+
+def test_dyn_embed_URLSE_basic():
+    As = np.random.rand(5, 10, 10)
+    d = 3
+    embedding = dyn_embed(As, d, method="URLSE")
+    assert embedding.shape == (50, d)
+
+
+def test_dyn_embed_URLSE_flat_false():
+    As = np.random.rand(5, 10, 10)
+    d = 3
+    embedding = dyn_embed(As, d, method="URLSE", flat=False)
+    assert embedding.shape == (5, 10, d)
