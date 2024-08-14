@@ -3,6 +3,7 @@ import numpy as np
 from scipy import sparse
 from pyemb.embedding import dyn_embed
 
+
 @pytest.mark.parametrize(
     "method, flat, expected_shape",
     [

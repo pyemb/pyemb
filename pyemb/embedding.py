@@ -114,8 +114,11 @@ def embed(
     if d > n:
         raise ValueError("d must be smaller than the number of nodes")
 
-
-    if isinstance(Y, list) or (isinstance(Y, np.ndarray) and sparse.issparse(Y[0])) or (isinstance(Y, np.ndarray) and len(Y.shape) == 3):
+    if (
+        isinstance(Y, list)
+        or (isinstance(Y, np.ndarray) and sparse.issparse(Y[0]))
+        or (isinstance(Y, np.ndarray) and len(Y.shape) == 3)
+    ):
         is_series = True
         T = len(Y)
         Y = _unfold_from_snapshots(Y)
@@ -505,9 +508,13 @@ def dyn_embed(
         raise ValueError("d must be smaller than the number of nodes")
 
     # Make sure each is float
-    for t in range(len(As)):
-        if As[t].dtype != float:
-            As[t] = As[t].astype(float)
+    if isinstance(As, list) or (isinstance(As, np.ndarray) and len(As.shape) == 1):
+        for t in range(len(As)):
+            if As[t].dtype not in [np.float32, np.float64]:
+                As[t] = As[t].astype(np.float32)
+    else:
+        if As.dtype not in [np.float32, np.float64]:
+            As = As.astype(np.float32)
 
     # Check if As is sparse
     if sparse.issparse(As[0]):

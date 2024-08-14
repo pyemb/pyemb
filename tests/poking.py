@@ -1,3 +1,7 @@
+"""
+This is to be removed - it's just a playground for testing things out.
+"""
+
 # %%
 import pyemb as eb
 from pyemb.simulation import iid_SBM
