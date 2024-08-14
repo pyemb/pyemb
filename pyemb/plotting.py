@@ -55,7 +55,16 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
 
 
 def snapshot_plot(
-    embedding, n, node_labels, points_of_interest, point_labels=[], max_cols=4, **kwargs
+    embedding,
+    n,
+    node_labels,
+    points_of_interest,
+    point_labels=[],
+    max_cols=4,
+    add_legend=False,
+    legend_adjust=0,
+    max_legend_cols=5,
+    **kwargs,
 ):
     """
     Plots the selected embedding snapshots as a grid of scatter plots.
@@ -96,6 +105,8 @@ def snapshot_plot(
         T = embedding.shape[0] // n
         embedding = embedding.reshape(T, n, embedding.shape[1])
 
+    enc_node_labels = pd.factorize(node_labels)[0]
+
     for t_idx, t in enumerate(points_of_interest):
         if num_rows == 1:
             subplot = axs[t_idx]
@@ -104,10 +115,10 @@ def snapshot_plot(
             t_col = t_idx % num_cols
             subplot = axs[t_row, t_col]
 
-        subplot.scatter(
+        scatter = subplot.scatter(
             embedding[t, :, 0],
             embedding[t, :, 1],
-            c=pd.factorize(node_labels)[0],
+            c=enc_node_labels,
             **kwargs,
         )
 
@@ -124,5 +135,27 @@ def snapshot_plot(
     if len(points_of_interest) < num_rows * num_cols:
         for idx in range(len(points_of_interest), num_rows * num_cols):
             fig.delaxes(axs.flatten()[idx])
+
+    if add_legend:
+        # Extract and print colormap
+        colormap = scatter.get_cmap()
+        norm = scatter.norm
+        unique_enc_labels = np.unique(enc_node_labels)
+        colors = [colormap(norm(label)) for label in unique_enc_labels]
+
+        # Add legend
+        handles = []
+        labels = []
+        for label, color in zip(np.unique(node_labels), colors):
+            handles.append(
+                plt.Line2D(
+                    [0], [0], marker="o", color=color, linestyle="None", label=label
+                )
+            )
+            labels.append(label)
+
+        fig.legend(
+            handles, labels, loc="lower center", ncol=min(len(labels), max_legend_cols), bbox_to_anchor=(0.5, legend_adjust)
+        )
 
     return fig
