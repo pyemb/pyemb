@@ -6,7 +6,12 @@ import logging
 import numba as nb
 import ot
 
-from ._utils import _symmetric_dilation, _form_omni_matrix_sparse, _form_omni_matrix
+from ._utils import (
+    _symmetric_dilation,
+    _form_omni_matrix_sparse,
+    _form_omni_matrix,
+    _unfold_from_snapshots,
+)
 from .tools import to_laplacian
 
 
@@ -59,22 +64,29 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     return Ws
 
 
-
-def embed(Y, d=50, version='sqrt', return_right=False, flat = True, make_laplacian=False, regulariser=0):
-    """ 
-    Embed a matrix.   
+def embed(
+    Y,
+    d=50,
+    version="sqrt",
+    return_right=False,
+    flat=True,
+    make_laplacian=False,
+    regulariser=0,
+):
+    """
+    Embed a matrix.
 
     Parameters
     ----------
     Y : numpy.ndarray or list of numpy.ndarray
-        The matrix to embed. 
+        The matrix to embed.
     d : int
         The number of dimensions to embed into.
     version : str
         The version of the embedding. Options are 'full' or 'sqrt' (default).
     return_right : bool
         Whether to return the right embedding.
-    flat : bool 
+    flat : bool
         Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d).
     make_laplacian : bool
         Whether to use the Laplacian matrix.
@@ -85,26 +97,46 @@ def embed(Y, d=50, version='sqrt', return_right=False, flat = True, make_laplaci
     -------
     left_embedding : numpy.ndarray
         The left embedding.
-    right_embedding : numpy.ndarray 
-        The right embedding.  
+    right_embedding : numpy.ndarray
+        The right embedding.
     """
-    
-    if isinstance(Y, list) or (isinstance(Y, np.ndarray) and len(Y.shape) == 3):
-        is_series = True
-        A = Y[0]
-        T = len(Y)
-        for t in range(1, T):
-            A = sparse.hstack((A, Y[t]))
-        Y = A
-        
+
+    # CHECKS -------------------------------------------
+    if not isinstance(d, int) or d <= 0:
+        raise ValueError("d must be a positive integer")
+
+    # check d is smaller than the number of nodes
+    if isinstance(Y, list):
+        n = Y[0].shape[0]
     else:
+        n = Y.shape[0]
+
+    if d > n:
+        raise ValueError("d must be smaller than the number of nodes")
+
+    if (
+        isinstance(Y, list)
+        or (isinstance(Y, np.ndarray) and sparse.issparse(Y[0]))
+        or (isinstance(Y, np.ndarray) and len(Y.shape) == 3)
+    ):
+        is_series = True
+        T = len(Y)
+        Y = _unfold_from_snapshots(Y)
+
+    else:
+        if Y.dtype != float:
+            Y = Y.astype(float)
+
         num_components = sparse.csgraph.connected_components(
-        _symmetric_dilation(Y), directed=False)[0]
+            _symmetric_dilation(Y), directed=False
+        )[0]
         if num_components > 1:
             warnings.warn("Warning: More than one connected component in the graph.")
 
     if version not in ["full", "sqrt"]:
         raise ValueError("version must be full or sqrt (default)")
+
+    # --------------------------------------------------
 
     if make_laplacian == True:
         L = to_laplacian(Y, regulariser)
@@ -126,11 +158,13 @@ def embed(Y, d=50, version='sqrt', return_right=False, flat = True, make_laplaci
         right_embedding = vT.T[:, o] @ np.diag(S)
         if is_series:
             if not flat:
-                n = Y[0].shape[0]
+                n = Y.shape[0]
                 YA = np.zeros((T, n, d))
                 for t in range(T):
                     YA[t, :, :] = right_embedding[n * t : n * (t + 1), :]
+
                 right_embedding = YA
+
         return left_embedding, right_embedding
     else:
         return left_embedding
@@ -179,17 +213,25 @@ def eigen_decomp(A, dim=None):
 
 def ISE(As, d, flat=True, procrustes=False, consistent_orientation=True):
     """
-    Computes t specrtal embedding (ISE) for each adjacency snapshot
+    Computes the spectral embedding (ISE) for each adjacency snapshot.
 
-    Inputs
-    As: numpy array of an adjacency matrix series of shape (T, n, n)
-    d: embedding dimension
-    flat: whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d)
-    procrustes: whether to align each embedding with the previous embedding
-    consistent_orientation: whether to ensure the eigenvector orientation is consistent
+    Parameters
+    ----------
+    As : numpy.ndarray
+        An adjacency matrix series of shape (T, n, n).
+    d : int
+        Embedding dimension.
+    flat : bool, optional
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+    procrustes : bool, optional
+        Whether to align each embedding with the previous embedding. Default is False.
+    consistent_orientation : bool, optional
+        Whether to ensure the eigenvector orientation is consistent. Default is True.
 
-    Output
-    YA: dynamic embedding of shape (n*T, d) or (T, n, d)
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape (n*T, d) or (T, n, d).
     """
 
     n = As[0].shape[0]
@@ -245,20 +287,30 @@ def ISE(As, d, flat=True, procrustes=False, consistent_orientation=True):
 
 def UASE(As, d, flat=True, sparse_matrix=False, return_left=False):
     """
-    Computes the unfolded adjacency spectral embedding (UASE)
+    Computes the unfolded adjacency spectral embedding (UASE).
+    For more details, see:
     https://arxiv.org/abs/2007.10455
     https://arxiv.org/abs/2106.01282
 
-    Inputs
-    As: numpy array of an adjacency matrix series of shape (T, n, n)
-    d: embedding dimension
-    flat: whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d)
-    sparse_matrix: whether the adjacency matrices are sparse
-    return_left: whether to return the left (anchor) embedding as well as the right (dynamic) embedding
+    Parameters
+    ----------
+    As : numpy.ndarray
+        An adjacency matrix series of shape (T, n, n).
+    d : int
+        Embedding dimension.
+    flat : bool, optional
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+    sparse_matrix : bool, optional
+        Whether the adjacency matrices are sparse. Default is False.
+    return_left : bool, optional
+        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is False.
 
-    Output
-    YA: dynamic embedding of shape (n*T, d) or (T, n, d)
-    (optional) XA: anchor embedding of shape (n, d)
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape (n*T, d) or (T, n, d).
+    numpy.ndarray, optional
+        Anchor embedding of shape (n, d) if return_left is True.
     """
     # Assume fixed n over time
     n = As[0].shape[0]
@@ -299,20 +351,36 @@ def UASE(As, d, flat=True, sparse_matrix=False, return_left=False):
 def regularised_ULSE(
     As,
     d,
-    regulariser=0,
+    regulariser="auto",
     flat=True,
     sparse_matrix=False,
     return_left=False,
-    verbose=False,
 ):
-    """Compute the unfolded (regularlised) Laplacian Spectral Embedding
-
-    As: adjacency matrices of shape (T, n, n)
-    d: embedding dimension
-    regulariser: regularisation parameter. 0 for no regularisation, 'auto' for automatic regularisation (this often isn't the best).
-    flat: True outputs embedding of shape (nT, d), False outputs shape (T, n, d)
     """
+    Computes the regularised unfolded Laplacian spectral embedding (regularised ULSE).
 
+    Parameters
+    ----------
+    As : numpy.ndarray
+        An adjacency matrix series of shape (T, n, n).
+    d : int
+        Embedding dimension.
+    regulariser : float, optional
+        Regularisation parameter for the Laplacian matrix. By default, this is the average node degree.
+    flat : bool, optional
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+    sparse_matrix : bool, optional
+        Whether the adjacency matrices are sparse. Default is False.
+    return_left : bool, optional
+        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is False.
+
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape (n*T, d) or (T, n, d).
+    numpy.ndarray, optional
+        Anchor embedding of shape (n, d) if return_left is True.
+    """
     # Assume fixed n over time
     n = As[0].shape[0]
     T = len(As)
@@ -328,7 +396,7 @@ def regularised_ULSE(
             A = np.hstack((A, As[t]))
 
     # Construct (regularised) Laplacian matrix
-    L = to_laplacian(A, regulariser=regulariser, verbose=verbose)
+    L = to_laplacian(A, regulariser=regulariser)
 
     # Compute spectral embedding
     U, S, Vt = sparse.linalg.svds(L, d)
@@ -349,23 +417,28 @@ def regularised_ULSE(
         return XA, YA
 
 
-
 def OMNI(As, d, flat=True, sparse_matrix=False):
     """
-    Computes the omnibus spectral embedding
+    Computes the omnibus dynamic spectral embedding.
+    For more details, see:
     https://arxiv.org/abs/1705.09355
 
-    Inputs
-    As: adjacency matrices of shape (T, n, n)
-    d: embedding dimension
-    flat: True outputs embedding of shape (nT, d), False outputs shape (T, n, d)
-    sparse_matrix: True uses sparse matrices, False uses dense matrices
+    Parameters
+    ----------
+    As : numpy.ndarray
+        Adjacency matrices of shape (T, n, n).
+    d : int
+        Embedding dimension.
+    flat : bool, optional
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+    sparse_matrix : bool, optional
+        Whether to use sparse matrices. Default is False.
 
-    Outputs
-    XA: dynamic embedding of shape (T, n, d) or (nT, d)
-
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape (n*T, d) or (T, n, d).
     """
-
     n = As[0].shape[0]
     T = len(As)
 
@@ -394,11 +467,54 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
 
 def dyn_embed(
     As,
-    d = 50,
+    d=50,
     method="UASE",
     regulariser="auto",
     flat=True,
 ):
+    """
+    Computes the dynamic embedding using a specified method.
+
+    Parameters
+    ----------
+    As : numpy.ndarray or list
+        An adjacency matrix series which is either a numpy array of shape (T, n, n), a list of numpy arrays of shape (n, n), or a series of CSR matrices.
+    d : int, optional
+        Embedding dimension. Default is 50.
+    method : str, optional
+        The embedding method to use. Options are "ISE", "ISE PROCRUSTES", "UASE", "OMNI", "ULSE", "URLSE", "RANDOM". Default is "UASE".
+    regulariser : float or "auto", optional
+        Regularisation parameter for the Laplacian matrix. If "auto", the regulariser is set to the average node degree. Default is "auto".
+    flat : bool, optional
+        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape (n*T, d) or (T, n, d).
+
+    Raises
+    ------
+    Exception
+        If the specified method is not recognized.
+    """
+
+    if not isinstance(d, int) or d <= 0:
+        raise ValueError("d must be a positive integer")
+
+    # check d is smaller than the number of nodes
+    n = As[0].shape[0]
+    if d > n:
+        raise ValueError("d must be smaller than the number of nodes")
+
+    # Make sure each is float
+    if isinstance(As, list) or (isinstance(As, np.ndarray) and len(As.shape) == 1):
+        for t in range(len(As)):
+            if As[t].dtype not in [np.float32, np.float64]:
+                As[t] = As[t].astype(np.float32)
+    else:
+        if As.dtype not in [np.float32, np.float64]:
+            As = As.astype(np.float32)
 
     # Check if As is sparse
     if sparse.issparse(As[0]):
@@ -406,13 +522,12 @@ def dyn_embed(
     else:
         sparse_matrix = False
 
-    """Computes the embedding using a specified method"""
     if method.upper() == "ISE":
         YA = ISE(As, d, flat=flat)
     elif method.upper() == "ISE PROCRUSTES":
         YA = ISE(As, d, procrustes=True, flat=flat)
     elif method.upper() == "UASE":
-        _, YA = embed(As, d, return_right = True, flat=flat)
+        _, YA = embed(As, d, return_right=True, flat=flat)
     elif method.upper() == "OMNI":
         YA = OMNI(As, d, sparse_matrix=sparse_matrix, flat=flat)
     elif method.upper() == "ULSE":
@@ -421,7 +536,12 @@ def dyn_embed(
         )
     elif method.upper() == "URLSE":
         _, YA = embed(
-            As, d, return_right=True, regulariser=regulariser, flat=flat, make_laplacian=True
+            As,
+            d,
+            return_right=True,
+            regulariser=regulariser,
+            flat=flat,
+            make_laplacian=True,
         )
     elif method.upper() == "RANDOM":
         if flat:
