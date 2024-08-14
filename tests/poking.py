@@ -11,11 +11,22 @@ n = 200
 T = 5
 As, labels = iid_SBM(n=n, T=T)
 
-# make sparse
-from scipy import sparse
+emb = eb.dyn_embed(As, 3, "URLSE", flat=False)
 
-As = [sparse.csr_matrix(A) for A in As]
+# %%
+dc = eb.degree_correction(emb)
+emb.shape
+# %%
+from copy import deepcopy
+import numpy as np
 
-_ = eb.dyn_embed(As, 3, "URLSE", flat=False)
+X = emb
+
+
+tol = 1e-12
+Y = deepcopy(X)
+norms = np.linalg.norm(X, axis=1)
+idx = np.where(norms > tol)
+Y[idx] = X[idx] / (norms[idx, None])
 
 # %%

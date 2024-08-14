@@ -477,8 +477,8 @@ def dyn_embed(
 
     Parameters
     ----------
-    As : numpy.ndarray
-        An adjacency matrix series of shape (T, n, n).
+    As : numpy.ndarray or list
+        An adjacency matrix series which is either a numpy array of shape (T, n, n), a list of numpy arrays of shape (n, n), or a series of CSR matrices.
     d : int, optional
         Embedding dimension. Default is 50.
     method : str, optional
