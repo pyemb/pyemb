@@ -51,7 +51,7 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
         **kwargs,
     )
 
-    fig.show()
+    return fig
 
 
 def snapshot_plot(
@@ -155,7 +155,11 @@ def snapshot_plot(
             labels.append(label)
 
         fig.legend(
-            handles, labels, loc="lower center", ncol=min(len(labels), max_legend_cols), bbox_to_anchor=(0.5, legend_adjust)
+            handles,
+            labels,
+            loc="lower center",
+            ncol=min(len(labels), max_legend_cols),
+            bbox_to_anchor=(0.5, legend_adjust),
         )
 
     return fig
