@@ -50,6 +50,7 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
         range_y=[min(embedding[:, 1]) - pad_y, max(embedding[:, 1]) + pad_y],
         **kwargs,
     )
+    fig.show()
 
     return fig
 
