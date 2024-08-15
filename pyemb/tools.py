@@ -110,60 +110,80 @@ def select(embedding, attributes, select_attributes):
     return selected_X, selected_attributes
 
 
-def degree_correction(X):
+def degree_correction(embedding):
     """
     Perform degree correction.
 
     Parameters
     ----------
-    X : numpy.ndarray
-        The embedding of the graph.
+    embedding : numpy.ndarray
+        The embedding of the graph, either 2D or 3D.
 
     Returns
     -------
-    Y : numpy.ndarray
+    embedding_dc : numpy.ndarray
         The degree-corrected embedding.
     """
+
+    # requires the embedding to be flat
+    flat = True
+    if len(embedding.shape) == 3:
+        # if not flat, then the embedding is dynamic
+        T = embedding.shape[0]
+        n = embedding.shape[1]
+        d = embedding.shape[2]
+        embedding = embedding.reshape(-1, d)
+        flat = False
+
     tol = 1e-12
-    Y = deepcopy(X)
-    norms = np.linalg.norm(X, axis=1)
+    embedding_dc = deepcopy(embedding)
+    norms = np.linalg.norm(embedding, axis=1)
     idx = np.where(norms > tol)
-    Y[idx] = X[idx] / (norms[idx, None])
-    return Y
+    embedding_dc[idx] = embedding[idx] / (norms[idx, None])
+
+    if not flat:
+        embedding_dc = embedding_dc.reshape(T, n, d)
+
+    return embedding_dc
 
 
 def varimax(Phi, gamma=1, q=20, tol=1e-6):
-    """ 
-    Perform varimax rotation.   
-    
-    Parameters  
-    ----------  
-    Phi : numpy.ndarray 
+    """
+    Perform varimax rotation.
+
+    Parameters
+    ----------
+    Phi : numpy.ndarray
         The matrix to rotate.
-    gamma : float, optional 
+    gamma : float, optional
         The gamma parameter.
-    q : int, optional   
+    q : int, optional
         The number of iterations.
-    tol : float, optional   
+    tol : float, optional
         The tolerance.
-        
-    Returns 
-    ------- 
-    numpy.ndarray   
+
+    Returns
+    -------
+    numpy.ndarray
         The rotated matrix.
-    """ 
-    
+    """
+
     p, k = Phi.shape
     R = np.eye(k)
     d = 0
     for i in range(q):
         d_old = d
         Lambda = np.dot(Phi, R)
-        u, s, vh = np.linalg.svd(np.dot(Phi.T, np.asarray(Lambda)**3 - (gamma/p)
-                                        * np.dot(Lambda, np.diag(np.diag(np.dot(Lambda.T, Lambda))))))
+        u, s, vh = np.linalg.svd(
+            np.dot(
+                Phi.T,
+                np.asarray(Lambda) ** 3
+                - (gamma / p)
+                * np.dot(Lambda, np.diag(np.diag(np.dot(Lambda.T, Lambda)))),
+            )
+        )
         R = np.dot(u, vh)
         d = np.sum(s)
-        if d/d_old < tol:
+        if d / d_old < tol:
             break
     return np.dot(Phi, R)
-

@@ -3,7 +3,7 @@ from scipy import sparse
 import numpy as np
 import pandas as pd
 import numba as nb
-from tqdm import tqdm 
+from tqdm import tqdm
 import nltk
 from re import sub, compile
 from textblob import Word
@@ -115,8 +115,9 @@ def _symmetric_dilation(M):
     Dilate a matrix to a symmetric matrix.
     """
     m, n = M.shape
-    D = sparse.vstack([sparse.hstack([_zero_matrix(m), M]),
-                      sparse.hstack([M.T, _zero_matrix(n)])])
+    D = sparse.vstack(
+        [sparse.hstack([_zero_matrix(m), M]), sparse.hstack([M.T, _zero_matrix(n)])]
+    )
 
     return D
 
@@ -158,6 +159,7 @@ def _form_omni_matrix(As, n, T):
 
     return A
 
+
 def _form_omni_matrix_sparse(As, n, T, verbose=False):
     """
     Forms embedding matrix for the omnibus embedding using sparse matrices
@@ -173,6 +175,37 @@ def _form_omni_matrix_sparse(As, n, T, verbose=False):
                 A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] = As[t1]
                 A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] += As[t2]
                 A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] /= 2
+
+    return A
+
+
+def _unfold_from_snapshots(As):
+    """
+    Takes a T-length series of adjacency matrices and stacks them into a single (n x nT) unfolded matrix.
+
+    Parameters
+    ----------
+    As : list or numpy.ndarray
+        The series of adjacency matrices.
+
+    Returns
+    -------
+    A : scipy.sparse.csr_matrix (n, n*T)
+        The unfolded adjacency matrix.
+    """
+    T = len(As)
+
+    if As[0].dtype != float:
+        As = [A.astype(float) for A in As]
+
+    if sparse.issparse(As[0]):
+        A = As[0]
+        for t in range(1, T):
+            A = sparse.hstack((A, As[t]))
+    else:
+        A = As[0]
+        for t in range(1, T):
+            A = np.hstack((A, As[t]))
 
     return A
 
@@ -195,7 +228,6 @@ def _unfolded_to_list(A):
     T = nT // n
     As = [A[:, i * n : (i + 1) * n] for i in range(T)]
     return As
-
 
 ## ==== For hierarchical clustering ==== ##
 
@@ -231,7 +263,8 @@ def _find_cluster_sizes(G_clusters):
     """
     return {key: len(value) for key, value in G_clusters.items()}
 
-def _find_value_percentage(data_list):
+   
+def _find_value_percentage(data_list):   
     """
     Calculate the percentage of each unique value in a list.
 
