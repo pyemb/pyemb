@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
+import networkx as nx
 
 from scipy.cluster.hierarchy import cophenet
 from scipy.spatial.distance import squareform
@@ -7,9 +8,11 @@ from scipy.stats import rankdata
 from sklearn.metrics import pairwise_distances
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
-import networkx as nx
 from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
+from fa2_modified import ForceAtlas2
+
+from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes
 
 
 ## ========= Dot product based hierarchical clustering ========= ##
@@ -90,7 +93,8 @@ class DotProductAgglomerativeClustering:
     def _ip_metric(X):
         return -(X @ X.T)
     
-## ======= linkage matrix and Kendall's tau similarity ======= ##
+## ======= Linkage matrix ======= ##
+
 
 def linkage_matrix(model):
     """ 
@@ -126,8 +130,350 @@ def linkage_matrix(model):
     ).astype(float)
 
     linkage_matrix[:,:2] = linkage_matrix[:,:2].astype(int)
+
     return linkage_matrix
 
+## ======= Cophenetic distances ======= ##
+
+def cophenetic_distances(Z):
+    """
+    Calculate the cophenetic distances between each observation and internal nodes.
+
+    Parameters
+    ----------
+    Z : ndarray
+        The linkage matrix.
+
+    Returns
+    -------
+    d : ndarray
+        The full distance matrix (2n-1) x (2n-1).
+    """
+    n = Z.shape[0] + 1
+    N = 2 * n - 1
+    d = np.zeros((N, N))
+    curr_node = np.zeros(n, dtype=int)
+    members = np.zeros(n, dtype=int)
+    left_start = np.zeros(n, dtype=int)
+
+    visited_size = ((N >> 3) + 1)
+    visited = np.zeros(visited_size, dtype=np.uint8)
+
+    k = 0
+    curr_node[0] = 2 * n - 2
+    left_start[0] = 0
+    while k >= 0:
+        root = curr_node[k] - n
+        i_lc = int(Z[root, 0])
+        i_rc = int(Z[root, 1])
+
+        if i_lc >= n:  # left child is not a leaf
+            n_lc = int(Z[i_lc - n, 3])
+            if not _is_visited(visited, i_lc):
+                _set_visited(visited, i_lc)
+                k += 1
+                curr_node[k] = i_lc
+                left_start[k] = left_start[k - 1]
+                continue  # visit the left subtree
+        else:
+            n_lc = 1
+            members[left_start[k]] = i_lc
+
+        if i_rc >= n:  # right child is not a leaf
+            n_rc = int(Z[i_rc - n, 3])
+            if not _is_visited(visited, i_rc):
+                _set_visited(visited, i_rc)
+                k += 1
+                curr_node[k] = i_rc
+                left_start[k] = left_start[k - 1] + n_lc
+                continue  # visit the right subtree
+        else:
+            n_rc = 1
+            members[left_start[k] + n_lc] = i_rc
+
+        # back to the root of current subtree
+        dist = Z[root, 2]
+        right_start = left_start[k] + n_lc
+
+        # Update distances for leaf nodes in left and right children
+        for i in range(left_start[k], right_start):
+            for j in range(right_start, right_start + n_rc):
+                d[members[i], members[j]] = dist
+                d[members[j], members[i]] = dist
+
+        # Update distances for internal nodes
+        all_members = members[left_start[k]:right_start + n_rc]
+        for i in all_members:
+            d[root + n, i] = dist
+            d[i, root + n] = dist
+
+        # Add distance between the root of the current subtree and its parent
+        if k > 0:
+            parent = curr_node[k - 1] - n
+            parent_dist = Z[parent, 2]
+            d[root + n, parent + n] = parent_dist
+            d[parent + n, root + n] = parent_dist
+
+        k -= 1  # back to parent node
+
+    return d
+
+
+## ======= Calculate branch lengths ======= ##
+
+def branch_lengths(Z, point_cloud = None):
+    """
+    Calculate branch lengths for a hierarchical clustering dendrogram.
+
+    Parameters:
+    ----------
+    Z (ndarray): The linkage matrix.
+    point_cloud (ndarray): The data points.
+
+    Returns:
+    -------
+    ndarray: Matrix of branch lengths.
+    """
+    n = Z.shape[0] + 1
+    N = 2 * n - 1
+    
+    
+    if point_cloud is None:
+        leaf_heights = np.repeat(np.max(Z[:, 2]), n)
+    else:
+        leaf_heights = np.linalg.norm(point_cloud, axis=1)**2
+    heights = np.hstack([leaf_heights, Z[:, 2]])
+    merge_heights = cophenetic_distances(Z)
+
+    # Efficient matrix calculation
+    heights_matrix = np.add.outer(heights, heights)
+    B = np.abs(heights_matrix - 2 * merge_heights)
+    B[merge_heights == 0] = -np.inf
+
+    return B
+
+## ======= Find node descendants  ======= ##
+
+def find_descendents(Z, node, desc=None, just_leaves=True):
+    """
+    Find all descendants of a given node in a hierarchical clustering tree.
+
+    Parameters:
+    ----------
+    Z (ndarray): The linkage matrix.
+    node (int): The node to find descendants of.
+    desc (dict, optional): Dictionary to store descendants.
+    just_leaves (bool, optional): Whether to include only leaf nodes.
+
+    Returns:
+    -------
+    list: List of descendants.
+    """
+    if desc is None:
+        desc = {}
+    n_samples = Z.shape[0] + 1
+    if node in desc:
+        return desc[node]
+    if node < n_samples:
+        return [node]
+    
+    pair = Z[node - n_samples, :2].astype(int)
+    desc[node] = find_descendents(Z, pair[0], desc, just_leaves) + find_descendents(Z, pair[1], desc, just_leaves)
+
+    if not just_leaves:
+        desc[node] = [int(pair[0]), int(pair[1])] + desc[node]
+    return desc[node]
+
+## ======= Construct epsilon tree ======= ##
+
+def _epsilon_tree(Z, B, epsilon = 0.25):
+    """
+    Condense a hierarchical clustering tree.
+
+    Parameters:
+    ----------
+    Z (ndarray): The linkage matrix.
+    B (ndarray): Matrix of branch lengths.
+    epsilon (float): Threshold for condensing the tree.
+
+    Returns:
+    -------
+    nx.Graph: Condensed tree as a NetworkX graph.
+    """
+    n = Z.shape[0] + 1
+    N = 2*n-1
+    G = nx.Graph()
+
+    reverse_lm = Z[::-1] 
+
+    internal_nodes = sorted(range(n, n + reverse_lm.shape[0]), reverse=True)
+    internal_nodes_set = set(internal_nodes)
+
+    desc = {i: find_descendents(Z, i) for i in range(n, 2 * n - 1)}
+    desc[N-1] = list(range(N))
+    
+    while len(internal_nodes) > 0:
+        idx = internal_nodes[0]        
+        i = N - idx - 1
+        merge = reverse_lm[i]
+        left = int(merge[0])
+        right = int(merge[1])
+        
+        left_desc = desc[left] if left >= n else [left]
+        right_desc = desc[right] if right >= n else [right]
+        
+        if np.any(B[idx, left_desc] > epsilon):
+            G.add_edge(idx, left, len=B[idx, left])
+        else:
+            internal_nodes_set.difference_update([left] + left_desc)
+        
+        if np.any(B[idx, right_desc] > epsilon):
+            G.add_edge(idx, right, len=B[idx, right])
+        else:
+            internal_nodes_set.difference_update([right] + right_desc)
+        
+        # Update the list after potential changes
+        internal_nodes_set.difference_update([idx])
+        internal_nodes = sorted(internal_nodes_set, reverse=True)
+    return G
+
+## ======= Find clusters ======= ##
+
+def _find_clusters(G, Z, just_leaves=True):
+    """
+    Find clusters in a condensed tree.
+
+    Parameters:
+    G (nx.Graph): Condensed tree.
+    Z (ndarray): The linkage matrix.
+    just_leaves (bool, optional): Whether to include only leaf nodes.
+
+    Returns:
+    dict: Dictionary of clusters.
+    """
+    total = []
+    visited = set()
+    G_desc = {}
+
+    for left, right in reversed(list(G.edges(data=False))):
+        for node in (right, left):
+            if node not in visited:
+                desc = find_descendents(Z, node, just_leaves=just_leaves)
+                G_desc[node] = list(set(desc) - set(total))
+                total += desc
+                visited.add(node)
+    return G_desc
+
+## ======= Construct tree ======= ##
+
+class ConstructTree:
+    """
+    Construct a condensed tree from a hierarchical clustering model.
+    
+    Parameters: 
+    ----------  
+    model : AgglomerativeClustering, optional  
+        The fitted model.   
+    point_cloud : ndarray, optional 
+        The data points.
+    epsilon : float, optional   
+        The threshold for condensing the tree.
+    **kwargs : dict, optional   
+        Additional keyword arguments.
+    
+    Attributes: 
+    ----------  
+    model : AgglomerativeClustering  
+        The fitted model.   
+    point_cloud : ndarray   
+        The data points.
+    epsilon : float 
+        The threshold for condensing the tree.
+    linkage : ndarray   
+        The linkage matrix. 
+    tree : nx.Graph 
+        The condensed tree.
+    collapsed_branches : dict   
+        The collapsed branches.    
+    """
+    def __init__(self, point_cloud = None,  model = None, epsilon=0.25):
+        self.model = model
+        self.point_cloud = point_cloud
+        self.epsilon = epsilon
+        self.linkage = None
+        self.tree = None
+        self.collapsed_branches = None
+
+    def fit(self, **kwargs):
+        """
+        Fit the condensed tree.
+        """
+        if self.model is None and self.point_cloud is None:
+            raise ValueError("Please provide either an agglomerative clustering or the data for hierchical clustering.")
+        
+        if self.model is not None and self.point_cloud is not None:
+            Z = linkage_matrix(self.model)
+            print('Calculating branch lengths...')
+            B = branch_lengths(Z, self.point_cloud)
+            print('Constructing tree...')
+            self.tree = _epsilon_tree(Z, B, epsilon = self.epsilon)
+        if self.model is None and self.point_cloud is not None:
+            print('Performing clustering...')
+            self.model = DotProductAgglomerativeClustering(**kwargs)
+            self.model.fit(self.point_cloud)
+            Z = linkage_matrix(self.model)
+            print('Calculating branch lengths...')
+            B = branch_lengths(Z, self.point_cloud)
+            print('Constructing tree...')
+            self.tree = _epsilon_tree(Z, B, epsilon = self.epsilon)
+        if self.model is not None and self.point_cloud is None:
+            print('Constructing tree...')
+            data = self.model.children_
+            n = self.model.n_leaves_
+            self.tree = nx.Graph()
+            for i in range(self.point_cloud.shape[0]):
+                idx = i + n
+                to_merge = self.point_cloud[i]
+                self.tree.add_edge(to_merge[0], idx)
+                self.tree.add_edge(to_merge[1], idx)
+        return self
+    
+    def plot(self, labels = None, colours = None, colour_threshold = .5, prog = "sfdp", forceatlas_iter = 250, node_size = 10, scaling_node_size = 1, **kwargs):
+        """
+        Plot the condensed tree.
+        """
+        if self.tree is None:
+            raise ValueError("Please fit the tree first.")
+        if self.linkage is None:
+            self.linkage = linkage_matrix(self.model)
+        
+        G_clusters = _find_clusters(self.tree, self.linkage, just_leaves = True)
+        
+        if labels is not None and isinstance(colours, dict):
+            colour_dict = _find_colours(labels, colours, G_clusters, colour_threshold = colour_threshold)
+            colours = [colour_dict[node] for node in self.tree.nodes()]
+        if colours is None:
+            colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
+        
+        cluster_sizes_dict = _find_cluster_sizes(G_clusters)
+        plot_sizes_dict = {k: node_size + scaling_node_size * v for k, v in cluster_sizes_dict.items()}
+        sizes = [plot_sizes_dict[node] for node in self.tree.nodes()]
+    
+        n = self.model.n_leaves_
+        forceatlas2 = ForceAtlas2()
+        plt.figure(figsize=(10,10))
+        positions = nx.nx_agraph.graphviz_layout(self.tree, prog=prog, root=2*n-2)
+        if forceatlas_iter != 0:
+            positions = forceatlas2.forceatlas2_networkx_layout(self.tree, pos=positions, iterations=forceatlas_iter)
+        nx.draw(self.tree, positions, node_color=colours, 
+                node_size=sizes, **kwargs)
+        plt.show()
+
+
+
+
+
+## ======= Kendall's tau similarity ======= ##
     
 def get_ranking(model):
     """ 
@@ -179,88 +525,7 @@ def kendalltau_similarity(model, true_ranking):
     return np.mean(kt)
 
 
-
-
-# def plot_HC_clustering(model, node_colours=None, no_merges=None, labels=None, plot_labels=None, internal_node_colour='black',
-#                        linewidths=None, edgecolors=None, leaf_node_size=20, fontsize=10, internal_node_size=1, figsize=(10, 10)):
-#     """ 
-#     Plot the hierarchical clustering tree.    
-
-#     Parameters  
-#     ----------  
-#     model : AgglomerativeClustering 
-#         The fitted model.   
-#     node_colours : array-like, shape (n_samples,)   
-#         The colour of the nodes.
-#     no_merges : int, optional
-#         The number of merges to plot. If None, plot all merges.
-#     labels : array-like, shape (n_samples,) 
-#         The labels of the samples.
-#     plot_labels : bool, optional    
-#         Whether to plot the labels.
-#     internal_node_colour : str, optional    
-#         The colour of the internal nodes.   
-#     linewidths : float, optional    
-#         The width of the lines. 
-#     edgecolors : str, optional  
-#         The colour of the edges.
-#     leaf_node_size : int, optional  
-#         The size of the leaf nodes. 
-#     fontsize : int, optional
-#         The size of the font.
-#     internal_node_size : int, optional  
-#         The size of the internal nodes.
-#     figsize : tuple, optional   
-#         The size of the figure.
-
-#     Returns 
-#     ------- 
-#     None    
-#     """
-
-#     if no_merges is None:
-#         no_merges = model.children_.shape[0]
-#     if node_colours is None:
-#         node_colours = np.repeat('skyblue', model.n_leaves_)
-#     if labels is None:
-#         labels = np.repeat('', model.children_.shape[0] + model.n_leaves_)
-
-#     data = model.children_[:no_merges, :]
-#     n = model.n_leaves_
-
-#     G = nx.Graph()
-
-#     for i in range(data.shape[0]):
-#         idx = i + n
-#         to_merge = data[i]
-#         G.add_edge(to_merge[0], idx)
-#         G.add_edge(to_merge[1], idx)
-
-#     node_colours_ = {}
-#     node_sizes = {}
-#     node_names = {}
-#     for node in G.nodes():
-#         if node < n:
-#             node_colours_[node] = node_colours[node]
-#             node_sizes[node] = leaf_node_size
-#             node_names[node] = labels[node]
-#         else:
-#             node_colours_[node] = internal_node_colour
-#             node_sizes[node] = internal_node_size
-#             node_names[node] = ''
-
-#     # Draw the graph with node sizes and names
-#     plt.figure(figsize=figsize)  # Adjust figure size
-
-#     positions = nx.nx_agraph.graphviz_layout(G, prog="sfdp")
-#     nx.draw(G, positions, with_labels=False, node_size=[
-#             node_sizes[node] for node in G.nodes()], node_color=[
-#             node_colours_[node] for node in G.nodes()], edgecolors=edgecolors, linewidths=linewidths)
-
-#     nx.draw_networkx_labels(
-#         G, positions, labels=node_names, font_size=fontsize)
-#     plt.show()
-
+## ========= Hyperbolicity ========= ##
 
 
 def sample_hyperbolicity(data, metric='dot_products', num_samples=5000):
@@ -329,16 +594,3 @@ def sample_hyperbolicity(data, metric='dot_products', num_samples=5000):
     # return hyps
     return np.max(hyps), np.mean(hyps)
 
-
-
-def _get_triu(matrix, k=1):
-    return matrix[np.triu_indices(matrix.shape[0], k=k)]
-
-
-def _utri2mat(utri):
-    n = int(-1 + np.sqrt(1 + 8*len(utri))) // 2
-    iu1 = np.triu_indices(n)
-    ret = np.empty((n, n))
-    ret[iu1] = utri
-    ret.T[iu1] = utri
-    return ret
