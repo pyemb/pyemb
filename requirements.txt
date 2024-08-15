@@ -39,3 +39,5 @@ scipy==1.14.0
 setuptools==59.6.0
 textblob==0.18.0.post0
 tqdm==4.66.4
+fa2_modified==0.3.10
+pygraphviz==1.13

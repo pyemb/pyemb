@@ -11,7 +11,7 @@ def read_requirements():
 
 setup(
     name="pyemb",
-    version="1.0.0a3",
+    version="1.0.0a4",
     author="Annie Gray",
     author_email="annie.gray@bristol.ac.uk",
     description="EDA for complex data",
