@@ -5,8 +5,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import networkx as nx
 from copy import deepcopy
 from tqdm import tqdm
+import nltk
 
-from ._utils import *
+from ._utils import _symmetric_dilation, _count_based_on_keys, _ensure_stopwords_downloaded, _del_email_address, _clean_text_, _transform_edge_data, _create_adjacency_matrix, _create_node_attributes, _extract_node_time_info, _unfolded_to_list
 
 def graph_from_dataframes(
     tables,

@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 import networkx as nx
 
-from scipy.cluster.hierarchy import cophenet
+from scipy.cluster.hierarchy import cophenet,dendrogram
 from scipy.spatial.distance import squareform
 from scipy.stats import rankdata
 from sklearn.metrics import pairwise_distances
@@ -431,9 +431,9 @@ class ConstructTree:
             data = self.model.children_
             n = self.model.n_leaves_
             self.tree = nx.Graph()
-            for i in range(self.point_cloud.shape[0]):
+            for i in range(self.model.children_.shape[0]):
                 idx = i + n
-                to_merge = self.point_cloud[i]
+                to_merge = self.model.children_[i]
                 self.tree.add_edge(to_merge[0], idx)
                 self.tree.add_edge(to_merge[1], idx)
         return self
@@ -447,19 +447,27 @@ class ConstructTree:
         if self.linkage is None:
             self.linkage = linkage_matrix(self.model)
         
-        G_clusters = _find_clusters(self.tree, self.linkage, just_leaves = True)
-        
-        if labels is not None and isinstance(colours, dict):
-            colour_dict = _find_colours(labels, colours, G_clusters, colour_threshold = colour_threshold)
-            colours = [colour_dict[node] for node in self.tree.nodes()]
-        if colours is None:
-            colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
-        
-        cluster_sizes_dict = _find_cluster_sizes(G_clusters)
-        plot_sizes_dict = {k: node_size + scaling_node_size * v for k, v in cluster_sizes_dict.items()}
-        sizes = [plot_sizes_dict[node] for node in self.tree.nodes()]
-    
         n = self.model.n_leaves_
+        n_nodes = self.tree.number_of_nodes() 
+        
+        if n_nodes != 2*n-1:
+            G_clusters = _find_clusters(self.tree, self.linkage, just_leaves = True)
+            if labels is not None and isinstance(colours, dict):
+                colour_dict = _find_colours(labels, colours, G_clusters, colour_threshold = colour_threshold)
+                colours = [colour_dict[node] for node in self.tree.nodes()]
+            if colours is None:
+                colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
+            cluster_sizes_dict = _find_cluster_sizes(G_clusters)
+            plot_sizes_dict = {k: node_size + scaling_node_size * v for k, v in cluster_sizes_dict.items()}
+            sizes = [plot_sizes_dict[node] for node in self.tree.nodes()]
+        else:
+            sizes = [node_size if node < self.model.n_leaves_  else 1 for node in self.tree.nodes()]
+            if labels is not None and isinstance(colours, dict):
+                colours = [colours[labels[node]] if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
+            if colours is None:
+                colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
+            
+    
         forceatlas2 = ForceAtlas2()
         plt.figure(figsize=(10,10))
         positions = nx.nx_agraph.graphviz_layout(self.tree, prog=prog, root=2*n-2)
@@ -593,4 +601,47 @@ def sample_hyperbolicity(data, metric='dot_products', num_samples=5000):
             continue
     # return hyps
     return np.max(hyps), np.mean(hyps)
+
+def plot_dendrogram(model, dot_product_clustering=True, rescale = False,  **kwargs):
+    """
+    Create linkage matrix and then plot the dendrogram  
+
+    Parameters  
+    ----------  
+    model : AgglomerativeClustering 
+        The fitted model to plot.
+    **kwargs : dict 
+        Keyword arguments for dendrogram function.
+
+    Returns 
+    ------- 
+    None
+    """
+    counts = np.zeros(model.children_.shape[0])
+    n_samples = len(model.labels_)
+    for i, merge in enumerate(model.children_):
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
+    
+    d_max = np.max(model.distances_)
+    d_min = np.min(model.distances_)    
+        
+    if dot_product_clustering:
+        distances = d_max - model.distances_
+    else:   
+        distances = model.distances_
+    if rescale:
+        distances = distances / (d_max - d_min)
+
+    linkage_matrix = np.column_stack(
+        [model.children_, distances, counts]
+    ).astype(float)
+
+    # Plot the corresponding dendrogram
+    dendrogram(linkage_matrix, **kwargs)
 

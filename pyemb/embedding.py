@@ -33,12 +33,6 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     ws : list of numpy.ndarray
         The Wasserstein distances between the training and test data for each number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
-
-    try:
-        import ot
-    except ModuleNotFoundError:
-        logging.error("ot not found, please install ot package with 'pip install pot'")
-
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
     Y1 = Y[idx]
@@ -60,9 +54,11 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
         M = ot.dist((Y1 @ Vt.T[:, :dim]) @ Vt[:dim, :], Y2, metric="euclidean")
         Ws.append(ot.emd2(np.repeat(1 / n1, n1), np.repeat(1 / n2, n2), M))
 
-    print(f"Recommended dimension: {np.argmin(Ws)}, Wasserstein distance {Ws[dim]:.5f}")
-    return Ws
-
+    if not isinstance(dims, list):
+        dims = list(dims)
+    chosen_dim = dims[np.argmin(Ws)]
+    print(f"Recommended dimension: {chosen_dim}, Wasserstein distance {Ws[np.argmin(Ws)]:.5f}")
+    return Ws, int(chosen_dim)
 
 def embed(
     Y,
