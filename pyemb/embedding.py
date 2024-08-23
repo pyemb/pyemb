@@ -53,7 +53,6 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     for dim in tqdm(dims):
         M = ot.dist((Y1 @ Vt.T[:, :dim]) @ Vt[:dim, :], Y2, metric="euclidean")
         Ws.append(ot.emd2(np.repeat(1 / n1, n1), np.repeat(1 / n2, n2), M))
-
     if not isinstance(dims, list):
         dims = list(dims)
     chosen_dim = dims[np.argmin(Ws)]

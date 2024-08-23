@@ -12,7 +12,7 @@ from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
 from fa2_modified import ForceAtlas2
 
-from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes
+from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes, _utri2mat, _get_triu
 
 
 ## ========= Dot product based hierarchical clustering ========= ##
@@ -21,8 +21,9 @@ class DotProductAgglomerativeClustering:
     """ 
     Perform hierarchical clustering using dot product as the metric.    
     
-    Parameters: 
-    ----------  
+    Parameters
+    ----------
+
     metric : str, optional  
         The metric to use for clustering.   
     linkage : str, optional 
@@ -32,7 +33,7 @@ class DotProductAgglomerativeClustering:
     n_clusters : int, optional  
         The number of clusters to find.
         
-    Attributes: 
+    Attributes 
     ----------  
     distances_ : ndarray    
         The distances between the clusters. 
@@ -100,7 +101,7 @@ def linkage_matrix(model):
     """ 
     Convert a hierarchical clustering model to a linkage matrix.    
     
-    Parameters: 
+    Parameters
     ----------  
     model : AgglomerativeClustering
         The fitted model.   
@@ -109,7 +110,7 @@ def linkage_matrix(model):
     max_height : float, optional    
         The maximum height of the tree.
         
-    Returns:    
+    Returns  
     ------- 
     ndarray
         The linkage matrix.
@@ -225,12 +226,12 @@ def branch_lengths(Z, point_cloud = None):
     """
     Calculate branch lengths for a hierarchical clustering dendrogram.
 
-    Parameters:
+    Parameters
     ----------
     Z (ndarray): The linkage matrix.
     point_cloud (ndarray): The data points.
 
-    Returns:
+    Returns
     -------
     ndarray: Matrix of branch lengths.
     """
@@ -258,14 +259,14 @@ def find_descendents(Z, node, desc=None, just_leaves=True):
     """
     Find all descendants of a given node in a hierarchical clustering tree.
 
-    Parameters:
+    Parameters
     ----------
     Z (ndarray): The linkage matrix.
     node (int): The node to find descendants of.
     desc (dict, optional): Dictionary to store descendants.
     just_leaves (bool, optional): Whether to include only leaf nodes.
 
-    Returns:
+    Returns
     -------
     list: List of descendants.
     """
@@ -290,13 +291,13 @@ def _epsilon_tree(Z, B, epsilon = 0.25):
     """
     Condense a hierarchical clustering tree.
 
-    Parameters:
+    Parameters
     ----------
     Z (ndarray): The linkage matrix.
     B (ndarray): Matrix of branch lengths.
     epsilon (float): Threshold for condensing the tree.
 
-    Returns:
+    Returns
     -------
     nx.Graph: Condensed tree as a NetworkX graph.
     """
@@ -343,12 +344,14 @@ def _find_clusters(G, Z, just_leaves=True):
     """
     Find clusters in a condensed tree.
 
-    Parameters:
+    Parameters
+    ----------
     G (nx.Graph): Condensed tree.
     Z (ndarray): The linkage matrix.
     just_leaves (bool, optional): Whether to include only leaf nodes.
 
-    Returns:
+    Returns
+    -------
     dict: Dictionary of clusters.
     """
     total = []
@@ -370,7 +373,7 @@ class ConstructTree:
     """
     Construct a condensed tree from a hierarchical clustering model.
     
-    Parameters: 
+    Parameters
     ----------  
     model : AgglomerativeClustering, optional  
         The fitted model.   
@@ -381,7 +384,7 @@ class ConstructTree:
     **kwargs : dict, optional   
         Additional keyword arguments.
     
-    Attributes: 
+    Attributes
     ----------  
     model : AgglomerativeClustering  
         The fitted model.   

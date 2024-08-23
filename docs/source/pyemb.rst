@@ -4,10 +4,10 @@ pyemb package
 Submodules
 ----------
 
-pyemb.analysis module
----------------------
+pyemb.preprocessing module
+--------------------------
 
-.. automodule:: pyemb.analysis
+.. automodule:: pyemb.preprocessing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,10 +20,35 @@ pyemb.embedding module
    :undoc-members:
    :show-inheritance:
 
-pyemb.preprocessing module
---------------------------
+pyemb.tools module
+------------------
 
-.. automodule:: pyemb.preprocessing
+.. automodule:: pyemb.tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyemb.plotting module
+---------------------
+
+.. automodule:: pyemb.plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+pyemb.hc module
+---------------
+
+.. automodule:: pyemb.hc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyemb.simulation module
+-----------------------
+
+.. automodule:: pyemb.simulation
    :members:
    :undoc-members:
    :show-inheritance:
