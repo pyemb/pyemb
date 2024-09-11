@@ -3,6 +3,14 @@ import plotly.express as px
 import numpy as np
 import pandas as pd
 
+def ensure_plotly():
+    try:
+        import plotly
+    except ImportError:
+        raise ImportError(
+            "Plotly is not installed. Please install it using `pip install plotly`."
+        )
+
 
 def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
     """
@@ -25,6 +33,9 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
         The title of the plot.
 
     """
+    
+    ensure_plotly()
+    
     if len(embedding.shape) == 3:
         embedding = embedding.reshape((n * T, -1))
 
