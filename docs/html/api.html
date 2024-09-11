@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyemb package &mdash; pyemb  documentation</title>
+  <title>API &mdash; pyemb  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorials" href="tutorials/index.html" />
-    <link rel="prev" title="pyemb" href="modules.html" /> 
+    <link rel="next" title="Contributors and References" href="refs.html" />
+    <link rel="prev" title="Planaria single-cell" href="tutorials/planaria.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,68 +46,87 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pyemb</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">pyemb package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.preprocessing">pyemb.preprocessing module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.find_connected_components"><code class="docutils literal notranslate"><span class="pre">find_connected_components()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.find_subgraph"><code class="docutils literal notranslate"><span class="pre">find_subgraph()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.graph_from_dataframes"><code class="docutils literal notranslate"><span class="pre">graph_from_dataframes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.largest_cc_of"><code class="docutils literal notranslate"><span class="pre">largest_cc_of()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.text_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">text_matrix_and_attributes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.time_series_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">time_series_matrix_and_attributes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.preprocessing.to_networkx"><code class="docutils literal notranslate"><span class="pre">to_networkx()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.embedding">pyemb.embedding module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.ISE"><code class="docutils literal notranslate"><span class="pre">ISE()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.OMNI"><code class="docutils literal notranslate"><span class="pre">OMNI()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.UASE"><code class="docutils literal notranslate"><span class="pre">UASE()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.dyn_embed"><code class="docutils literal notranslate"><span class="pre">dyn_embed()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.eigen_decomp"><code class="docutils literal notranslate"><span class="pre">eigen_decomp()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.regularised_ULSE"><code class="docutils literal notranslate"><span class="pre">regularised_ULSE()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.embedding.wasserstein_dimension_select"><code class="docutils literal notranslate"><span class="pre">wasserstein_dimension_select()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.tools">pyemb.tools module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.tools.degree_correction"><code class="docutils literal notranslate"><span class="pre">degree_correction()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.tools.recover_subspaces"><code class="docutils literal notranslate"><span class="pre">recover_subspaces()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.tools.select"><code class="docutils literal notranslate"><span class="pre">select()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.tools.to_laplacian"><code class="docutils literal notranslate"><span class="pre">to_laplacian()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.tools.varimax"><code class="docutils literal notranslate"><span class="pre">varimax()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.plotting">pyemb.plotting module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.plotting.quick_plot"><code class="docutils literal notranslate"><span class="pre">quick_plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.plotting.snapshot_plot"><code class="docutils literal notranslate"><span class="pre">snapshot_plot()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.hc">pyemb.hc module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree"><code class="docutils literal notranslate"><span class="pre">ConstructTree</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.branch_lengths"><code class="docutils literal notranslate"><span class="pre">branch_lengths()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.cophenetic_distances"><code class="docutils literal notranslate"><span class="pre">cophenetic_distances()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.find_descendents"><code class="docutils literal notranslate"><span class="pre">find_descendents()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.get_ranking"><code class="docutils literal notranslate"><span class="pre">get_ranking()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.kendalltau_similarity"><code class="docutils literal notranslate"><span class="pre">kendalltau_similarity()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.linkage_matrix"><code class="docutils literal notranslate"><span class="pre">linkage_matrix()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.plot_dendrogram"><code class="docutils literal notranslate"><span class="pre">plot_dendrogram()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.sample_hyperbolicity"><code class="docutils literal notranslate"><span class="pre">sample_hyperbolicity()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb.simulation">pyemb.simulation module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.simulation.SBM"><code class="docutils literal notranslate"><span class="pre">SBM()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.simulation.iid_SBM"><code class="docutils literal notranslate"><span class="pre">iid_SBM()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pyemb.simulation.symmetrises"><code class="docutils literal notranslate"><span class="pre">symmetrises()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyemb">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.preprocessing">Preprocessing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.find_connected_components"><code class="docutils literal notranslate"><span class="pre">find_connected_components()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.find_subgraph"><code class="docutils literal notranslate"><span class="pre">find_subgraph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.graph_from_dataframes"><code class="docutils literal notranslate"><span class="pre">graph_from_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.largest_cc_of"><code class="docutils literal notranslate"><span class="pre">largest_cc_of()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.text_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">text_matrix_and_attributes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.time_series_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">time_series_matrix_and_attributes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.to_networkx"><code class="docutils literal notranslate"><span class="pre">to_networkx()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.embedding">Embedding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.ISE"><code class="docutils literal notranslate"><span class="pre">ISE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.OMNI"><code class="docutils literal notranslate"><span class="pre">OMNI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.UASE"><code class="docutils literal notranslate"><span class="pre">UASE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.dyn_embed"><code class="docutils literal notranslate"><span class="pre">dyn_embed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.eigen_decomp"><code class="docutils literal notranslate"><span class="pre">eigen_decomp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.regularised_ULSE"><code class="docutils literal notranslate"><span class="pre">regularised_ULSE()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.wasserstein_dimension_select"><code class="docutils literal notranslate"><span class="pre">wasserstein_dimension_select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.plotting">Plotting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.ensure_plotly"><code class="docutils literal notranslate"><span class="pre">ensure_plotly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.quick_plot"><code class="docutils literal notranslate"><span class="pre">quick_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.snapshot_plot"><code class="docutils literal notranslate"><span class="pre">snapshot_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.hc">Hierarchical Clustering</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.ConstructTree"><code class="docutils literal notranslate"><span class="pre">ConstructTree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.model"><code class="docutils literal notranslate"><span class="pre">ConstructTree.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.point_cloud"><code class="docutils literal notranslate"><span class="pre">ConstructTree.point_cloud</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.epsilon"><code class="docutils literal notranslate"><span class="pre">ConstructTree.epsilon</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.linkage"><code class="docutils literal notranslate"><span class="pre">ConstructTree.linkage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.tree"><code class="docutils literal notranslate"><span class="pre">ConstructTree.tree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.collapsed_branches"><code class="docutils literal notranslate"><span class="pre">ConstructTree.collapsed_branches</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.fit"><code class="docutils literal notranslate"><span class="pre">ConstructTree.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.ConstructTree.plot"><code class="docutils literal notranslate"><span class="pre">ConstructTree.plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.distances_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.distances_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.children_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.children_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.labels_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.labels_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.n_clusters_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.n_clusters_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.n_connected_components_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.n_connected_components_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.n_leaves_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.n_leaves_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.n_features_in_"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.n_features_in_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.n_clusters_</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyemb.hc.DotProductAgglomerativeClustering.fit"><code class="docutils literal notranslate"><span class="pre">DotProductAgglomerativeClustering.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.branch_lengths"><code class="docutils literal notranslate"><span class="pre">branch_lengths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.cophenetic_distances"><code class="docutils literal notranslate"><span class="pre">cophenetic_distances()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.find_descendents"><code class="docutils literal notranslate"><span class="pre">find_descendents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.get_ranking"><code class="docutils literal notranslate"><span class="pre">get_ranking()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.kendalltau_similarity"><code class="docutils literal notranslate"><span class="pre">kendalltau_similarity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.linkage_matrix"><code class="docutils literal notranslate"><span class="pre">linkage_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.plot_dendrogram"><code class="docutils literal notranslate"><span class="pre">plot_dendrogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.hc.sample_hyperbolicity"><code class="docutils literal notranslate"><span class="pre">sample_hyperbolicity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.tools">Matrix and Graph Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.tools.degree_correction"><code class="docutils literal notranslate"><span class="pre">degree_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.tools.recover_subspaces"><code class="docutils literal notranslate"><span class="pre">recover_subspaces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.tools.select"><code class="docutils literal notranslate"><span class="pre">select()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.tools.to_laplacian"><code class="docutils literal notranslate"><span class="pre">to_laplacian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.tools.varimax"><code class="docutils literal notranslate"><span class="pre">varimax()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyemb.simulation">Simulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.simulation.SBM"><code class="docutils literal notranslate"><span class="pre">SBM()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.simulation.iid_SBM"><code class="docutils literal notranslate"><span class="pre">iid_SBM()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.simulation.symmetrises"><code class="docutils literal notranslate"><span class="pre">symmetrises()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="refs.html">Contributors and References</a></li>
 </ul>
 
         </div>
@@ -124,10 +143,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">pyemb</a></li>
-      <li class="breadcrumb-item active">pyemb package</li>
+      <li class="breadcrumb-item active">API</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/pyemb.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -135,13 +153,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyemb-package">
-<h1>pyemb package<a class="headerlink" href="#pyemb-package" title="Link to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Link to this heading"></a></h1>
 <section id="module-pyemb.preprocessing">
-<span id="pyemb-preprocessing-module"></span><h2>pyemb.preprocessing module<a class="headerlink" href="#module-pyemb.preprocessing" title="Link to this heading"></a></h2>
+<span id="preprocessing"></span><h2>Preprocessing<a class="headerlink" href="#module-pyemb.preprocessing" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.preprocessing.find_connected_components">
 <span class="sig-prename descclassname"><span class="pre">pyemb.preprocessing.</span></span><span class="sig-name descname"><span class="pre">find_connected_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.preprocessing.find_connected_components" title="Link to this definition"></a></dt>
@@ -311,7 +326,7 @@ the attributes of the nodes in the columns.</p></li>
 
 </section>
 <section id="module-pyemb.embedding">
-<span id="pyemb-embedding-module"></span><h2>pyemb.embedding module<a class="headerlink" href="#module-pyemb.embedding" title="Link to this heading"></a></h2>
+<span id="embedding"></span><h2>Embedding<a class="headerlink" href="#module-pyemb.embedding" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.embedding.ISE">
 <span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">ISE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">As</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procrustes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistent_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.ISE" title="Link to this definition"></a></dt>
@@ -506,118 +521,13 @@ For more details, see:
 </dd></dl>
 
 </section>
-<section id="module-pyemb.tools">
-<span id="pyemb-tools-module"></span><h2>pyemb.tools module<a class="headerlink" href="#module-pyemb.tools" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.tools.degree_correction">
-<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">degree_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.degree_correction" title="Link to this definition"></a></dt>
-<dd><p>Perform degree correction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph, either 2D or 3D.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>embedding_dc</strong> – The degree-corrected embedding.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.tools.recover_subspaces">
-<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">recover_subspaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.recover_subspaces" title="Link to this definition"></a></dt>
-<dd><p>Recover the subspaces for each partition from an embedding.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph.</p></li>
-<li><p><strong>attributes</strong> (<em>list</em><em> of </em><em>lists</em>) – The attributes of the nodes. The first list contains the attributes
-of the nodes in rows. The second list contains
-the attributes of the nodes in the columns.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>partition_embeddings</strong> (<em>dict</em>) – The embeddings of the partitions.</p></li>
-<li><p><strong>partition_attributes</strong> (<em>dict</em>) – The attributes of the nodes in the partitions.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.tools.select">
-<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_attributes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.select" title="Link to this definition"></a></dt>
-<dd><p>Select portion of embedding and attributes associated with a set of attributes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph.</p></li>
-<li><p><strong>attributes</strong> (<em>list</em><em> of </em><em>lists</em>) – The attributes of the nodes. The first list contains the attributes
-of the nodes in rows. The second list contains
-the attributes of the nodes in the columns.</p></li>
-<li><p><strong>select_attributes</strong> (<em>dict</em><em> or </em><em>list</em><em> of </em><em>dicts</em>) – The attributes to select by. If a list of dicts is provided, the intersection of the nodes
-satisfying each dict is selected.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>selected_X</strong> (<em>numpy.ndarray</em>) – The selected embedding.</p></li>
-<li><p><strong>selected_attributes</strong> (<em>list of lists</em>) – The attributes of the selected nodes.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.tools.to_laplacian">
-<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">to_laplacian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regulariser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.to_laplacian" title="Link to this definition"></a></dt>
-<dd><p>Convert an adjacency matrix to a Laplacian matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>scipy.sparse.csr_matrix</em>) – The adjacency matrix.</p></li>
-<li><p><strong>regulariser</strong> (<em>float</em>) – The regulariser to be added to the degrees of the nodes. If ‘auto’, the regulariser is set to the mean of the degrees.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>L</strong> – The Laplacian matrix.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>scipy.sparse.csr_matrix</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.tools.varimax">
-<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">varimax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.varimax" title="Link to this definition"></a></dt>
-<dd><p>Perform varimax rotation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Phi</strong> (<em>numpy.ndarray</em>) – The matrix to rotate.</p></li>
-<li><p><strong>gamma</strong> (<em>float</em><em>, </em><em>optional</em>) – The gamma parameter.</p></li>
-<li><p><strong>q</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations.</p></li>
-<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The tolerance.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The rotated matrix.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 <section id="module-pyemb.plotting">
-<span id="pyemb-plotting-module"></span><h2>pyemb.plotting module<a class="headerlink" href="#module-pyemb.plotting" title="Link to this heading"></a></h2>
+<span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-pyemb.plotting" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.plotting.ensure_plotly">
+<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">ensure_plotly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.ensure_plotly" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.plotting.quick_plot">
 <span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">quick_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.quick_plot" title="Link to this definition"></a></dt>
@@ -663,7 +573,7 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 
 </section>
 <section id="module-pyemb.hc">
-<span id="pyemb-hc-module"></span><h2>pyemb.hc module<a class="headerlink" href="#module-pyemb.hc" title="Link to this heading"></a></h2>
+<span id="hierarchical-clustering"></span><h2>Hierarchical Clustering<a class="headerlink" href="#module-pyemb.hc" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyemb.hc.ConstructTree">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyemb.hc.</span></span><span class="sig-name descname"><span class="pre">ConstructTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_cloud</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.hc.ConstructTree" title="Link to this definition"></a></dt>
@@ -1027,8 +937,118 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 </dd></dl>
 
 </section>
+<section id="module-pyemb.tools">
+<span id="matrix-and-graph-tools"></span><h2>Matrix and Graph Tools<a class="headerlink" href="#module-pyemb.tools" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.tools.degree_correction">
+<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">degree_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.degree_correction" title="Link to this definition"></a></dt>
+<dd><p>Perform degree correction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph, either 2D or 3D.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>embedding_dc</strong> – The degree-corrected embedding.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.tools.recover_subspaces">
+<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">recover_subspaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.recover_subspaces" title="Link to this definition"></a></dt>
+<dd><p>Recover the subspaces for each partition from an embedding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph.</p></li>
+<li><p><strong>attributes</strong> (<em>list</em><em> of </em><em>lists</em>) – The attributes of the nodes. The first list contains the attributes
+of the nodes in rows. The second list contains
+the attributes of the nodes in the columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>partition_embeddings</strong> (<em>dict</em>) – The embeddings of the partitions.</p></li>
+<li><p><strong>partition_attributes</strong> (<em>dict</em>) – The attributes of the nodes in the partitions.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.tools.select">
+<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_attributes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.select" title="Link to this definition"></a></dt>
+<dd><p>Select portion of embedding and attributes associated with a set of attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding</strong> (<em>numpy.ndarray</em>) – The embedding of the graph.</p></li>
+<li><p><strong>attributes</strong> (<em>list</em><em> of </em><em>lists</em>) – The attributes of the nodes. The first list contains the attributes
+of the nodes in rows. The second list contains
+the attributes of the nodes in the columns.</p></li>
+<li><p><strong>select_attributes</strong> (<em>dict</em><em> or </em><em>list</em><em> of </em><em>dicts</em>) – The attributes to select by. If a list of dicts is provided, the intersection of the nodes
+satisfying each dict is selected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>selected_X</strong> (<em>numpy.ndarray</em>) – The selected embedding.</p></li>
+<li><p><strong>selected_attributes</strong> (<em>list of lists</em>) – The attributes of the selected nodes.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.tools.to_laplacian">
+<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">to_laplacian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regulariser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.to_laplacian" title="Link to this definition"></a></dt>
+<dd><p>Convert an adjacency matrix to a Laplacian matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>scipy.sparse.csr_matrix</em>) – The adjacency matrix.</p></li>
+<li><p><strong>regulariser</strong> (<em>float</em>) – The regulariser to be added to the degrees of the nodes. If ‘auto’, the regulariser is set to the mean of the degrees.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>L</strong> – The Laplacian matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>scipy.sparse.csr_matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.tools.varimax">
+<span class="sig-prename descclassname"><span class="pre">pyemb.tools.</span></span><span class="sig-name descname"><span class="pre">varimax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.tools.varimax" title="Link to this definition"></a></dt>
+<dd><p>Perform varimax rotation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Phi</strong> (<em>numpy.ndarray</em>) – The matrix to rotate.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em><em>, </em><em>optional</em>) – The gamma parameter.</p></li>
+<li><p><strong>q</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations.</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The tolerance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The rotated matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-pyemb.simulation">
-<span id="pyemb-simulation-module"></span><h2>pyemb.simulation module<a class="headerlink" href="#module-pyemb.simulation" title="Link to this heading"></a></h2>
+<span id="simulation"></span><h2>Simulation<a class="headerlink" href="#module-pyemb.simulation" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.simulation.SBM">
 <span class="sig-prename descclassname"><span class="pre">pyemb.simulation.</span></span><span class="sig-name descname"><span class="pre">SBM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[0.5,</span> <span class="pre">0.5],</span> <span class="pre">[0.5,</span> <span class="pre">0.4]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.5,</span> <span class="pre">0.5])</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.simulation.SBM" title="Link to this definition"></a></dt>
@@ -1045,17 +1065,14 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 <dd></dd></dl>
 
 </section>
-<section id="module-pyemb">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyemb" title="Link to this heading"></a></h2>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="pyemb" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorials/index.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorials/planaria.html" class="btn btn-neutral float-left" title="Planaria single-cell" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="refs.html" class="btn btn-neutral float-right" title="Contributors and References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

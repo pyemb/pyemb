@@ -1,62 +1,51 @@
-pyemb package
-=============
+API
+====
 
-Submodules
-----------
 
-pyemb.preprocessing module
---------------------------
+Preprocessing
+---------------
 
 .. automodule:: pyemb.preprocessing
    :members:
    :undoc-members:
    :show-inheritance:
 
-pyemb.embedding module
-----------------------
+Embedding
+----------
 
 .. automodule:: pyemb.embedding
    :members:
    :undoc-members:
    :show-inheritance:
 
-pyemb.tools module
-------------------
-
-.. automodule:: pyemb.tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pyemb.plotting module
----------------------
+Plotting
+----------
 
 .. automodule:: pyemb.plotting
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-pyemb.hc module
----------------
+Hierarchical Clustering
+------------------------
 
 .. automodule:: pyemb.hc
    :members:
    :undoc-members:
    :show-inheritance:
 
-pyemb.simulation module
+Matrix and Graph Tools 
 -----------------------
 
-.. automodule:: pyemb.simulation
+.. automodule:: pyemb.tools
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+Simulation
+-----------------------
 
-.. automodule:: pyemb
+.. automodule:: pyemb.simulation
    :members:
    :undoc-members:
    :show-inheritance:
