@@ -8,3 +8,4 @@ dist/
 test.ipynb
 pyemb/__pycache__/
 docs/source/tutorials/data/
+other/

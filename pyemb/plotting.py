@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
-import plotly.express as px
 import numpy as np
 import pandas as pd
 
 def ensure_plotly():
     try:
-        import plotly
+        import plotly.express as px
     except ImportError:
         raise ImportError(
             "Plotly is not installed. Please install it using `pip install plotly`."
