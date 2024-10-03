@@ -46,7 +46,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation and Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inst_over.html">Installation and Overview</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Lyon school graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#load-dataset">Load dataset</a></li>
@@ -199,7 +199,7 @@
 <a class="reference external" href="https://edwarddavis1.github.io/example_pyemb_quick_plot/">here</a> to
 view an example of the interactive output of <code class="docutils literal notranslate"><span class="pre">quick_plot()</span></code>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Quick interactive + animated plot of the embedding</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">quick_plot</span><span class="p">(</span><span class="n">URLSE_emb</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">node_labels</span><span class="p">)</span>
+<span class="c1"># fig = eb.quick_plot(URLSE_emb, n, T, node_labels)</span>
 </pre></div>
 </div>
 </section>
@@ -212,19 +212,19 @@ view an example of the interactive output of <code class="docutils literal notra
 <span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Class time&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">]</span>
 
 <span class="c1"># Plot the snapshots</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+<span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">URLSE_emb</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="c1"># adjust the vertical height of the legend</span>
     <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
 
 <span class="c1"># Apply any further adjustments to the plot</span>
-<span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/lyon_11_0.png" src="../_images/lyon_11_0.png" />
@@ -234,14 +234,15 @@ view an example of the interactive output of <code class="docutils literal notra
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">URLSE_emb_dc</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">URLSE_emb</span><span class="p">)</span>
 <span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">URLSE_emb_dc</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
+
 <span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE with degree correction&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -267,22 +268,46 @@ which is illustrated by no two time points looking at all alike.</p>
 
 <span class="n">ISE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">ISE_emb</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
-    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>     <span class="c1"># maximum number of columns in the plot</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
-
-    <span class="c1"># Apply other matplotlib settings</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
-    <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../_images/lyon_16_0.png" src="../_images/lyon_16_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ISE&quot;</span><span class="p">)</span>
+<span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">ISE_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="c1"># Adjust the text size on the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+
+<span class="n">ISE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">ISE_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_17_0.png" src="../_images/lyon_17_0.png" />
 </section>
 <section id="omnibus-embedding-omni">
 <h2>Omnibus embedding (OMNI)<a class="headerlink" href="#omnibus-embedding-omni" title="Link to this heading"></a></h2>
@@ -303,22 +328,20 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.</p>
 
 <span class="n">OMNI_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">OMNI_emb</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
-    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>     <span class="c1"># maximum number of columns in the plot</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
-
-    <span class="c1"># Apply other matplotlib settings</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
-    <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_18_0.png" src="../_images/lyon_18_0.png" />
+<img alt="../_images/lyon_19_0.png" src="../_images/lyon_19_0.png" />
 </section>
 <section id="uase">
 <h2>UASE<a class="headerlink" href="#uase" title="Link to this heading"></a></h2>
@@ -339,22 +362,20 @@ Neural Information Processing Systems 34 (2021): 10158-10170.</p>
 
 <span class="n">UASE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">UASE_emb</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
-    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>     <span class="c1"># maximum number of columns in the plot</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
-
-    <span class="c1"># Apply other matplotlib settings</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
-    <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_20_0.png" src="../_images/lyon_20_0.png" />
+<img alt="../_images/lyon_21_0.png" src="../_images/lyon_21_0.png" />
 </section>
 <section id="urlse">
 <h2>URLSE<a class="headerlink" href="#urlse" title="Link to this heading"></a></h2>
@@ -374,22 +395,20 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.</p>
 
 <span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">URLSE_emb</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">,</span>
-    <span class="n">node_labels</span><span class="p">,</span>
-    <span class="n">points_of_interest</span><span class="p">,</span>
-    <span class="n">point_labels</span><span class="p">,</span>
-    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>     <span class="c1"># maximum number of columns in the plot</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend_adjust</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span>
-
-    <span class="c1"># Apply other matplotlib settings</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
-    <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_22_0.png" src="../_images/lyon_22_0.png" />
+<img alt="../_images/lyon_23_0.png" src="../_images/lyon_23_0.png" />
 </section>
 </section>
 

@@ -46,7 +46,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inst_over.html">Installation and Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyemb.preprocessing">Preprocessing</a><ul>
@@ -71,7 +71,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyemb.plotting">Plotting</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.ensure_plotly"><code class="docutils literal notranslate"><span class="pre">ensure_plotly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.get_fig_legend_handles_labels"><code class="docutils literal notranslate"><span class="pre">get_fig_legend_handles_labels()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.quick_plot"><code class="docutils literal notranslate"><span class="pre">quick_plot()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.plotting.snapshot_plot"><code class="docutils literal notranslate"><span class="pre">snapshot_plot()</span></code></a></li>
 </ul>
@@ -524,9 +524,10 @@ For more details, see:
 <section id="module-pyemb.plotting">
 <span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-pyemb.plotting" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyemb.plotting.ensure_plotly">
-<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">ensure_plotly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.ensure_plotly" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="pyemb.plotting.get_fig_legend_handles_labels">
+<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">get_fig_legend_handles_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.get_fig_legend_handles_labels" title="Link to this definition"></a></dt>
+<dd><p>Get the legend handles and labels from a figure.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.plotting.quick_plot">
@@ -538,8 +539,8 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>embedding</strong> (<em>numpy.ndarray</em><em> (</em><em>n*T</em><em>, </em><em>d</em><em>) or </em><em>(</em><em>T</em><em>, </em><em>n</em><em>, </em><em>d</em><em>)</em>) – The dynamic embedding.</p></li>
 <li><p><strong>n</strong> (<em>int</em>) – The number of nodes.</p></li>
-<li><p><strong>T</strong> (<em>int</em>) – The number of time points (&gt; 1 animates the embedding).</p></li>
-<li><p><strong>node_labels</strong> (<em>list</em><em> of </em><em>length n</em>) – The labels of the nodes (time-invariant).</p></li>
+<li><p><strong>T</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The number of time points (&gt; 1 animates the embedding).</p></li>
+<li><p><strong>node_labels</strong> (<em>list</em><em> of </em><em>length n</em><em> (</em><em>optional</em><em>)</em>) – The labels of the nodes (time-invariant).</p></li>
 <li><p><strong>return_df</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – Option to return the plotting dataframe.</p></li>
 <li><p><strong>title</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The title of the plot.</p></li>
 </ul>
@@ -549,17 +550,27 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.plotting.snapshot_plot">
-<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">snapshot_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points_of_interest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_adjust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_legend_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.snapshot_plot" title="Link to this definition"></a></dt>
-<dd><p>Plots the selected embedding snapshots as a grid of scatter plots.</p>
+<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">snapshot_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_of_interest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_to_anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.5,</span> <span class="pre">-0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower</span> <span class="pre">center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_legend_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.snapshot_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot a snapshot of an embedding at a given time point.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>embedding</strong> (<em>numpy.ndarray</em><em> (</em><em>T</em><em>, </em><em>n</em><em>, </em><em>d</em><em>) or </em><em>(</em><em>n*T</em><em>, </em><em>d</em><em>)</em>) – The dynamic embedding.</p></li>
-<li><p><strong>n</strong> (<em>int</em>) – The number of nodes.</p></li>
-<li><p><strong>node_labels</strong> (<em>list</em><em> of </em><em>length n</em>) – The labels of the nodes (time-invariant).</p></li>
-<li><p><strong>points_of_interest</strong> (<em>list</em><em> of </em><em>int</em>) – The time point indices to plot.</p></li>
-<li><p><strong>point_labels</strong> (<em>list</em><em> of </em><em>str</em><em> (</em><em>optional</em><em>)</em>) – The labels of the points of interest.</p></li>
-<li><p><strong>max_cols</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The maximum number of columns in the scatter plot grid.</p></li>
+<li><p><strong>embedding</strong> (<em>np.ndarray</em><em> or </em><em>list</em><em> of </em><em>np.ndarray</em>) – The embedding to plot.</p></li>
+<li><p><strong>n</strong> (<em>int</em><em>  (</em><em>optional</em><em>)</em>) – The number of nodes in the graph. Should be provided if the embedding is a single numpy array and n is not the first dimension of the array.</p></li>
+<li><p><strong>node_labels</strong> (<em>list</em><em> (</em><em>optional</em><em>)</em>) – The labels of the nodes. Default is None.</p></li>
+<li><p><strong>c</strong> (<em>list</em><em> or </em><em>dict</em><em> (</em><em>optional</em><em>)</em>) – The colors of the nodes. If a list is provided, it should be a list of length n. If a dictionary is provided, it should map each unique label to a colour.</p></li>
+<li><p><strong>idx_of_interest</strong> (<em>list</em><em> (</em><em>optional</em><em>)</em>) – The indices which to plot. For example if embedding is a list, idx_of_interest can be used to plot only a subset of the embeddings. By default, all embeddings are plotted.</p></li>
+<li><p><strong>max_cols</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The maximum number of columns in the plot. Default is 4.</p></li>
+<li><p><strong>add_legend</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – Whether to add a legend to the plot. Default is False.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The title of the plot. If a list is provided, each element will be the title of a subplot. Default is None.</p></li>
+<li><p><strong>sharex</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – Whether to share the x-axis across subplots. Default is False.</p></li>
+<li><p><strong>sharey</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – Whether to share the y-axis across subplots. Default is False.</p></li>
+<li><p><strong>figsize_scale</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The scale of the figure size. Default is 5.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em> (</em><em>optional</em><em>)</em>) – The figure size. Default is None.</p></li>
+<li><p><strong>bbox_to_anchor</strong> (<em>tuple</em><em> (</em><em>optional</em><em>)</em>) – The bbox_to_anchor parameter for the legend. Default is (0.5,-.1).</p></li>
+<li><p><strong>loc</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The location of the legend. Default is ‘lower center’.</p></li>
+<li><p><strong>max_legend_cols</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The maximum number of columns in the legend. Default is 4.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em> (</em><em>optional</em><em>)</em>) – Additional keyword arguments for the scatter plot.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
