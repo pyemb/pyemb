@@ -12,7 +12,7 @@ pyemb is a toolkit for anaylsing complex datasets, such as high-dimensional data
    :maxdepth: 2
    :caption: Contents:
 
-   installation
+   inst_over
    tutorials/index
    api
    refs

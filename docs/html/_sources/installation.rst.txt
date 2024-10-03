@@ -1,5 +1,5 @@
-Installation and Overview
-==========================
+Installation
+=============
 
 
 Installation    
@@ -19,17 +19,3 @@ To install the package from source, clone the repository and run
         cd pyemb  
         pip install -e .    
 
-Overview    
---------    
-
-The package includes the following modules: 
-    * preprocessing 
-    * matrix and graph tools 
-    * embedding 
-    * visualisation
-    * hierarchical clustering    
-
-The functionality of the package is demonstrated in the tutorials through a few real datasets.
-
-Preprocessing
-~~~~~~~~~~~~~~

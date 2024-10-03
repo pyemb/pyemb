@@ -111,10 +111,7 @@ view an example of the interactive output of ``quick_plot()``.
 .. code:: ipython3
 
     # Quick interactive + animated plot of the embedding
-    fig = eb.quick_plot(URLSE_emb, n, T, node_labels)
-
-
-
+    # fig = eb.quick_plot(URLSE_emb, n, T, node_labels)
 
 Visualise embedding time point snapshots of interest
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,19 +125,19 @@ Visualise embedding time point snapshots of interest
     point_labels = ["Class time", "Lunch time"]
     
     # Plot the snapshots
-    fig = eb.snapshot_plot(
+    URLSE_fig = eb.snapshot_plot(
         URLSE_emb, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1, # adjust the vertical height of the legend
-        cmap="tab20"
+        cmap="tab20"   
     )
     
     # Apply any further adjustments to the plot
-    _ = fig.suptitle("URLSE")
+    _ = URLSE_fig.suptitle("URLSE")
 
 
 
@@ -155,14 +152,15 @@ Degree-correct the embedding
     URLSE_emb_dc = eb.degree_correction(URLSE_emb)
     URLSE_fig = eb.snapshot_plot(
         URLSE_emb_dc, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1,
-        cmap="tab20"
+        cmap="tab20"   
     )
+    
     _ = URLSE_fig.suptitle("URLSE with degree correction")
 
 
@@ -195,23 +193,52 @@ which is illustrated by no two time points looking at all alike.
     
     ISE_fig = eb.snapshot_plot(
         ISE_emb, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
-        max_cols=3,     # maximum number of columns in the plot
+        n= n,
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels,
+        max_cols=3, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1,
-        
-        # Apply other matplotlib settings
-        cmap="tab20",
-        s=70,
+        cmap="tab20"   
     )
     plt.tight_layout()
 
 
 
 .. image:: lyon_files/lyon_16_0.png
+
+
+.. code:: ipython3
+
+    ISE_emb = eb.dyn_embed(As, d, method="ISE")
+    ISE_emb = eb.degree_correction(ISE_emb)
+    
+    points_of_interest = [5, 14, 27, 41, 50, 63]
+    point_labels = ["Morning", "Lunch time", "Afternoon"] * 2
+    
+    # Adjust the text size on the plot
+    plt.rcParams.update({'font.size': 14})
+    
+    ISE_fig = eb.snapshot_plot(
+        ISE_emb, 
+        n= n,
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels,
+        max_cols=3, 
+        sharex = True,
+        sharey = True,
+        add_legend=True, 
+        cmap="tab20"   
+    )
+    
+    plt.tight_layout()
+
+
+
+.. image:: lyon_files/lyon_17_0.png
 
 
 Omnibus embedding (OMNI)
@@ -239,23 +266,21 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.
     
     OMNI_fig = eb.snapshot_plot(
         OMNI_emb, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
-        max_cols=3,     # maximum number of columns in the plot
+        n= n,
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels,
+        max_cols=3, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1,
-        
-        # Apply other matplotlib settings
-        cmap="tab20",
-        s=70,
+        cmap="tab20"   
     )
     plt.tight_layout()
 
 
 
-.. image:: lyon_files/lyon_18_0.png
+.. image:: lyon_files/lyon_19_0.png
 
 
 UASE
@@ -283,23 +308,21 @@ Neural Information Processing Systems 34 (2021): 10158-10170.
     
     UASE_fig = eb.snapshot_plot(
         UASE_emb, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
-        max_cols=3,     # maximum number of columns in the plot
+        n= n,
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels,
+        max_cols=3, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1,
-        
-        # Apply other matplotlib settings
-        cmap="tab20",
-        s=70,
+        cmap="tab20" 
     )
     plt.tight_layout()
 
 
 
-.. image:: lyon_files/lyon_20_0.png
+.. image:: lyon_files/lyon_21_0.png
 
 
 URLSE
@@ -325,21 +348,19 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.
     
     URLSE_fig = eb.snapshot_plot(
         URLSE_emb, 
-        n, 
-        node_labels, 
-        points_of_interest, 
-        point_labels, 
-        max_cols=3,     # maximum number of columns in the plot
+        n= n,
+        node_labels = node_labels, 
+        idx_of_interest = points_of_interest, 
+        title = point_labels,
+        max_cols=3, 
+        sharex = True,
+        sharey = True,
         add_legend=True, 
-        legend_adjust=-0.1,
-        
-        # Apply other matplotlib settings
-        cmap="tab20",
-        s=70,
+        cmap="tab20" 
     )
     plt.tight_layout()
 
 
 
-.. image:: lyon_files/lyon_22_0.png
+.. image:: lyon_files/lyon_23_0.png
 

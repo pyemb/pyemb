@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; pyemb  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="tutorials/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyemb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="inst_over.html">Installation and Overview</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preprocessing">Preprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#relational-database">Relational Database</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#time-series-data">Time Series Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#text-data">Text Data</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#matrix-and-graph-tools">Matrix and Graph Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#embedding">Embedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualisation">Visualisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hierarchical-clustering">Hierarchical Clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refs.html">Contributors and References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyemb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="inst_over.html">Installation and Overview</a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt>The package includes the following modules:</dt><dd><ul class="simple">
+<li><p>preprocessing</p></li>
+<li><p>matrix and graph tools</p></li>
+<li><p>embedding</p></li>
+<li><p>visualisation</p></li>
+<li><p>hierarchical clustering</p></li>
+</ul>
+</dd>
+</dl>
+<p>The functionality of the package is demonstrated in the tutorials through a few real datasets. However, further details on functionality can be found here.</p>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading"></a></h2>
+<p>This module contains a variety of functions for preprocessing data with two outputs</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>matrix of the data</strong>,</p></li>
+<li><p><strong>list of two dictionaries</strong> , one for the rows and one for the columns, that contain the metadata of the data.</p></li>
+</ol>
+</div></blockquote>
+<p>The types of data that can be processed include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>relational database</strong>: <cite>graph_from_dataframes</cite>, where pairs of columns are specified to indicate nodes in the same row have an edge between them,</p></li>
+<li><p><strong>time series data</strong>: <cite>time_series_matrix_and_attributes</cite> <em>(in progress)</em>,</p></li>
+<li><p><strong>text data</strong>: <cite>text_matrix_and_attributes`</cite> where the column on text data is converted to tf-idf features (columns).</p></li>
+</ul>
+</div></blockquote>
+<p>There is also functionality for finding connected components, subgraphs and converting to a networkx object.</p>
+<section id="relational-database">
+<h3>Relational Database<a class="headerlink" href="#relational-database" title="Link to this heading"></a></h3>
+<p>The <cite>graph_from_dataframes</cite> function takes a few parameters but two main ones we’ll talk about here: <cite>tables</cite> and <cite>relationship_cols</cite>. <cite>tables</cite> is a list of dataframes. <cite>relationship_cols</cite> is a list of lists of columns, which indicates which pairs of columns we’re interested in.
+For example: If I have tables = [df1,df2] where the columns of each are cols(df1) = [A,B,C] , cols(df2) = [B,C,D,E], there are a couple of ways to use <cite>relationship_cols</cite>:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>If relationship_cols = [[A,B], [B,C], [D,E]]</dt><dd><ul class="simple">
+<li><p>the function will look for those pairs of columns in each of the tables,</p></li>
+<li><p>from df1 I’d get the elements which are connected from A,B and B,C and from df2 I’d get the relationships from B,C and D,E</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>I can be more specific and have relationship_cols = [[[A,B], [B,C]], [D,E]]</dt><dd><ul class="simple">
+<li><p>relationship_cols[0] would be the columns we search for in df1 and relationship_cols[1] would be the columns we search for in df2</p></li>
+<li><p>In this case, from df1 I’d get the elements which are connected from A,B and B,C and from df2 I’d only get the relationships from D,E</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>A simplified version is described in this diagram:</p>
+<a class="reference internal image-reference" href="_images/graph_from_tables.png"><img alt="_images/graph_from_tables.png" src="_images/graph_from_tables.png" style="width: 750px;" /></a>
+</section>
+<section id="time-series-data">
+<h3>Time Series Data<a class="headerlink" href="#time-series-data" title="Link to this heading"></a></h3>
+<a class="reference internal image-reference" href="_images/timeseries.png"><img alt="_images/timeseries.png" src="_images/timeseries.png" style="width: 750px;" /></a>
+</section>
+<section id="text-data">
+<h3>Text Data<a class="headerlink" href="#text-data" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="matrix-and-graph-tools">
+<h2>Matrix and Graph Tools<a class="headerlink" href="#matrix-and-graph-tools" title="Link to this heading"></a></h2>
+</section>
+<section id="embedding">
+<h2>Embedding<a class="headerlink" href="#embedding" title="Link to this heading"></a></h2>
+</section>
+<section id="visualisation">
+<h2>Visualisation<a class="headerlink" href="#visualisation" title="Link to this heading"></a></h2>
+</section>
+<section id="hierarchical-clustering">
+<h2>Hierarchical Clustering<a class="headerlink" href="#hierarchical-clustering" title="Link to this heading"></a></h2>
+</section>
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials/index.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Annie Gray.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

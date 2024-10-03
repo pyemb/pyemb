@@ -14,6 +14,7 @@ hierarchical levels.
     import numpy as np
     from sklearn.datasets import fetch_20newsgroups
     import pyemb as eb
+    import matplotlib.pyplot as plt
 
 Data load
 ---------
@@ -148,22 +149,9 @@ details
 
 .. code:: ipython3
 
-    ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
-
-
-.. parsed-literal::
-
-    100%|██████████| 40/40 [02:28<00:00,  3.72s/it]
-
-.. parsed-literal::
-
-    Recommended dimension: 34, Wasserstein distance 0.97237
-
-
-.. parsed-literal::
-
-    
-
+    # ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
+    # print("Selected dimension: {}".format(dim))
+    dim = 28
 
 .. code:: ipython3
 
@@ -172,7 +160,7 @@ details
 
 .. parsed-literal::
 
-    Selected dimension: 34
+    Selected dimension: 28
 
 
 PCA and tSNE
@@ -191,21 +179,6 @@ Apply t-SNE
     from sklearn.manifold import TSNE
     
     tsne_zeta = TSNE(n_components=2, perplexity=30).fit_transform(zeta)
-
-Make dataframes of PCA embedding and t-SNE embedding for plotting
-
-.. code:: ipython3
-
-    zeta_df = pd.DataFrame(zeta[:, :2])
-    zeta_df["target"] = np.array(df['target_names'])
-    targets = zeta_df["target"].unique()
-    targets = sorted(targets)
-    labels = df['target']
-    
-    tsne_zeta_df = pd.DataFrame(tsne_zeta)
-    tsne_zeta_df["target"] = np.array(df['target_names'])
-    targets = tsne_zeta_df["target"].unique()
-    targets = sorted(targets)
 
 Colours dictionary where topics from the same theme have different
 shades of the same colour
@@ -237,32 +210,23 @@ Plot PCA on the LHS and PCA + t-SNE on the RHS
 
 .. code:: ipython3
 
-    import matplotlib.pyplot as plt
-    
-    fig, ax = plt.subplots(1, 2, figsize=(20, 10))
-    for t in targets:
-        t_df = zeta_df[zeta_df['target'] == t]
-        ax[0].scatter(t_df[0], t_df[1], marker='o', edgecolor='black',
-                      linewidth=0, s=30, label=t, c=target_colour[t])
-    ax[0].set_title(f'PCA', fontsize=25)
-    ax[0].axes.xaxis.set_visible(False)
-    ax[0].axes.yaxis.set_visible(False)
-    
-    for t in targets:
-        t_df = tsne_zeta_df[tsne_zeta_df['target'] == t]
-        ax[1].scatter(t_df[0], t_df[1], marker='o', edgecolor='black',
-                      linewidth=0, s=30, label=t, alpha=1, c=target_colour[t])
-    ax[1].set_title(f'PCA + t-SNE', fontsize=25)
-    ax[1].legend(loc='upper right', bbox_to_anchor=(
-        1.51, 1), prop={'size': 15}, markerscale=2)
-    ax[1].axes.xaxis.set_visible(False)
-    ax[1].axes.yaxis.set_visible(False)
-    
-    plt.subplots_adjust(wspace=0.05, hspace=0)
+    pca_fig = eb.snapshot_plot(
+        embedding = [zeta[:, :2],tsne_zeta], 
+        node_labels = df['target_names'].tolist(), 
+        c = target_colour,
+        title = ['PCA','tSNE'],
+        add_legend=True, 
+        max_legend_cols = 6,
+       figsize = (15,6),
+       bbox_to_anchor= (.5,-.15),
+        # Apply other matplotlib settings
+        s=10,
+    )
+    plt.tight_layout()
 
 
 
-.. image:: newsgroup_files/newsgroup_26_0.png
+.. image:: newsgroup_files/newsgroup_24_0.png
 
 
 Hierarchical clustering with dot products [2]
@@ -303,7 +267,7 @@ Plot dendrogram
 
 
 
-.. image:: newsgroup_files/newsgroup_35_0.png
+.. image:: newsgroup_files/newsgroup_33_0.png
 
 
 On documents
@@ -332,7 +296,7 @@ zero as we don’t want to prune the tree
 
 .. parsed-literal::
 
-    <pyemb.hc.ConstructTree at 0x78a385b366e0>
+    <pyemb.hc.ConstructTree at 0x718de98d9360>
 
 
 
@@ -342,7 +306,7 @@ zero as we don’t want to prune the tree
 
 
 
-.. image:: newsgroup_files/newsgroup_40_0.png
+.. image:: newsgroup_files/newsgroup_38_0.png
 
 
 References
