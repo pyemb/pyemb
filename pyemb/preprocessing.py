@@ -80,8 +80,10 @@ def graph_from_dataframes(
     attributes = _create_node_attributes(
         nodes, partitions, times, len(nodes), len(times)
     )
-
-    return _unfolded_to_list(A.tocsr()), attributes
+    As = _unfolded_to_list(A.tocsr())
+    if len(As) ==1:
+        As = As[0]
+    return As, attributes
 
 
 
