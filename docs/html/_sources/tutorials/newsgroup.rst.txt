@@ -8,14 +8,6 @@ In this notebook, we will demonstrate use on the 20Newsgroup data. Each
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.
 
-.. code:: ipython3
-
-    import pandas as pd
-    import numpy as np
-    from sklearn.datasets import fetch_20newsgroups
-    import pyemb as eb
-    import matplotlib.pyplot as plt
-
 Data load
 ---------
 
@@ -226,7 +218,7 @@ Plot PCA on the LHS and PCA + t-SNE on the RHS
 
 
 
-.. image:: newsgroup_files/newsgroup_24_0.png
+.. image:: newsgroup_files/newsgroup_23_0.png
 
 
 Hierarchical clustering with dot products [2]
@@ -267,7 +259,7 @@ Plot dendrogram
 
 
 
-.. image:: newsgroup_files/newsgroup_33_0.png
+.. image:: newsgroup_files/newsgroup_32_0.png
 
 
 On documents
@@ -306,7 +298,7 @@ zero as we don’t want to prune the tree
 
 
 
-.. image:: newsgroup_files/newsgroup_38_0.png
+.. image:: newsgroup_files/newsgroup_37_0.png
 
 
 References
