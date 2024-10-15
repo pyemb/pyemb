@@ -1,13 +1,6 @@
 MIMIC-III
 =========
 
-.. code:: ipython3
-
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-
-
 MIMIC-III is a relational database of heath-related data of patients at
 at critical care units of a medical center between 2001-2012. This full
 database can be found
@@ -24,6 +17,11 @@ which we use as labels.
 .. code:: ipython3
 
     import pyemb as eb
+
+.. code:: ipython3
+
+    # Load the data 
+    data = pd.read_csv('data/iris.csv')
 
 Data load
 ~~~~~~~~~

@@ -1,14 +1,6 @@
 Planaria single-cell
 ====================
 
-.. code:: ipython3
-
-    import numpy as np
-    import pandas as pd
-    import networkx as nx
-    import pyemb as eb
-    import matplotlib.pyplot as plt
-
 Load data
 ---------
 
@@ -92,7 +84,7 @@ We can plot the two representations of our data with the
 
 
 
-.. image:: planaria_files/planaria_12_0.png
+.. image:: planaria_files/planaria_11_0.png
 
 
 Construct tree
@@ -114,7 +106,7 @@ if set to zero the full tree will be given.
 
 .. code:: ipython3
 
-    tree = eb.ConstructTree(zeta, epsilon=0.25)
+    tree = eb.ConstructTree(zeta, epsilon=0.2)
     tree.fit()
 
 
@@ -129,7 +121,7 @@ if set to zero the full tree will be given.
 
 .. parsed-literal::
 
-    <pyemb.hc.ConstructTree at 0x7d62adb73460>
+    <pyemb.hc.ConstructTree at 0x754a7014bb50>
 
 
 
@@ -143,24 +135,27 @@ Layouts, node settings and others can also be changed.
 
 .. code:: ipython3
 
-    tree.plot(labels,colors, prog = 'twopi')
+    fig = tree.plot(labels,colors, prog = 'twopi')
 
 
 .. parsed-literal::
 
-    100%|██████████| 250/250 [00:02<00:00, 113.01it/s]
-
+    100%|██████████| 250/250 [00:03<00:00, 70.96it/s]
 
 .. parsed-literal::
 
-    BarnesHut Approximation  took  1.21  seconds
-    Repulsion forces  took  0.81  seconds
+    BarnesHut Approximation  took  2.24  seconds
+    Repulsion forces  took  1.05  seconds
     Gravitational forces  took  0.02  seconds
     Attraction forces  took  0.01  seconds
-    AdjustSpeedAndApplyForces step  took  0.08  seconds
+    AdjustSpeedAndApplyForces step  took  0.10  seconds
+
+
+.. parsed-literal::
+
+    
 
 
 
-.. image:: planaria_files/planaria_19_2.png
-
+.. image:: planaria_files/planaria_18_3.png
 

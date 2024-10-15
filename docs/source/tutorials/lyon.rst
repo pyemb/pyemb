@@ -1,22 +1,6 @@
 Lyon school graph
 =================
 
-.. code:: ipython3
-
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
-    
-    from scipy import sparse
-    from scipy.sparse.linalg import svds
-    from scipy import linalg
-    
-    import pyemb as eb
-
-.. code:: ipython3
-
-    np.random.seed(42)
-
 Load dataset
 ~~~~~~~~~~~~
 
@@ -141,7 +125,7 @@ Visualise embedding time point snapshots of interest
 
 
 
-.. image:: lyon_files/lyon_11_0.png
+.. image:: lyon_files/lyon_9_0.png
 
 
 Degree-correct the embedding
@@ -165,7 +149,7 @@ Degree-correct the embedding
 
 
 
-.. image:: lyon_files/lyon_13_0.png
+.. image:: lyon_files/lyon_11_0.png
 
 
 Compare embedding methods
@@ -207,7 +191,7 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_16_0.png
+.. image:: lyon_files/lyon_14_0.png
 
 
 .. code:: ipython3
@@ -238,7 +222,7 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_17_0.png
+.. image:: lyon_files/lyon_15_0.png
 
 
 Omnibus embedding (OMNI)
@@ -280,7 +264,7 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.
 
 
 
-.. image:: lyon_files/lyon_19_0.png
+.. image:: lyon_files/lyon_17_0.png
 
 
 UASE
@@ -322,7 +306,7 @@ Neural Information Processing Systems 34 (2021): 10158-10170.
 
 
 
-.. image:: lyon_files/lyon_21_0.png
+.. image:: lyon_files/lyon_19_0.png
 
 
 URLSE
@@ -362,5 +346,5 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.
 
 
 
-.. image:: lyon_files/lyon_23_0.png
+.. image:: lyon_files/lyon_21_0.png
 

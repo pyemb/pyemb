@@ -102,20 +102,6 @@
              
   <section id="lyon-school-graph">
 <h1>Lyon school graph<a class="headerlink" href="#lyon-school-graph" title="Link to this heading"></a></h1>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-
-<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
-</pre></div>
-</div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-</pre></div>
-</div>
 <section id="load-dataset">
 <h2>Load dataset<a class="headerlink" href="#load-dataset" title="Link to this heading"></a></h2>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">window</span> <span class="o">=</span> <span class="mi">15</span><span class="o">*</span><span class="mi">60</span>
@@ -228,7 +214,7 @@ view an example of the interactive output of <code class="docutils literal notra
 <span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_11_0.png" src="../_images/lyon_11_0.png" />
+<img alt="../_images/lyon_9_0.png" src="../_images/lyon_9_0.png" />
 </section>
 <section id="degree-correct-the-embedding">
 <h2>Degree-correct the embedding<a class="headerlink" href="#degree-correct-the-embedding" title="Link to this heading"></a></h2>
@@ -247,7 +233,7 @@ view an example of the interactive output of <code class="docutils literal notra
 <span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE with degree correction&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_13_0.png" src="../_images/lyon_13_0.png" />
+<img alt="../_images/lyon_11_0.png" src="../_images/lyon_11_0.png" />
 <section id="compare-embedding-methods">
 <h3>Compare embedding methods<a class="headerlink" href="#compare-embedding-methods" title="Link to this heading"></a></h3>
 </section>
@@ -282,7 +268,7 @@ which is illustrated by no two time points looking at all alike.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_16_0.png" src="../_images/lyon_16_0.png" />
+<img alt="../_images/lyon_14_0.png" src="../_images/lyon_14_0.png" />
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ISE&quot;</span><span class="p">)</span>
 <span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">ISE_emb</span><span class="p">)</span>
 
@@ -308,7 +294,7 @@ which is illustrated by no two time points looking at all alike.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_17_0.png" src="../_images/lyon_17_0.png" />
+<img alt="../_images/lyon_15_0.png" src="../_images/lyon_15_0.png" />
 </section>
 <section id="omnibus-embedding-omni">
 <h2>Omnibus embedding (OMNI)<a class="headerlink" href="#omnibus-embedding-omni" title="Link to this heading"></a></h2>
@@ -342,7 +328,7 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_19_0.png" src="../_images/lyon_19_0.png" />
+<img alt="../_images/lyon_17_0.png" src="../_images/lyon_17_0.png" />
 </section>
 <section id="uase">
 <h2>UASE<a class="headerlink" href="#uase" title="Link to this heading"></a></h2>
@@ -376,7 +362,7 @@ Neural Information Processing Systems 34 (2021): 10158-10170.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_21_0.png" src="../_images/lyon_21_0.png" />
+<img alt="../_images/lyon_19_0.png" src="../_images/lyon_19_0.png" />
 </section>
 <section id="urlse">
 <h2>URLSE<a class="headerlink" href="#urlse" title="Link to this heading"></a></h2>
@@ -409,7 +395,7 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_23_0.png" src="../_images/lyon_23_0.png" />
+<img alt="../_images/lyon_21_0.png" src="../_images/lyon_21_0.png" />
 </section>
 </section>
 

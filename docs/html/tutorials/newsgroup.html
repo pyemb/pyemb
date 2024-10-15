@@ -99,13 +99,6 @@
 <p>In this notebook, we will demonstrate use on the 20Newsgroup data. Each
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_20newsgroups</span>
-<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</pre></div>
-</div>
 </section>
 <section id="data-load">
 <h2>Data load<a class="headerlink" href="#data-load" title="Link to this heading"></a></h2>
@@ -280,7 +273,7 @@ shades of the same colour</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_24_0.png" src="../_images/newsgroup_24_0.png" />
+<img alt="../_images/newsgroup_23_0.png" src="../_images/newsgroup_23_0.png" />
 </section>
 <section id="hierarchical-clustering-with-dot-products-2">
 <h2>Hierarchical clustering with dot products [2]<a class="headerlink" href="#hierarchical-clustering-with-dot-products-2" title="Link to this heading"></a></h2>
@@ -310,7 +303,7 @@ tree.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_33_0.png" src="../_images/newsgroup_33_0.png" />
+<img alt="../_images/newsgroup_32_0.png" src="../_images/newsgroup_32_0.png" />
 </section>
 <section id="on-documents">
 <h2>On documents<a class="headerlink" href="#on-documents" title="Link to this heading"></a></h2>
@@ -333,7 +326,7 @@ zero as we don’t want to prune the tree</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;target_names&quot;</span><span class="p">]),</span> <span class="n">colours</span> <span class="o">=</span> <span class="n">target_colour</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">forceatlas_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_38_0.png" src="../_images/newsgroup_38_0.png" />
+<img alt="../_images/newsgroup_37_0.png" src="../_images/newsgroup_37_0.png" />
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
