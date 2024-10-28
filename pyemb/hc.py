@@ -11,6 +11,7 @@ from tqdm import tqdm
 from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
 from fa2_modified import ForceAtlas2
+import matplotlib.patches as mpatches
 
 from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes, _utri2mat, _get_triu
 
@@ -19,32 +20,32 @@ from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_size
 
 class DotProductAgglomerativeClustering:
     """ 
-    Perform hierarchical clustering using dot product as the metric.    
+    Perform hierarchical clustering using dot product as the metric. If a different metric is used, the AgglomerativeClustering class from scikit-learn is used.  
     
     Parameters
     ----------
 
     metric : str, optional  
-        The metric to use for clustering.   
+        The metric to use for clustering. Default is ``dot_product``.
     linkage : str, optional 
-        The linkage criterion to use.
+        The linkage criterion to use. Default is ``average``.
     distance_threshold : float, optional    
-        The linkage distance threshold above which, clusters will not be merged.
+        The linkage distance threshold above which, clusters will not be merged. Default is ``0``.
     n_clusters : int, optional  
-        The number of clusters to find.
+        The number of clusters to find. Default is ``None``.
         
     Attributes 
     ----------  
     distances_ : ndarray    
-        The distances between the clusters. 
+        Distance between the corresponding nodes in ``children_``. 
     children_ : ndarray 
         The children of each non-leaf node.
     labels_ : ndarray   
-        The labels of each point.
+        Cluster labels of each point.
     n_clusters_ : int   
         The number of clusters.
     n_connected_components_ : int   
-        The number of connected components. 
+        The estimated number of connected components. 
     n_leaves_ : int 
         The number of leaves.
     n_features_in_ : int    
@@ -104,11 +105,7 @@ def linkage_matrix(model):
     Parameters
     ----------  
     model : AgglomerativeClustering
-        The fitted model.   
-    get_heights : bool, optional    
-        Whether to return heights or counts.
-    max_height : float, optional    
-        The maximum height of the tree.
+        The fitted model.
         
     Returns  
     ------- 
@@ -148,7 +145,7 @@ def cophenetic_distances(Z):
     Returns
     -------
     d : ndarray
-        The full distance matrix (2n-1) x (2n-1).
+        The full cophenetic distance matrix ``(2n-1) x (2n-1)``.
     """
     n = Z.shape[0] + 1
     N = 2 * n - 1
@@ -228,12 +225,15 @@ def branch_lengths(Z, point_cloud = None):
 
     Parameters
     ----------
-    Z (ndarray): The linkage matrix.
-    point_cloud (ndarray): The data points.
+    Z : ndarray
+        The linkage matrix.
+    point_cloud : ndarray, optional
+        The data points. If not provided, the leaf heights are set to the maximum height.
 
     Returns
     -------
-    ndarray: Matrix of branch lengths.
+    ndarray
+        Matrix of branch lengths.
     """
     n = Z.shape[0] + 1
     N = 2 * n - 1
@@ -261,14 +261,19 @@ def find_descendents(Z, node, desc=None, just_leaves=True):
 
     Parameters
     ----------
-    Z (ndarray): The linkage matrix.
-    node (int): The node to find descendants of.
-    desc (dict, optional): Dictionary to store descendants.
-    just_leaves (bool, optional): Whether to include only leaf nodes.
+    Z : ndarray 
+        The linkage matrix.
+    node : int 
+        The node to find descendants of.
+    desc : dict, optional 
+        Dictionary to store descendants.
+    just_leaves : bool, optional
+        Whether to include only leaf nodes.
 
     Returns
     -------
-    list: List of descendants.
+    list
+        List of descendants.
     """
     if desc is None:
         desc = {}
@@ -293,13 +298,17 @@ def _epsilon_tree(Z, B, epsilon = 0.25):
 
     Parameters
     ----------
-    Z (ndarray): The linkage matrix.
-    B (ndarray): Matrix of branch lengths.
-    epsilon (float): Threshold for condensing the tree.
+    Z : ndarray 
+        The linkage matrix.
+    B : ndarray 
+        Matrix of branch lengths.
+    epsilon : float 
+        Threshold for condensing the tree.
 
     Returns
     -------
-    nx.Graph: Condensed tree as a NetworkX graph.
+    nx.Graph 
+        Condensed tree as a ``NetworkX`` graph.
     """
     n = Z.shape[0] + 1
     N = 2*n-1
@@ -346,13 +355,17 @@ def _find_clusters(G, Z, just_leaves=True):
 
     Parameters
     ----------
-    G (nx.Graph): Condensed tree.
-    Z (ndarray): The linkage matrix.
-    just_leaves (bool, optional): Whether to include only leaf nodes.
+    G : nx.Graph  
+        Condensed tree.
+    Z : ndarray
+        The linkage matrix.
+    just_leaves : bool, optional
+        Whether to include only leaf nodes.
 
     Returns
     -------
-    dict: Dictionary of clusters.
+    dict
+        Dictionary of clusters.
     """
     total = []
     visited = set()
@@ -441,10 +454,60 @@ class ConstructTree:
                 self.tree.add_edge(to_merge[1], idx)
         return self
     
-    def plot(self, labels = None, colours = None, colour_threshold = .5, prog = "sfdp", forceatlas_iter = 250, node_size = 10, scaling_node_size = 1, **kwargs):
+    def plot(self, 
+            labels = None, 
+            colours = None, 
+            colour_threshold = .5, 
+            
+            prog = "sfdp", 
+            forceatlas_iter = 250, 
+            node_size = 10, 
+            scaling_node_size = 1, 
+            
+            add_legend = True, 
+            max_legend_cols = 4,
+            move_legend = (0.5,-.1),
+            loc = 'lower center',
+            **kwargs):
         """
         Plot the condensed tree.
+        
+        Parameters  
+        ----------  
+        labels : list, optional 
+            Labels for each leaf node. Default is ``None``.   
+        colours : dict, optional    
+            A dictionary of colours for each label. Default is ``None``, then leaf nodes are coloured light blue and internal nodes are black. 
+        colour_threshold : float, optional
+            Used for cluster nodes, colour by a type if ``num_of_type / num_points_in_cluster > colour_threshold``. Default is ``0.5``. 
+        
+        prog : str, optional    
+            The graphviz program to use for layout. Default is ``sfdp``.
+        forceatlas_iter : int, optional 
+            The number of iterations to run the forceatlas2 algorithm. If it is set to zero, forceatlas2 won't be used. Default is ``250``.
+        node_size : int, optional   
+            The size of the nodes of one data point. Default is ``10``.
+        scaling_node_size : int, optional   
+            The scaling factor for the size of the cluster nodes: ``node_size + scaling_node_size * num_points_in_cluster``. Default is ``1``.
+        add_legend : bool, optional 
+            Whether to add a legend to the plot. Default is ``True``.
+        max_legend_cols : int, optional 
+            The maximum number of columns in the legend. Default is ``4``.
+        loc: str (optional)    
+            The anchor point for where the legend will be placed. Default is ``lower center``.
+        move_legend: tuple (optional) 
+            This adjusts the exact coordinates of the anchor point. Default is ``(0.5,-.1)``.
+        **kwargs : dict, optional   
+            Additional keyword arguments to pass to ``nx.draw``.
         """
+        
+        try:
+            from networkx.drawing.nx_agraph import graphviz_layout
+        except ImportError:
+            raise ImportError(
+                "Graph drawing requires pygraphviz. Please install it using `pip install pygraphviz`, or see https://pygraphviz.github.io/documentation/stable/install.html for more information."
+            )
+        
         if self.tree is None:
             raise ValueError("Please fit the tree first.")
         if self.linkage is None:
@@ -453,11 +516,23 @@ class ConstructTree:
         n = self.model.n_leaves_
         n_nodes = self.tree.number_of_nodes() 
         
-        if n_nodes != 2*n-1:
+        
+        if add_legend:
+            if isinstance(colours, dict):
+                colour_dict = colours
+                colour_dict['internal'] = 'black'
+            elif isinstance(colours, list):
+                colour_dict = {label: colour for label, colour in zip(labels, colours)}
+                colour_dict['internal'] = 'black'
+            else: 
+                colour_dict = {'leaf': 'lightblue', 'internal': 'black'}
+        
+
+        if n_nodes != 2*n-1: ## this means the tree is condensed
             G_clusters = _find_clusters(self.tree, self.linkage, just_leaves = True)
             if labels is not None and isinstance(colours, dict):
-                colour_dict = _find_colours(labels, colours, G_clusters, colour_threshold = colour_threshold)
-                colours = [colour_dict[node] for node in self.tree.nodes()]
+                colour_dict_hold = _find_colours(labels, colours, G_clusters, colour_threshold = colour_threshold)
+                colours = [colour_dict_hold[node] for node in self.tree.nodes()]
             if colours is None:
                 colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
             cluster_sizes_dict = _find_cluster_sizes(G_clusters)
@@ -470,14 +545,22 @@ class ConstructTree:
             if colours is None:
                 colours = ['lightblue' if node < self.model.n_leaves_  else 'black' for node in self.tree.nodes()]
             
-    
-        forceatlas2 = ForceAtlas2()
+        if 'white' in colours:
+            colour_dict['mixed'] = 'white'
+
         plt.figure(figsize=(10,10))
-        positions = nx.nx_agraph.graphviz_layout(self.tree, prog=prog, root=2*n-2)
+        positions = graphviz_layout(self.tree, prog=prog, root=2*n-2)
         if forceatlas_iter != 0:
+            forceatlas2 = ForceAtlas2()
             positions = forceatlas2.forceatlas2_networkx_layout(self.tree, pos=positions, iterations=forceatlas_iter)
         nx.draw(self.tree, positions, node_color=colours, 
                 node_size=sizes, **kwargs)
+
+        # Create legend patches for each unique label-color pair
+        patches = [mpatches.Patch(color=color, label=label) for label, color in colour_dict.items()]
+
+        # Add the legend
+        plt.legend(handles=patches, ncols = min(len(colour_dict.keys()), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
         plt.show()
 
 
@@ -516,7 +599,7 @@ def kendalltau_similarity(model, true_ranking):
     ----------  
     model : AgglomerativeClustering 
         The fitted model.   
-    true_ranking : array-like, shape (n_samples, n_samples) 
+    true_ranking : array-like, shape ``(n_samples, n_samples)`` 
         The true ranking of the samples.
 
     Returns 
@@ -548,7 +631,7 @@ def sample_hyperbolicity(data, metric='dot_products', num_samples=5000):
     data : numpy.ndarray    
         The data to calculate the hyperbolicity.
     metric : str    
-        The metric to use. Options are 'dot_products', 'cosine_similarity', 'precomputed' or any metric supported by scikit-learn.   
+        The metric to use. Options are ``dot_products``, ``cosine_similarity``, ``precomputed`` or any metric supported by ``scikit-learn``.   
     num_samples : int   
         The number of samples to calculate the hyperbolicity.   
         

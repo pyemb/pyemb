@@ -53,15 +53,15 @@ def load_planaria():
     
     Returns 
     ------- 
-    loaded_data : dict
+    dict
         A dictionary with the following keys:
-        - 'Y': numpy array of shape (n_samples, n_features)
+        - Y : numpy array of shape ``(n_samples, n_features)``
             The preprocessed data matrix.
-        - 'labels': numpy array of shape (n_samples,)
+        - labels : numpy array of shape ``(n_samples,)``
             The cell type of each data point.
-        - 'labels': numpy array
+        - labels : numpy array
             The unique cell types.
-        - 'colour_dict': dict
+        - colour_dict : dict
             A dictionary mapping cell types to colours.
     """
     dataset_path = _download_dataset('planaria_data.pkl')
@@ -76,17 +76,17 @@ def load_newsgroup():
     
     Returns 
     ------- 
-    loaded_data : pandas DataFrame
+    pandas DataFrame
         A DataFrame with the following columns:
-        - 'data': str
+        - data : str
             The text of the newsgroup post.
-        - 'target': int
+        - target : int
             The label of the newsgroup post.
-        - 'target_names': str
+        - target_names : str
             The label name of the newsgroup post.
-        - 'layer1': str
+        - layer1: str
             The category of the newsgroup post. 
-        - 'layer2': str 
+        - layer2: str 
             The subcategory of the newsgroup post.
     """
     dataset_path = _download_dataset('newsgroup_data.pkl')
@@ -101,12 +101,12 @@ def load_lyon():
     
     Returns
     ------- 
-    loaded_data : dict
+    dict
         A dictionary with the following keys:
-        - 'data': numpy array of shape (n_edges, 3)
-            The edges of the network. The first column is time and the second and third columns are the nodes.
-        - 'labels': numpy array of shape (n_nodes,) 
-            The labels of the nodes.
+        - data : numpy array of shape ``(n_edges, 3)``
+            The edges of the network. The first column is time and the second and third columns are the nodes. The nodes are indices from 0.
+        - labels : numpy array of shape ``(n_nodes,)`` 
+            The labels of the nodes. The index of the label corresponds to the node index.
     """
     dataset_path = _download_dataset('lyon_data.pkl')
     with open(dataset_path, 'rb') as file:
