@@ -1,14 +1,6 @@
 Planaria single-cell
 ====================
 
-.. code:: ipython3
-
-    import numpy as np
-    import pandas as pd
-    import networkx as nx
-    import pyemb as eb
-    import matplotlib.pyplot as plt
-
 This section uses `data <https://shiny.mdc-berlin.de/psca/>`__ from the
 paper `Plass et al.,
 2018 <https://www.science.org/doi/abs/10.1126/science.aaq1723>`__. It
@@ -49,7 +41,7 @@ Load data
 
 .. parsed-literal::
 
-    Data matrix is 2000 samples by 5821 features
+    Data matrix is 5000 samples by 100 features
 
 
 Dimension selection and visualisation
@@ -61,13 +53,33 @@ function and visualise.
 
 .. code:: ipython3
 
-    zeta = p**-.5 * eb.embed(Y, d=14, version='full')
+    ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
+    print("Selected dimension: {}".format(dim))
+
+
+.. parsed-literal::
+
+    100%|██████████| 40/40 [01:06<00:00,  1.67s/it]
+
+.. parsed-literal::
+
+    Recommended dimension: 16, Wasserstein distance 0.18280
+    Selected dimension: 16
+
+
+.. parsed-literal::
+
+    
+
+
+.. code:: ipython3
+
+    zeta = eb.embed(Y, d=14, version='full')
 
 .. code:: ipython3
 
     ## TSNE
     from sklearn.manifold import TSNE
-    
     tsne = TSNE(n_components=2, perplexity = 30).fit_transform(zeta)
 
 We can plot the two representations of our data with the
@@ -122,7 +134,7 @@ documentation for details of this.
 
 .. code:: ipython3
 
-    tree = eb.ConstructTree(zeta, epsilon=0.05)
+    tree = eb.ConstructTree(zeta, epsilon=0.2)
     tree.fit()
 
 
@@ -137,7 +149,7 @@ documentation for details of this.
 
 .. parsed-literal::
 
-    <pyemb.hc.ConstructTree at 0x791d39750970>
+    <pyemb.hc.ConstructTree at 0x7a1014496170>
 
 
 
@@ -152,16 +164,16 @@ documentation for details of this.
 
 .. parsed-literal::
 
-    100%|██████████| 250/250 [00:01<00:00, 148.43it/s]
+    100%|██████████| 250/250 [00:03<00:00, 69.38it/s]
 
 
 .. parsed-literal::
 
-    BarnesHut Approximation  took  0.94  seconds
-    Repulsion forces  took  0.61  seconds
-    Gravitational forces  took  0.01  seconds
+    BarnesHut Approximation  took  2.26  seconds
+    Repulsion forces  took  1.08  seconds
+    Gravitational forces  took  0.02  seconds
     Attraction forces  took  0.01  seconds
-    AdjustSpeedAndApplyForces step  took  0.06  seconds
+    AdjustSpeedAndApplyForces step  took  0.12  seconds
 
 
 

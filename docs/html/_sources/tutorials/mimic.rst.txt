@@ -1,14 +1,6 @@
 MIMIC-III
 =========
 
-.. code:: ipython3
-
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import pyemb as eb
-
-
 Here, we demonstrate functionality related to multipartite graphs
 `Modell et al., 2022 <https://arxiv.org/abs/2202.03945>`__ – a natural
 way to explore relational databases. We use
@@ -124,7 +116,6 @@ data.
     Selected dimension: 21
 
 
-    
 
 
 .. code:: ipython3
@@ -177,7 +168,7 @@ others are grey.
 
 
 
-.. image:: mimic_files/mimic_19_0.png
+.. image:: mimic_files/mimic_18_0.png
 
 
 Therefore, it is clear we see some clustering based on diagnosis. It is

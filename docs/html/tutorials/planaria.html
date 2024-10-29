@@ -94,13 +94,6 @@
              
   <section id="planaria-single-cell">
 <h1>Planaria single-cell<a class="headerlink" href="#planaria-single-cell" title="Link to this heading"></a></h1>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</pre></div>
-</div>
 <p>This section uses <a class="reference external" href="https://shiny.mdc-berlin.de/psca/">data</a> from the
 paper <a class="reference external" href="https://www.science.org/doi/abs/10.1126/science.aaq1723">Plass et al.,
 2018</a>. It
@@ -131,7 +124,7 @@ the script on how to do this can be found
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data matrix is&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;samples by&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;features&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">matrix</span> <span class="ow">is</span> <span class="mi">2000</span> <span class="n">samples</span> <span class="n">by</span> <span class="mi">5821</span> <span class="n">features</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">matrix</span> <span class="ow">is</span> <span class="mi">5000</span> <span class="n">samples</span> <span class="n">by</span> <span class="mi">100</span> <span class="n">features</span>
 </pre></div>
 </div>
 </section>
@@ -140,12 +133,22 @@ the script on how to do this can be found
 <p>After selecting the dimension <a class="reference external" href="https://arxiv.org/pdf/2208.11665">Whiteley et al.,
 2022</a>, perform PCA with embedding
 function and visualise.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">p</span><span class="o">**-</span><span class="mf">.5</span> <span class="o">*</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ws</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">wasserstein_dimension_select</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">),</span> <span class="n">split</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected dimension: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 40/40 [01:06&lt;00:00,  1.67s/it]
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Recommended</span> <span class="n">dimension</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="n">Wasserstein</span> <span class="n">distance</span> <span class="mf">0.18280</span>
+<span class="n">Selected</span> <span class="n">dimension</span><span class="p">:</span> <span class="mi">16</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## TSNE</span>
 <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
-
 <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">perplexity</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">zeta</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -188,7 +191,7 @@ majority if proportion of majority is greater than colour_threshold),
 else, if there is no majority node, it is plotted white.</p>
 <p>Layouts, node settings and others can also be changed. See the
 documentation for details of this.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">ConstructTree</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">ConstructTree</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 <span class="n">tree</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -197,7 +200,7 @@ documentation for details of this.</p>
 <span class="n">Constructing</span> <span class="n">tree</span><span class="o">...</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x791d39750970</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x7a1014496170</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">,</span>
@@ -207,14 +210,14 @@ documentation for details of this.</p>
                 <span class="n">prog</span> <span class="o">=</span> <span class="s1">&#39;twopi&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 250/250 [00:01&lt;00:00, 148.43it/s]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 250/250 [00:03&lt;00:00, 69.38it/s]
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BarnesHut</span> <span class="n">Approximation</span>  <span class="n">took</span>  <span class="mf">0.94</span>  <span class="n">seconds</span>
-<span class="n">Repulsion</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.61</span>  <span class="n">seconds</span>
-<span class="n">Gravitational</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.01</span>  <span class="n">seconds</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BarnesHut</span> <span class="n">Approximation</span>  <span class="n">took</span>  <span class="mf">2.26</span>  <span class="n">seconds</span>
+<span class="n">Repulsion</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">1.08</span>  <span class="n">seconds</span>
+<span class="n">Gravitational</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.02</span>  <span class="n">seconds</span>
 <span class="n">Attraction</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.01</span>  <span class="n">seconds</span>
-<span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.06</span>  <span class="n">seconds</span>
+<span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.12</span>  <span class="n">seconds</span>
 </pre></div>
 </div>
 <img alt="../_images/planaria_18_2.png" src="../_images/planaria_18_2.png" />

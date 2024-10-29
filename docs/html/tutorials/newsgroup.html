@@ -102,12 +102,6 @@ clustering. For this, we will demonstrate on a sample of the
 <a class="reference external" href="https://qwone.com/~jason/20Newsgroups/">20Newsgroup data</a>. Each
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</pre></div>
-</div>
 <section id="data-load">
 <h2>Data load<a class="headerlink" href="#data-load" title="Link to this heading"></a></h2>
 <p>Import data and create dataframe.</p>
@@ -138,9 +132,6 @@ documents a word needs to appear in to be included.</p>
 <p>Perform dimension selection using Wasserstein distances, see <a class="reference external" href="https://arxiv.org/pdf/2208.11665">Whiteley
 et al., 2022</a> for details.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ws</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">wasserstein_dimension_select</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">),</span> <span class="n">split</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">28</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected dimension: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
@@ -205,7 +196,7 @@ shades of the same colour</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_21_0.png" src="../_images/newsgroup_21_0.png" />
+<img alt="../_images/newsgroup_19_0.png" src="../_images/newsgroup_19_0.png" />
 </section>
 <section id="hierarchical-clustering-with-dot-products-gray-et-al-2024">
 <h2>Hierarchical clustering with dot products, <a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf">Gray et al., 2024</a><a class="headerlink" href="#hierarchical-clustering-with-dot-products-gray-et-al-2024" title="Link to this heading"></a></h2>
@@ -232,7 +223,7 @@ Then we do HC on the whole dataset and visualise the output tree.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_30_0.png" src="../_images/newsgroup_30_0.png" />
+<img alt="../_images/newsgroup_28_0.png" src="../_images/newsgroup_28_0.png" />
 </section>
 <section id="on-documents">
 <h2>On documents<a class="headerlink" href="#on-documents" title="Link to this heading"></a></h2>
@@ -265,7 +256,7 @@ zero as we don’t want to prune the tree.</p>
 <span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.20</span>  <span class="n">seconds</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_35_2.png" src="../_images/newsgroup_35_2.png" />
+<img alt="../_images/newsgroup_33_2.png" src="../_images/newsgroup_33_2.png" />
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>

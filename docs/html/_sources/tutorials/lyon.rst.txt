@@ -1,19 +1,6 @@
 School contact graph
 ====================
 
-.. code:: ipython3
-
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
-    
-    from scipy import sparse
-    from scipy.sparse.linalg import svds
-    from scipy import linalg
-    import pyemb as eb
-    
-    np.random.seed(42)
-
 This tutorial aims to explore the different methods to embed a dynamic
 network (URLSE, ISE, OMNI and UASE). To do this, we use a `temporal
 network <http://www.sociopatterns.org/datasets/primary-school-temporal-network-data/>`__
@@ -118,7 +105,7 @@ Visualise embedding time point snapshots of interest
 
 
 
-.. image:: lyon_files/lyon_15_0.png
+.. image:: lyon_files/lyon_14_0.png
 
 
 Degree-correct the embedding
@@ -143,7 +130,7 @@ Degree-correct the embedding
 
 
 
-.. image:: lyon_files/lyon_17_0.png
+.. image:: lyon_files/lyon_16_0.png
 
 
 Compare embedding methods
@@ -186,7 +173,7 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_20_0.png
+.. image:: lyon_files/lyon_19_0.png
 
 
 .. code:: ipython3
@@ -218,7 +205,7 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_21_0.png
+.. image:: lyon_files/lyon_20_0.png
 
 
 Omnibus embedding (OMNI)
@@ -258,7 +245,7 @@ mixing as (e.g. the orange class clearly does not mix).
 
 
 
-.. image:: lyon_files/lyon_23_0.png
+.. image:: lyon_files/lyon_22_0.png
 
 
 UASE
@@ -297,7 +284,7 @@ lunchtime.
 
 
 
-.. image:: lyon_files/lyon_25_0.png
+.. image:: lyon_files/lyon_24_0.png
 
 
 URLSE
@@ -335,7 +322,7 @@ classtime and the mixing of classes at lunchtime.
 
 
 
-.. image:: lyon_files/lyon_27_0.png
+.. image:: lyon_files/lyon_26_0.png
 
 
 References

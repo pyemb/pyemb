@@ -107,18 +107,6 @@
              
   <section id="school-contact-graph">
 <h1>School contact graph<a class="headerlink" href="#school-contact-graph" title="Link to this heading"></a></h1>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
-
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-</pre></div>
-</div>
 <p>This tutorial aims to explore the different methods to embed a dynamic
 network (URLSE, ISE, OMNI and UASE). To do this, we use a <a class="reference external" href="http://www.sociopatterns.org/datasets/primary-school-temporal-network-data/">temporal
 network</a>
@@ -203,7 +191,7 @@ view an example of the interactive output of <code class="docutils literal notra
 <span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_15_0.png" src="../_images/lyon_15_0.png" />
+<img alt="../_images/lyon_14_0.png" src="../_images/lyon_14_0.png" />
 </section>
 <section id="degree-correct-the-embedding">
 <h3>Degree-correct the embedding<a class="headerlink" href="#degree-correct-the-embedding" title="Link to this heading"></a></h3>
@@ -223,7 +211,7 @@ view an example of the interactive output of <code class="docutils literal notra
 <span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE with degree correction&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_17_0.png" src="../_images/lyon_17_0.png" />
+<img alt="../_images/lyon_16_0.png" src="../_images/lyon_16_0.png" />
 </section>
 </section>
 <section id="compare-embedding-methods">
@@ -259,7 +247,7 @@ which is illustrated by no two time points looking at all alike.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_20_0.png" src="../_images/lyon_20_0.png" />
+<img alt="../_images/lyon_19_0.png" src="../_images/lyon_19_0.png" />
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ISE&quot;</span><span class="p">)</span>
 <span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">ISE_emb</span><span class="p">)</span>
 
@@ -286,7 +274,7 @@ which is illustrated by no two time points looking at all alike.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_21_0.png" src="../_images/lyon_21_0.png" />
+<img alt="../_images/lyon_20_0.png" src="../_images/lyon_20_0.png" />
 </section>
 <section id="omnibus-embedding-omni">
 <h3>Omnibus embedding (OMNI)<a class="headerlink" href="#omnibus-embedding-omni" title="Link to this heading"></a></h3>
@@ -319,7 +307,7 @@ mixing as (e.g. the orange class clearly does not mix).</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_23_0.png" src="../_images/lyon_23_0.png" />
+<img alt="../_images/lyon_22_0.png" src="../_images/lyon_22_0.png" />
 </section>
 <section id="uase">
 <h3>UASE<a class="headerlink" href="#uase" title="Link to this heading"></a></h3>
@@ -352,7 +340,7 @@ lunchtime.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_25_0.png" src="../_images/lyon_25_0.png" />
+<img alt="../_images/lyon_24_0.png" src="../_images/lyon_24_0.png" />
 </section>
 <section id="urlse">
 <h3>URLSE<a class="headerlink" href="#urlse" title="Link to this heading"></a></h3>
@@ -384,7 +372,7 @@ classtime and the mixing of classes at lunchtime.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/lyon_27_0.png" src="../_images/lyon_27_0.png" />
+<img alt="../_images/lyon_26_0.png" src="../_images/lyon_26_0.png" />
 </section>
 </section>
 </section>

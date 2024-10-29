@@ -8,13 +8,6 @@ clustering. For this, we will demonstrate on a sample of the
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.
 
-.. code:: ipython3
-
-    import pandas as pd
-    import numpy as np
-    import pyemb as eb
-    import matplotlib.pyplot as plt
-
 Data load
 ---------
 
@@ -60,10 +53,6 @@ et al., 2022 <https://arxiv.org/pdf/2208.11665>`__ for details.
 .. code:: ipython3
 
     ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
-
-.. code:: ipython3
-
-    dim = 28
 
 .. code:: ipython3
 
@@ -141,7 +130,7 @@ Plot PCA on the LHS and PCA + t-SNE on the RHS
 
 
 
-.. image:: newsgroup_files/newsgroup_21_0.png
+.. image:: newsgroup_files/newsgroup_19_0.png
 
 
 Hierarchical clustering with dot products, `Gray et al., 2024 <https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf>`__
@@ -179,7 +168,7 @@ Plot dendrogram
 
 
 
-.. image:: newsgroup_files/newsgroup_30_0.png
+.. image:: newsgroup_files/newsgroup_28_0.png
 
 
 On documents
@@ -233,7 +222,7 @@ zero as we don’t want to prune the tree.
 
 
 
-.. image:: newsgroup_files/newsgroup_35_2.png
+.. image:: newsgroup_files/newsgroup_33_2.png
 
 
 References
