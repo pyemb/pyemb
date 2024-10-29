@@ -67,10 +67,6 @@ function and visualise.
     Selected dimension: 16
 
 
-.. parsed-literal::
-
-    
-
 
 .. code:: ipython3
 
@@ -181,7 +177,7 @@ documentation for details of this.
 
 
 References
-==========
+------------
 
 -  Plass, M., Solana, J., Wolf, F.A., Ayoub, S., Misios, A., Glažar, P.,
    Obermayer, B., Theis, F.J., Kocks, C. and Rajewsky, N., 2018. Cell

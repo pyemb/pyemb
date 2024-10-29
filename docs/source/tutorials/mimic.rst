@@ -176,7 +176,7 @@ worth noting that while coronary and myocardial have quite a large
 overlap, these words both relate to problems with the heart.
 
 References
-==========
+------------
 
 -  Modell, A., Gallagher, I., Cape, J. and Rubin-Delanchy, P., 2022.
    Spectral embedding and the latent geometry of multipartite networks.

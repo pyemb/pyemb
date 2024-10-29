@@ -326,7 +326,7 @@ classtime and the mixing of classes at lunchtime.
 
 
 References
-==========
+------------
 
 -  Levin, K., Athreya, A., Tang, M., Lyzinski, V. and Priebe, C.E.,
    2017, November. A central limit theorem for an omnibus embedding of
