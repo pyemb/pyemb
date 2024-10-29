@@ -365,7 +365,7 @@ def regularised_ULSE(
     regulariser : float, optional
         Regularisation parameter for the Laplacian matrix. By default, this is the average node degree.
     flat : bool, optional
-        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True`.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
     sparse_matrix : bool, optional
         Whether the adjacency matrices are sparse. Default is ``False``.
     return_left : bool, optional

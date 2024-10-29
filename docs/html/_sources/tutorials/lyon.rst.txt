@@ -1,83 +1,75 @@
-Lyon school graph
-=================
-
-Load dataset
-~~~~~~~~~~~~
+School contact graph
+====================
 
 .. code:: ipython3
 
-    window = 15*60
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
     
-    day_1_start = (8*60+30)*60
-    day_1_end = (17*60+30)*60
-    day_2_start = ((24+8)*60+30)*60
-    day_2_end = ((24+17)*60+30)*60
+    from scipy import sparse
+    from scipy.sparse.linalg import svds
+    from scipy import linalg
+    import pyemb as eb
     
-    T1 = int((day_1_end - day_1_start) // window)
-    T2 = int((day_2_end - day_2_start) // window)
-    T = T1 + T2
+    np.random.seed(42)
+
+This tutorial aims to explore the different methods to embed a dynamic
+network (URLSE, ISE, OMNI and UASE). To do this, we use a `temporal
+network <http://www.sociopatterns.org/datasets/primary-school-temporal-network-data/>`__
+of contacts between the children and teachers in a French school.
+
+Load dataset
+------------
+
+.. code:: ipython3
+
+    data = eb.load_lyon()
     
-    print(f'Number of time windows: {T}')
-    
-    fname = 'data/ia-primary-school-proximity-attr.edges'
-    file = open(fname)
-    
-    nodes = []
-    node_labels = []
-    edge_tuples = []
-    
-    for line in file:
-        node_i, node_j, time, id_i, id_j = line.strip('\n').split(',')
-        
-        if day_1_start <= int(time) < day_1_end:
-            t = (int(time) - day_1_start) // window
-        elif day_2_start <= int(time) < day_2_end:
-            t = T1 + (int(time) - day_2_start) // window
-        else:
-            continue
-        
-        if node_i not in nodes:
-            nodes.append(node_i)
-            if id_i != "Teachers":
-                id_i = "Class " + id_i
-            node_labels.append(id_i)
-        
-        if node_j not in nodes:
-            nodes.append(node_j)
-            if id_j != "Teachers":
-                id_j = "Class " + id_j
-            node_labels.append(id_j)
-        
-        edge_tuples.append([t, node_i, node_j])
-        
-    edge_tuples = np.unique(edge_tuples, axis=0)
-    nodes = np.array(nodes)
-    
-    n = len(nodes)
-    print(f'Number of nodes: {n}')
-    
-    node_dict = dict(zip(nodes[np.argsort(node_labels)], range(n)))
-    node_labels = np.sort(node_labels)
-    
-    As = []
-    for t in range(T):
-        idx = np.where(edge_tuples[:, 0] == str(t))[0]
-        A = sparse.coo_matrix((np.ones(len(idx)), ([node_dict[edge_tuples[i, 1]] for i in idx], [node_dict[edge_tuples[i, 2]] for i in idx])), shape=(n,n))
-        As.append((A + A.T).sign())
+    edge_tuples = data['data']
+    node_labels = data['labels']
 
 
 .. parsed-literal::
 
-    Number of time windows: 72
-    Number of nodes: 242
+    Data loaded successfully
 
+
+``edge_tuples`` contains an array with three columns, the first column
+is time and the second and third columns are the nodes. The nodes are
+indicated by integers from 0, with the label of corresponding index
+giving their class (or ``Teachers``).
+
+.. code:: ipython3
+
+    n = node_labels.shape[0]
+    T = np.unique(edge_tuples[:,0]).shape[0]
+    
+    print(f'Number of nodes: {n}')
+    print(f'Number of time windows: {T}')
+
+
+.. parsed-literal::
+
+    Number of nodes: 242
+    Number of time windows: 71
+
+
+Transform the edge list into a list of matrices.
+
+.. code:: ipython3
+
+    As = []
+    for t in range(T):
+        idx = np.where(edge_tuples[:, 0] == str(t))[0]
+        A = sparse.coo_matrix((np.ones(len(idx)), ([edge_tuples[i, 1] for i in idx], [edge_tuples[i, 2] for i in idx])), shape=(n,n))
+        As.append((A + A.T).sign())
 
 Embed the dynamic network
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: ipython3
 
-    
     # Embed the graph using unfolded regularised Laplacian spectral embedding
     d = 10
     URLSE_emb = eb.dyn_embed(As, d=d, method="URLSE")
@@ -116,6 +108,7 @@ Visualise embedding time point snapshots of interest
         title = point_labels, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20"   
     )
@@ -125,7 +118,7 @@ Visualise embedding time point snapshots of interest
 
 
 
-.. image:: lyon_files/lyon_9_0.png
+.. image:: lyon_files/lyon_15_0.png
 
 
 Degree-correct the embedding
@@ -141,6 +134,7 @@ Degree-correct the embedding
         title = point_labels, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20"   
     )
@@ -149,7 +143,7 @@ Degree-correct the embedding
 
 
 
-.. image:: lyon_files/lyon_11_0.png
+.. image:: lyon_files/lyon_17_0.png
 
 
 Compare embedding methods
@@ -184,6 +178,7 @@ which is illustrated by no two time points looking at all alike.
         max_cols=3, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20"   
     )
@@ -191,7 +186,7 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_14_0.png
+.. image:: lyon_files/lyon_20_0.png
 
 
 .. code:: ipython3
@@ -214,6 +209,7 @@ which is illustrated by no two time points looking at all alike.
         max_cols=3, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20"   
     )
@@ -222,23 +218,20 @@ which is illustrated by no two time points looking at all alike.
 
 
 
-.. image:: lyon_files/lyon_15_0.png
+.. image:: lyon_files/lyon_21_0.png
 
 
 Omnibus embedding (OMNI)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The OMNI embedding [1] manages to fix the problem of time points looking
-completely different, as shown by classes remaining in similar places
-across all time points.
+The OMNI embedding `Levin et al.,
+2017 <https://ieeexplore.ieee.org/abstract/document/8215766?casa_token=A8Vz_qKy3WoAAAAA:TcmJnZtU85qQGJCSTh765-qZnj_carcslkH_ZgRl6U1ffI7YvcDF8wtrGfWhImw-GO8O0OT0-pp5>`__
+manages to fix the problem of time points looking completely different,
+as shown by classes remaining in similar places across all time points.
 
 However, at lunchtime we expect classes to mix, children play with
 children from other classes at lunch time. OMNI fails to show this
 mixing as (e.g. the orange class clearly does not mix).
-
-[1] Levin, Keith, et al. “A central limit theorem for an omnibus
-embedding of multiple random dot product graphs.” 2017 IEEE
-international conference on data mining workshops (ICDMW). IEEE, 2017.
 
 .. code:: ipython3
 
@@ -257,6 +250,7 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.
         max_cols=3, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20"   
     )
@@ -264,23 +258,19 @@ international conference on data mining workshops (ICDMW). IEEE, 2017.
 
 
 
-.. image:: lyon_files/lyon_17_0.png
+.. image:: lyon_files/lyon_23_0.png
 
 
 UASE
 ~~~~
 
-Unfoled adjacency spectral embedding (UASE) [2, 3] was the first of a
-suite of “unfolded” dynamic embedding methods. Owing to its property of
-stability [3], UASE is able to show both the clustering of classes in
-classtime as well as the total mixing of classes at lunchtime.
-
-[2] Jones, Andrew, and Patrick Rubin-Delanchy. “The multilayer random
-dot product graph.” arXiv preprint arXiv:2007.10455 (2020).
-
-[3] Gallagher, Ian, Andrew Jones, and Patrick Rubin-Delanchy. “Spectral
-embedding for dynamic networks with stability guarantees.” Advances in
-Neural Information Processing Systems 34 (2021): 10158-10170.
+Unfoled adjacency spectral embedding (UASE) `Jones et al.,
+2020 <https://arxiv.org/abs/2007.10455>`__, `Gallagher et al.,
+2021 <https://proceedings.neurips.cc/paper/2021/hash/5446f217e9504bc593ad9dcf2ec88dda-Abstract.html>`__
+was the first of a suite of “unfolded” dynamic embedding methods. Owing
+to its property of stability, UASE is able to show both the clustering
+of classes in classtime as well as the total mixing of classes at
+lunchtime.
 
 .. code:: ipython3
 
@@ -299,6 +289,7 @@ Neural Information Processing Systems 34 (2021): 10158-10170.
         max_cols=3, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20" 
     )
@@ -306,7 +297,7 @@ Neural Information Processing Systems 34 (2021): 10158-10170.
 
 
 
-.. image:: lyon_files/lyon_19_0.png
+.. image:: lyon_files/lyon_25_0.png
 
 
 URLSE
@@ -314,13 +305,10 @@ URLSE
 
 Unfolded regularised Laplacian spectral embedding (URLSE) is essentially
 a regularised version of UASE. URLSE is one of many possible unfolded
-dynamic embedding, all of which feature stability properties [4]. This
-means that, like UASE, this method is able to display the clustering of
-classes in classtime and the mixing of classes at lunchtime.
-
-[4] Ed Davis, Ian Gallagher, Daniel John Lawson, and Patrick
-Rubin-Delanchy. A simple and powerful framework for stable dynamic
-network embedding. arXiv preprint arXiv:2311.09251, 2023.
+dynamic embedding, all of which feature stability properties `Davis et
+al., 2023 <https://arxiv.org/abs/2311.09251>`__. This means that, like
+UASE, this method is able to display the clustering of classes in
+classtime and the mixing of classes at lunchtime.
 
 .. code:: ipython3
 
@@ -339,6 +327,7 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.
         max_cols=3, 
         sharex = True,
         sharey = True,
+        tick_labels = True,
         add_legend=True, 
         cmap="tab20" 
     )
@@ -346,5 +335,24 @@ network embedding. arXiv preprint arXiv:2311.09251, 2023.
 
 
 
-.. image:: lyon_files/lyon_21_0.png
+.. image:: lyon_files/lyon_27_0.png
 
+
+References
+==========
+
+-  Levin, K., Athreya, A., Tang, M., Lyzinski, V. and Priebe, C.E.,
+   2017, November. A central limit theorem for an omnibus embedding of
+   multiple random dot product graphs. In 2017 IEEE international
+   conference on data mining workshops (ICDMW) (pp. 964-967). IEEE.
+
+-  Jones, A. and Rubin-Delanchy, P., 2020. The multilayer random dot
+   product graph. arXiv preprint arXiv:2007.10455.
+
+-  Gallagher, I., Jones, A. and Rubin-Delanchy, P., 2021. Spectral
+   embedding for dynamic networks with stability guarantees. Advances in
+   Neural Information Processing Systems, 34, pp.10158-10170.
+
+-  Davis, E., Gallagher, I., Lawson, D.J. and Rubin-Delanchy, P., 2023.
+   A simple and powerful framework for stable dynamic network embedding.
+   arXiv preprint arXiv:2311.09251.

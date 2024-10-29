@@ -49,20 +49,18 @@ def _download_dataset(dataset_name):
 
 def load_planaria():
     """
-    Load the Planaria dataset.
+    Load the Planaria dataset. Returns a dictionary with the following keys.
     
     Returns 
     ------- 
-    dict
-        A dictionary with the following keys:
-        - Y : numpy array of shape ``(n_samples, n_features)``
-            The preprocessed data matrix.
-        - labels : numpy array of shape ``(n_samples,)``
-            The cell type of each data point.
-        - labels : numpy array
-            The unique cell types.
-        - colour_dict : dict
-            A dictionary mapping cell types to colours.
+    Y : numpy array of shape ``(n_samples, n_features)``
+        The preprocessed data matrix.
+    labels : numpy array of shape ``(n_samples,)``
+        The cell type of each data point.
+    labels : numpy array
+        The unique cell types.
+    colour_dict : dict
+        A dictionary mapping cell types to colours.
     """
     dataset_path = _download_dataset('planaria_data.pkl')
     with open(dataset_path, 'rb') as file:
@@ -72,22 +70,20 @@ def load_planaria():
 
 def load_newsgroup():
     """
-    Load the Newsgroup dataset.
+    Load the Newsgroup dataset. Returns a pandas DataFrame with the following columns.
     
     Returns 
     ------- 
-    pandas DataFrame
-        A DataFrame with the following columns:
-        - data : str
-            The text of the newsgroup post.
-        - target : int
-            The label of the newsgroup post.
-        - target_names : str
-            The label name of the newsgroup post.
-        - layer1: str
-            The category of the newsgroup post. 
-        - layer2: str 
-            The subcategory of the newsgroup post.
+    data : str
+        The text of the newsgroup post.
+    target : int
+        The label of the newsgroup post.
+    target_names : str
+        The label name of the newsgroup post.
+    layer1: str
+        The category of the newsgroup post. 
+    layer2: str 
+        The subcategory of the newsgroup post.
     """
     dataset_path = _download_dataset('newsgroup_data.pkl')
     with open(dataset_path, 'rb') as file:
@@ -97,16 +93,14 @@ def load_newsgroup():
 
 def load_lyon():
     """
-    Load the Lyon dataset.
+    Load the Lyon dataset. Returns a dictionary with the following keys.
     
     Returns
     ------- 
-    dict
-        A dictionary with the following keys:
-        - data : numpy array of shape ``(n_edges, 3)``
-            The edges of the network. The first column is time and the second and third columns are the nodes. The nodes are indices from 0.
-        - labels : numpy array of shape ``(n_nodes,)`` 
-            The labels of the nodes. The index of the label corresponds to the node index.
+    data : numpy array of shape ``(n_edges, 3)``
+        The edges of the network. The first column is time and the second and third columns are the nodes. The nodes are indices from 0.
+    labels : numpy array of shape ``(n_nodes,)`` 
+        The labels of the nodes. The index of the label corresponds to the node index.
     """
     dataset_path = _download_dataset('lyon_data.pkl')
     with open(dataset_path, 'rb') as file:

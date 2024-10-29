@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Lyon school graph" href="lyon.html" />
+    <link rel="next" title="School contact graph" href="lyon.html" />
     <link rel="prev" title="Tutorials" href="index.html" /> 
 </head>
 
@@ -52,9 +52,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#data-load">Data load</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lyon.html">Lyon school graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html">School contact graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html#references">References</a></li>
 <li class="toctree-l2"><a class="reference internal" href="newsgroup.html">20Newsgroup documents</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planaria.html">Planaria single-cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planaria.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
@@ -88,59 +91,70 @@
              
   <section id="mimic-iii">
 <h1>MIMIC-III<a class="headerlink" href="#mimic-iii" title="Link to this heading"></a></h1>
-<p>MIMIC-III is a relational database of heath-related data of patients at
-at critical care units of a medical center between 2001-2012. This full
-database can be found
-<a class="reference external" href="https://physionet.org/content/mimiciii/1.4/">here</a>, however the
-files we use here are: <code class="docutils literal notranslate"><span class="pre">ADMISSIONS.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">LABEVENTS.csv</span></code>,
-<code class="docutils literal notranslate"><span class="pre">MICROBIOLOGY.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">PRESCRIPTIONS.csv</span></code>.</p>
-<p>Here, the files <code class="docutils literal notranslate"><span class="pre">LABEVENTS.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">MICROBIOLOGY.csv</span></code> and
-<code class="docutils literal notranslate"><span class="pre">PRESCRIPTIONS.csv</span></code> all contain the associated hospital admission ID
-(<code class="docutils literal notranslate"><span class="pre">HADM_ID</span></code>) which we use to create a network. Within the admissions
-file, all the hospital admissions have a diagnosis associated with them
-which we use as labels.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the data</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/iris.csv&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
+<p>Here, we demonstrate functionality related to multipartite graphs
+<a class="reference external" href="https://arxiv.org/abs/2202.03945">Modell et al., 2022</a> – a natural
+way to explore relational databases. We use
+<a class="reference external" href="https://physionet.org/content/mimiciii/1.4/">MIMIC-III</a> which is a
+relational database of heath-related data of patients at critical care
+units of a medical center between 2001-2012.</p>
+<p>Unlike the other examples, the data cannot be shared directly. Users can
+apply for access to the database
+<a class="reference external" href="https://mimic.mit.edu/docs/gettingstarted/">here</a> and a smaller open
+access version can be found
+<a class="reference external" href="https://physionet.org/content/mimiciii-demo/1.4/">here</a>.</p>
+<p>The files we use here are: <code class="docutils literal notranslate"><span class="pre">ADMISSIONS.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">LABEVENTS.csv</span></code>,
+<code class="docutils literal notranslate"><span class="pre">MICROBIOLOGY.csv</span></code> and <code class="docutils literal notranslate"><span class="pre">PRESCRIPTIONS.csv</span></code>. These files all contain
+the associated hospital admission ID (<code class="docutils literal notranslate"><span class="pre">HADM_ID</span></code>) which we use to
+create a network. Within the admissions file, all the hospital
+admissions have a diagnosis associated with them which we use as labels.</p>
 <section id="data-load">
 <h2>Data load<a class="headerlink" href="#data-load" title="Link to this heading"></a></h2>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joining_col</span> <span class="o">=</span> <span class="s1">&#39;HADM_ID&#39;</span>
 <span class="n">data_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;micro&#39;</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">,</span> <span class="s1">&#39;pre&#39;</span><span class="p">]</span>
 <span class="n">dfs</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data_names</span><span class="p">}</span>
-
-<span class="c1"># dfs[&#39;pre&#39;][&#39;FORMULARY_DRUG_CD&#39;] = dfs[&#39;pre&#39;][&#39;FORMULARY_DRUG_CD&#39;].astype(str)</span>
-<span class="c1"># dfs[&#39;micro&#39;] = dfs[&#39;micro&#39;].dropna(subset=[&#39;ORG_ITEMID&#39;])</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_10719</span><span class="o">/</span><span class="mf">1716424642.</span><span class="n">py</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">DtypeWarning</span><span class="p">:</span> <span class="n">Columns</span> <span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="n">have</span> <span class="n">mixed</span> <span class="n">types</span><span class="o">.</span> <span class="n">Specify</span> <span class="n">dtype</span> <span class="n">option</span> <span class="n">on</span> <span class="kn">import</span> <span class="nn">or</span> <span class="nb">set</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_38409</span><span class="o">/</span><span class="mf">1342678660.</span><span class="n">py</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">DtypeWarning</span><span class="p">:</span> <span class="n">Columns</span> <span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="n">have</span> <span class="n">mixed</span> <span class="n">types</span><span class="o">.</span> <span class="n">Specify</span> <span class="n">dtype</span> <span class="n">option</span> <span class="n">on</span> <span class="kn">import</span> <span class="nn">or</span> <span class="nb">set</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="o">.</span>
   <span class="n">dfs</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data_names</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Create a dictionary of hospital admission IDs to diagnoses.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/adm.csv&#39;</span><span class="p">)</span>
-<span class="n">hadm_to_diag</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">adm</span><span class="p">[</span><span class="s1">&#39;HADM_ID&#39;</span><span class="p">],</span> <span class="n">adm</span><span class="p">[</span><span class="s1">&#39;DIAGNOSIS&#39;</span><span class="p">]))</span>
+<span class="n">hadm_to_diag</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">adm</span><span class="p">[</span><span class="n">joining_col</span><span class="p">],</span> <span class="n">adm</span><span class="p">[</span><span class="s1">&#39;DIAGNOSIS&#39;</span><span class="p">]))</span>
 <span class="n">hadm_to_diag</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">hadm_to_diag</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 </pre></div>
 </div>
+<p>Create a multipartite graph where we have links between hospital
+admission IDs and organism IDs, lab items and drugs.</p>
+<p>This creates a a large matrix where each unique entity in each parition
+has a row and a column.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">joining_col</span><span class="p">,</span> <span class="s1">&#39;ORG_ITEMID&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">joining_col</span><span class="p">,</span>
                                        <span class="s1">&#39;ITEMID&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">joining_col</span><span class="p">,</span> <span class="s1">&#39;FORMULARY_DRUG_CD&#39;</span><span class="p">]]</span>
 
 <span class="n">A</span><span class="p">,</span> <span class="n">attributes</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">graph_from_dataframes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dfs</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">pairs</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span><span class="n">it</span> <span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">03</span><span class="p">,</span>  <span class="mf">1.09</span><span class="n">s</span><span class="o">/</span><span class="n">it</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span><span class="n">it</span> <span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">03</span><span class="p">,</span>  <span class="mf">1.18</span><span class="n">s</span><span class="o">/</span><span class="n">it</span><span class="p">]</span>
 </pre></div>
 </div>
+<p>To create the matrix with hospital admissions as the rows and organism,
+lab and drug IDs as the columns, we use the <code class="docutils literal notranslate"><span class="pre">find_subgraph</span></code> functions.</p>
+<p>This takes in a list (of two lists), the first containing the attributes
+of items we want in the rows, here we want partition <code class="docutils literal notranslate"><span class="pre">HADM_ID</span></code>, and
+the second we have the attributes we want in the columns, that is the
+partitions <code class="docutils literal notranslate"><span class="pre">ORG_ITEMID</span></code>, <code class="docutils literal notranslate"><span class="pre">FORMULARY_DRUG_CD</span></code> and <code class="docutils literal notranslate"><span class="pre">ITEMID</span></code>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sub_attr</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[{</span><span class="s1">&#39;partition&#39;</span><span class="p">:</span> <span class="n">joining_col</span><span class="p">}],</span>
     <span class="p">[{</span><span class="s1">&#39;partition&#39;</span><span class="p">:</span> <span class="s1">&#39;ORG_ITEMID&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;partition&#39;</span><span class="p">:</span> <span class="s1">&#39;ITEMID&#39;</span><span class="p">},</span>
         <span class="p">{</span><span class="s1">&#39;partition&#39;</span><span class="p">:</span> <span class="s1">&#39;FORMULARY_DRUG_CD&#39;</span><span class="p">}]</span>
 <span class="p">]</span>
-<span class="n">subgraph_A</span><span class="p">,</span> <span class="n">subgraph_attributes</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">find_subgraph</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">sub_attr</span><span class="p">)</span>
+<span class="n">subgraph_A</span><span class="p">,</span> <span class="n">subgraph_attributes</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">find_subgraph</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">sub_attr</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of rows:&#39;</span><span class="p">,</span> <span class="n">subgraph_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -149,71 +163,80 @@ which we use as labels.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">rows</span><span class="p">:</span> <span class="mi">57709</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get a random sample of the rows of subgraph_A</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<p>For computational reasons we calculate the dimension on a sample of the
+data.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
 <span class="n">random_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">subgraph_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">subgraph_A</span> <span class="o">=</span> <span class="n">subgraph_A</span><span class="p">[</span><span class="n">random_rows</span><span class="p">,</span> <span class="p">:]</span>
-<span class="n">subgraph_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">subgraph_attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="n">random_rows</span><span class="p">]),</span> <span class="n">subgraph_attributes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+<span class="n">sample_subgraph_A</span> <span class="o">=</span> <span class="n">subgraph_A</span><span class="p">[</span><span class="n">random_rows</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="n">Y</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">sample_subgraph_A</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
+<span class="n">ws</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">wasserstein_dimension_select</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">split</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected dimension: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ws, dim = eb.wasserstein_dimension_select(subgraph_A_sample, range(50), split=0.5)</span>
-<span class="c1"># print(&quot;Selected dimension: {}&quot;.format(dim))</span>
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">20</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/ag16115/Documents/phd/pyemb/pyemb/embedding.py:129: UserWarning: Warning: More than one connected component in the graph.
+  warnings.warn(&quot;Warning: More than one connected component in the graph.&quot;)
+100%|██████████| 50/50 [03:30&lt;00:00,  4.20s/it]
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Recommended</span> <span class="n">dimension</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="n">Wasserstein</span> <span class="n">distance</span> <span class="mf">3.77451</span>
+<span class="n">Selected</span> <span class="n">dimension</span><span class="p">:</span> <span class="mi">21</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">le</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">subgraph_A</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">make_laplacian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">regulariser</span><span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">ag16115</span><span class="o">/</span><span class="n">Documents</span><span class="o">/</span><span class="n">phd</span><span class="o">/</span><span class="n">pyemb</span><span class="o">/</span><span class="n">venv</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.10</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyemb</span><span class="o">/</span><span class="n">embedding</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">129</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="ne">Warning</span><span class="p">:</span> <span class="n">More</span> <span class="n">than</span> <span class="n">one</span> <span class="n">connected</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">graph</span><span class="o">.</span>
-  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: More than one connected component in the graph.&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">split_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">subgraph_attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;::&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">subgraph_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
-
-<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">hadm_to_diag</span><span class="p">[</span><span class="n">a</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">split_labels</span><span class="p">]</span>
-</pre></div>
-</div>
+<p>Perform tSNE</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
 <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">tsne</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">le</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_to_colour</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;BYPASS&#39;</span><span class="p">:</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">,</span> <span class="s1">&#39;WITHDRAWAL&#39;</span><span class="p">:</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;MYOCARDIAL&#39;</span><span class="p">:</span> <span class="s1">&#39;lightpink&#39;</span><span class="p">,</span> <span class="s1">&#39;HEMORRHAGE&#39;</span><span class="p">:</span> <span class="s1">&#39;firebrick&#39;</span><span class="p">,</span> <span class="s1">&#39;CORONARY&#39;</span><span class="p">:</span> <span class="s1">&#39;powderblue&#39;</span><span class="p">,</span> <span class="s1">&#39;LEUKEMIA&#39;</span><span class="p">:</span> <span class="s1">&#39;plum&#39;</span><span class="p">,</span> <span class="s1">&#39;NEWBORN&#39;</span><span class="p">:</span> <span class="s1">&#39;coral&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">keywords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_to_colour</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="n">colours</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="c1"># Loop through each label</span>
-<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
-    <span class="n">found_keyword</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Track whether a keyword is found for this label</span>
-    <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>  <span class="c1"># Check if the keyword is in the label</span>
-            <span class="n">found_keyword</span> <span class="o">=</span> <span class="n">keyword</span>  <span class="c1"># Store the matching keyword</span>
-            <span class="k">break</span>  <span class="c1"># Exit the loop once a match is found</span>
+<p>Next, we can see if the tSNE plot shows any clustering related to the
+diagnoses. The labels are quite messy, with over 3000 unique diagnoses,
+so instead we colour based on whether a diagnosis contains one of the
+following words: withdrawal, hemorrhage, coronary, leukemia or newborn.</p>
+<p>These points will be coloured according to <code class="docutils literal notranslate"><span class="pre">labels_to_colour</span></code>, all
+others are grey.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">split_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">subgraph_attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;::&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">subgraph_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">hadm_to_diag</span><span class="p">[</span><span class="n">a</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">split_labels</span><span class="p">]</span>
+<span class="n">labels_to_colour</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;WITHDRAWAL&#39;</span><span class="p">:</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;MYOCARDIAL&#39;</span><span class="p">:</span> <span class="s1">&#39;lightpink&#39;</span><span class="p">,</span> <span class="s1">&#39;HEMORRHAGE&#39;</span><span class="p">:</span> <span class="s1">&#39;firebrick&#39;</span><span class="p">,</span> <span class="s1">&#39;CORONARY&#39;</span><span class="p">:</span> <span class="s1">&#39;powderblue&#39;</span><span class="p">,</span> <span class="s1">&#39;LEUKEMIA&#39;</span><span class="p">:</span> <span class="s1">&#39;lime&#39;</span><span class="p">,</span> <span class="s1">&#39;NEWBORN&#39;</span><span class="p">:</span> <span class="s1">&#39;coral&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">:</span> <span class="s1">&#39;darkgrey&#39;</span><span class="p">}</span>
 
-    <span class="c1"># Add the label to the dictionary, even if no keyword is found</span>
-    <span class="k">if</span> <span class="n">found_keyword</span><span class="p">:</span>
-        <span class="n">colours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels_to_colour</span><span class="p">[</span><span class="n">found_keyword</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">colours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;darkgrey&#39;</span><span class="p">)</span>
+<span class="n">keywords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_to_colour</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">plot_labels</span>  <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">next</span><span class="p">((</span><span class="n">keyword</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span> <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">label</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">label</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;OTHER&#39;</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+<span class="n">plot_colours</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels_to_colour</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">plot_labels</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">embedding</span> <span class="o">=</span> <span class="n">tsne</span><span class="p">,</span>
-    <span class="c1"># node_labels = labels,</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">colours</span><span class="p">,</span>
-    <span class="c1"># title = [&#39;PCA&#39;,&#39;tSNE&#39;],</span>
-    <span class="n">add_legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">plot_labels</span><span class="p">,</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">plot_colours</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;tSNE plot of HADM_IDs coloured by diagnosis&#39;</span><span class="p">,</span>
     <span class="c1"># Apply other matplotlib settings</span>
     <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-
-    <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="../_images/mimic_19_0.png" src="../_images/mimic_19_0.png" />
+<p>Therefore, it is clear we see some clustering based on diagnosis. It is
+worth noting that while coronary and myocardial have quite a large
+overlap, these words both relate to problems with the heart.</p>
 </section>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>Modell, A., Gallagher, I., Cape, J. and Rubin-Delanchy, P., 2022.
+Spectral embedding and the latent geometry of multipartite networks.
+arXiv preprint arXiv:2202.03945.</p></li>
+</ul>
 </section>
 
 
@@ -221,7 +244,7 @@ which we use as labels.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="lyon.html" class="btn btn-neutral float-right" title="Lyon school graph" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="lyon.html" class="btn btn-neutral float-right" title="School contact graph" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

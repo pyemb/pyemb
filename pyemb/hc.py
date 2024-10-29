@@ -50,8 +50,6 @@ class DotProductAgglomerativeClustering:
         The number of leaves.
     n_features_in_ : int    
         The number of features seen during fit.
-    n_clusters_ : int   
-        The number of clusters.
     """
     def __init__(self, metric='dot_product', linkage='average', distance_threshold=0, n_clusters=None):
         self.metric = metric

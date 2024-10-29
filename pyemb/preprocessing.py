@@ -22,19 +22,22 @@ def graph_from_dataframes(
 
     Parameters
     ----------
-    tables : list of pandas.DataFrame
-        The list of tables.
+    tables : pandas.DataFrame or list of pandas.DataFrames
+        Dataframe of relationships or list of dataframes. The column names of the dataframe(s) indicate the partition of the entities therein.
     relationship_cols : list of lists
-        The list of relationships. Either: Each relationship is a list of two lists,
-        each of which contains the names of the columns in the corresponding table. Or, a list of lists and each pair is looked for in each table.
+        The pairs of partitions we are interested in. This can be one of two formats. Either, a list of pairs of partitions, e.g. ``[['A','B'], ['C','B']]`` and each pair is looked for in each table. 
+        This allows for the case where the same relationships appear in different table.   
+        Or, ``len(relationship_cols) == len(tables)`` and the pairs of paritions to create relationships from for each table are given in the corresponding index of the list.
     same_attribute : bool
-        Whether the entities in the columns are from the same attribute.
-    dynamic_col : list of str
-        The list of dynamic columns.
-    weight_col : list of str
-        The list of weight columns.
+        Whether the entities in the columns are from the same attribute. This allows for intra-partition relationships.
+    dynamic_col : str or list of str
+        The name of the column containing the time information. If a list is given then ``dynamic_col[i]`` is the name of the time column for ``tables[i]``.
+        If ``None``, the time information is not used.
+    weight_col : str or list of str
+        The name of the column containing the edge weight information. If a list is given then ``weight_col[i]`` is the name of the weight column for ``tables[i]``.
+        If ``None``, the time information is not used.
     join_token : str
-        The token used to join the names of the partitions and the names of the nodes.
+        The token used to join the names of the partitions and the names of the entities to create a unique ID. Default is ``::``.
 
     Returns
     -------
@@ -44,6 +47,17 @@ def graph_from_dataframes(
         The attributes of the nodes. The first list contains the attributes
         of the nodes in the rows. The second list contains
         the attributes of the nodes in the columns.
+        
+    Examples    
+    --------    
+    >>> import pyemb as eb  
+    >>> # Create dataframes 
+    >>> df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})    
+    >>> df2 = pd.DataFrame({'A': [1, 2, 3], 'C': [7, 8, 9]})    
+    >>> # Create graph from dataframes  
+    >>> A, attributes = eb.graph_from_dataframes([df1, df2], [['A', 'B'], ['A', 'C']]) 
+    >>> print(A.todense())    
+    >>> print(attributes)       
     """
     # Ensure data and relationship_cols are in list format
     # add valueerror if not in the correct format
@@ -147,7 +161,7 @@ def _create_edge_list(
                 pair_data["P2"] = partition_pair[1]
 
                 edge_list.append(pair_data)
-                # print(partition_pair)
+        
     return pd.concat(edge_list)
 
 
@@ -158,7 +172,7 @@ def find_subgraph(A, attributes, subgraph_attributes):
     Parameters
     ----------
     A : scipy.sparse.csr_matrix
-        The adjacency matrix of the multipartite graph.
+        The matrix of the multipartite graph.
     attributes : list of lists
         The attributes of the nodes. The first list contains the attributes
         of the nodes in rows. The second list contains
@@ -170,12 +184,9 @@ def find_subgraph(A, attributes, subgraph_attributes):
 
     Returns
     -------
-    subgraph_A : scipy.sparse.csr_matrix
-        The adjacency matrix of the subgraph.
-    subgraph_attributes : list of lists
-        The attributes of the nodes of the subgraph. The first list contains
-        the attributes of the nodes in the rows. The second
-        list contains the attributes of the nodes in the columns.
+    scipy.sparse.csr_matrix, list of lists
+        The matrix and attributes of the subgraph.
+        
     """
 
     if not isinstance(subgraph_attributes[0], list):
@@ -234,7 +245,7 @@ def find_connected_components(A, attributes, n_components=None):
     Parameters
     ----------
     A : scipy.sparse.csr_matrix
-        The adjacency matrix of the graph.
+        The matrix of the graph.
     attributes : list of lists
         The attributes of the nodes. The first list contains the attributes
         of the nodes in rows. The second list contains
@@ -244,12 +255,8 @@ def find_connected_components(A, attributes, n_components=None):
 
     Returns
     -------
-    cc_As : list of scipy.sparse.csr_matrix
-        The adjacency matrices of the connected components.
-    cc_attributes : list of lists
-        The attributes of the nodes of the connected components. The first list contains
-        the attributes of the nodes in the rows. The second
-        list contains the attributes of the nodes in the columns.
+    list of scipy.sparse.csr_matrix, list of lists
+        The matrices of the connected components and their attributes.
     """
 
     A_dilation = _symmetric_dilation(A)
@@ -281,7 +288,7 @@ def largest_cc_of(A, attributes, partition, dynamic=False):
     Parameters
     ----------
     A : scipy.sparse.csr_matrix
-        The adjacency matrix of the graph.
+        The matrix of the graph.
     attributes : list of lists
         The attributes of the nodes. The first list contains the attributes
         of the nodes in rows. The second list contains
@@ -293,12 +300,8 @@ def largest_cc_of(A, attributes, partition, dynamic=False):
 
     Returns
     -------
-    cc_A : scipy.sparse.csr_matrix
-        The adjacency matrix of the connected component.
-    cc_attributes : list of lists
-        The attributes of the nodes of the connected component. The first list contains
-        the attributes of the nodes in the rows. The second
-        list contains the attributes of the nodes in the columns.
+    scipy.sparse.csr_matrix. list of lists
+        The matrix of the connected component and its attributes.
     """
     cc_As, cc_attributes = find_connected_components(A, attributes)
     if not dynamic:
@@ -343,16 +346,13 @@ def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     time_col : str
         The name of the column containing the time information.
     drop_nas : bool
-        Whether to drop rows with missing values.
+        Whether to drop rows with missing values. Default is ``True``.
 
     Returns
     -------
-    Y : numpy.ndarray
-        The matrix created from the time series.
-    attributes : list of lists
-        The attributes of the nodes. The first list contains the attributes
-        of the nodes in rows. The second list contains
-        the attributes of the nodes in the columns.
+    numpy.ndarray, list of lists
+        The matrix created from the time series and the attributes of the nodes. 
+        The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.
     """
     data = data.sort_values(by=time_col)
     if drop_nas:
@@ -376,7 +376,7 @@ def text_matrix_and_attributes(
     **kwargs,
 ):
     """
-    Create a matrix from a column of text data.
+    Create a matrix from a dataframe containing text data. This needs to have one column containing the text data and each row should be a document.
 
     Parameters
     ----------
@@ -385,24 +385,21 @@ def text_matrix_and_attributes(
     column_name : str
         The name of the column containing the text data.
     remove_stopwords : bool
-        Whether to remove stopwords.
+        Whether to remove stopwords. Default is ``True``.
     clean_text : bool
-        Whether to clean the text data.
+        Whether to clean the text data. Default is ``True``. This removes symbols and makes everything lower case.
     remove_email_addresses : bool
-        Whether to remove email addresses.
+        Whether to remove email addresses. Default is ``False``.
     update_stopwords : list of str
-        The list of additional stopwords to be removed.
+        The list of additional stopwords to be removed. Default is ``None``.
     kwargs : dict
-        Other arguments to be passed to sklearn.feature_extraction.text.TfidfVectorizer.
+        Other arguments to be passed to ``sklearn.feature_extraction.text.TfidfVectorizer``.
 
     Returns
     -------
-    Y : numpy.ndarray
-        The matrix created from the text data.
-    attributes : list of lists
-        The attributes of the nodes. The first list contains the attributes
-        of the nodes in rows. The second list contains
-        the attributes of the nodes in the columns.
+    numpy.ndarray, list of lists
+        The matrix created from the text data. The attributes of the nodes. 
+        The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.
     """
 
     _ensure_stopwords_downloaded()
@@ -412,7 +409,7 @@ def text_matrix_and_attributes(
         data[column_name] = data[column_name].apply(_del_email_address)
 
     if clean_text:
-        # gets rid of stopwords, symbols, makes lower case and base words
+        # gets rid of symbols and makes lower case
         data[column_name] = data[column_name].apply(_clean_text_)
 
     if remove_stopwords:
