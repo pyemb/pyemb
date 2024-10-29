@@ -50,7 +50,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../inst_over.html">Installation and Overview</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mimic.html">MIMIC-III</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lyon.html">Lyon school graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mimic.html#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html">School contact graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html#references">References</a></li>
 <li class="toctree-l2"><a class="reference internal" href="newsgroup.html">20Newsgroup documents</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Planaria single-cell</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#load-data">Load data</a></li>
@@ -58,6 +60,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#construct-tree">Construct tree</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
@@ -91,13 +94,17 @@
              
   <section id="planaria-single-cell">
 <h1>Planaria single-cell<a class="headerlink" href="#planaria-single-cell" title="Link to this heading"></a></h1>
-<section id="load-data">
-<h2>Load data<a class="headerlink" href="#load-data" title="Link to this heading"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
 <p>This section uses <a class="reference external" href="https://shiny.mdc-berlin.de/psca/">data</a> from the
-paper <a class="reference external" href="https://www.science.org/doi/abs/10.1126/science.aaq1723">‘Cell Type Atlas and Lineage Tree of a Whole Complex Animal by
-Single-Cell
-Transcriptomics’</a>.
-It contains expression levels of <span class="math notranslate nohighlight">\(p= 5821\)</span> genes measured across
+paper <a class="reference external" href="https://www.science.org/doi/abs/10.1126/science.aaq1723">Plass et al.,
+2018</a>. It
+contains expression levels of <span class="math notranslate nohighlight">\(p= 5821\)</span> genes measured across
 <span class="math notranslate nohighlight">\(n=5000\)</span> individual cells from adult planarians, a type of
 flatworm. Such data offer the possibility of discovering the cell
 lineage tree of an entire animal: the aim is to find out if the data
@@ -107,33 +114,33 @@ the Python package
 <a class="reference external" href="https://scanpy.readthedocs.io/en/stable/index.html">Scanpy</a>, where
 the script on how to do this can be found
 <a class="reference external" href="https://nbviewer.org/github/rajewsky-lab/planarian_lineages/blob/master/paga/preprocessing.ipynb">here</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/planaria_sample_data.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-<span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">)</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data matrix is&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;samples by&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;features&#39;</span><span class="p">)</span>
+<section id="load-data">
+<h2>Load data<a class="headerlink" href="#load-data" title="Link to this heading"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">load_planaria</span><span class="p">()</span>
 
-<span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;data/sample_annotation_5000.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-<span class="n">ordered_cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;data/planaria_ordered_cats.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-
-<span class="n">colors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/colors_dataset.txt&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span>
+<span class="n">ordered_cats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cell_types&#39;</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;color_dict&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">matrix</span> <span class="ow">is</span> <span class="mi">5000</span> <span class="n">samples</span> <span class="n">by</span> <span class="mi">5821</span> <span class="n">features</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">loaded</span> <span class="n">successfully</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">)</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data matrix is&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;samples by&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;features&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">matrix</span> <span class="ow">is</span> <span class="mi">2000</span> <span class="n">samples</span> <span class="n">by</span> <span class="mi">5821</span> <span class="n">features</span>
 </pre></div>
 </div>
 </section>
 <section id="dimension-selection-and-visualisation">
 <h2>Dimension selection and visualisation<a class="headerlink" href="#dimension-selection-and-visualisation" title="Link to this heading"></a></h2>
-<p>Perform dimension selection using Wasserstein distances, as explained in
-<a class="reference external" href="https://arxiv.org/pdf/2208.11665">‘Statistical exploration of the Manifold
-Hypothesis’</a>.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ws, dim = eb.wasserstein_dimension_select(Y, range(20), split=0.5)</span>
-<span class="c1"># print(&quot;Selected dimension: {}&quot;.format(dim))</span>
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">14</span>
-</pre></div>
-</div>
-<p>Now, perform PCA with the embedding function and visualise.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">p</span><span class="o">**-</span><span class="mf">.5</span> <span class="o">*</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
+<p>After selecting the dimension <a class="reference external" href="https://arxiv.org/pdf/2208.11665">Whiteley et al.,
+2022</a>, perform PCA with embedding
+function and visualise.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">p</span><span class="o">**-</span><span class="mf">.5</span> <span class="o">*</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## TSNE</span>
@@ -143,7 +150,7 @@ Hypothesis’</a>.</p>
 </pre></div>
 </div>
 <p>We can plot the two representations of our data with the
-<code class="docutils literal notranslate"><span class="pre">snapshot_plot</span></code> function</p>
+<code class="docutils literal notranslate"><span class="pre">snapshot_plot</span></code> function.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
     <span class="n">embedding</span> <span class="o">=</span> <span class="p">[</span><span class="n">zeta</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">],</span><span class="n">tsne</span><span class="p">],</span>
     <span class="n">node_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
@@ -151,10 +158,10 @@ Hypothesis’</a>.</p>
     <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PCA&#39;</span><span class="p">,</span><span class="s1">&#39;tSNE&#39;</span><span class="p">],</span>
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">max_legend_cols</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-   <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span>
-   <span class="n">bbox_to_anchor</span><span class="o">=</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span><span class="o">-</span><span class="mf">.35</span><span class="p">),</span>
+   <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mf">7.5</span><span class="p">),</span>
+   <span class="n">move_legend</span><span class="o">=</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span><span class="o">-</span><span class="mf">.3</span><span class="p">),</span>
     <span class="c1"># Apply other matplotlib settings</span>
-    <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
@@ -166,15 +173,22 @@ Hypothesis’</a>.</p>
 <p>From here we want to perform hierarchical clustering on the data and
 simplify this tree. This can be done using the hierarchical clustering
 module.</p>
-<p>We use hierarchical clustering with dot products as descibed in
-<a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf">‘Hierarchical clustering with dot products recovers hidden tree
-structure’</a>.
+<p>We use hierarchical clustering with dot products as descibed in <a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf">Gray et
+al.,
+2024</a>.
 This is the default HC in the class <code class="docutils literal notranslate"><span class="pre">ConstructTree</span></code> so we can just
 give it our point cloud. Otherwise, the HC can be done first and the
 model can be given to the <code class="docutils literal notranslate"><span class="pre">ConstructTree</span></code> class.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">epsilon</span></code> parameter controls the threshold for condensing tree and
 if set to zero the full tree will be given.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">ConstructTree</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<p>This can then be plotted. Points are coloured by labels, if a plotted
+node is a collection of data points then <code class="docutils literal notranslate"><span class="pre">colour_threshold</span></code> controls
+when to colour this node by the majority type of data point (colour by
+majority if proportion of majority is greater than colour_threshold),
+else, if there is no majority node, it is plotted white.</p>
+<p>Layouts, node settings and others can also be changed. See the
+documentation for details of this.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">ConstructTree</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 <span class="n">tree</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -183,30 +197,42 @@ if set to zero the full tree will be given.</p>
 <span class="n">Constructing</span> <span class="n">tree</span><span class="o">...</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x754a7014bb50</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x791d39750970</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>This can then be plotted. Points are coloured by labels, if a plotted
-node is a collection of data points then <code class="docutils literal notranslate"><span class="pre">colour_threshold</span></code> controls
-when to colour this node by the majority type of data point (colour by
-majority if proportion of majority is greater than colour_threshold),
-else, if there is no majority node, it is plotted black.</p>
-<p>Layouts, node settings and others can also be changed.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span><span class="n">colors</span><span class="p">,</span> <span class="n">prog</span> <span class="o">=</span> <span class="s1">&#39;twopi&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">,</span>
+                <span class="n">colours</span> <span class="o">=</span> <span class="n">colors</span><span class="p">,</span>
+                <span class="n">add_legend</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">move_legend</span> <span class="o">=</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span><span class="o">-</span><span class="mf">.25</span><span class="p">),</span>
+                <span class="n">prog</span> <span class="o">=</span> <span class="s1">&#39;twopi&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 250/250 [00:03&lt;00:00, 70.96it/s]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 250/250 [00:01&lt;00:00, 148.43it/s]
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BarnesHut</span> <span class="n">Approximation</span>  <span class="n">took</span>  <span class="mf">2.24</span>  <span class="n">seconds</span>
-<span class="n">Repulsion</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">1.05</span>  <span class="n">seconds</span>
-<span class="n">Gravitational</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.02</span>  <span class="n">seconds</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BarnesHut</span> <span class="n">Approximation</span>  <span class="n">took</span>  <span class="mf">0.94</span>  <span class="n">seconds</span>
+<span class="n">Repulsion</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.61</span>  <span class="n">seconds</span>
+<span class="n">Gravitational</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.01</span>  <span class="n">seconds</span>
 <span class="n">Attraction</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.01</span>  <span class="n">seconds</span>
-<span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.10</span>  <span class="n">seconds</span>
+<span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.06</span>  <span class="n">seconds</span>
 </pre></div>
 </div>
-<img alt="../_images/planaria_18_3.png" src="../_images/planaria_18_3.png" />
+<img alt="../_images/planaria_18_2.png" src="../_images/planaria_18_2.png" />
 </section>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>Plass, M., Solana, J., Wolf, F.A., Ayoub, S., Misios, A., Glažar, P.,
+Obermayer, B., Theis, F.J., Kocks, C. and Rajewsky, N., 2018. Cell
+type atlas and lineage tree of a whole complex animal by single-cell
+transcriptomics. Science, 360(6391), p.eaaq1723.</p></li>
+<li><p>Whiteley, N., Gray, A. and Rubin-Delanchy, P., 2022. Statistical
+exploration of the Manifold Hypothesis.</p></li>
+<li><p>Gray, A., Modell, A., Rubin-Delanchy, P. and Whiteley, N., 2024.
+Hierarchical clustering with dot products recovers hidden tree
+structure. Advances in Neural Information Processing Systems, 36.</p></li>
+</ul>
 </section>
 
 

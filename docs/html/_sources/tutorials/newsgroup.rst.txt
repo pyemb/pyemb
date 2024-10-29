@@ -1,12 +1,19 @@
 20Newsgroup documents
 =====================
 
-Introduction
-------------
-
-In this notebook, we will demonstrate use on the 20Newsgroup data. Each
+This sections aims to use the packages functionality on text data. This
+includes creating a amtrix of tf-idf features, PCA and hierarchical
+clustering. For this, we will demonstrate on a sample of the
+`20Newsgroup data <https://qwone.com/~jason/20Newsgroups/>`__. Each
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.
+
+.. code:: ipython3
+
+    import pandas as pd
+    import numpy as np
+    import pyemb as eb
+    import matplotlib.pyplot as plt
 
 Data load
 ---------
@@ -15,104 +22,15 @@ Import data and create dataframe.
 
 .. code:: ipython3
 
-    newsgroups = fetch_20newsgroups() 
-    
-    df = pd.DataFrame()
-    df["data"] = newsgroups["data"]
-    df["target"] = newsgroups["target"]
-    df["target_names"] = df.target.apply(
-        lambda row: newsgroups["target_names"][row])
-    df[['layer1', 'layer2']] = df['target_names'].str.split('.', n=1, expand=True)
-
-.. code:: ipython3
-
-    df.head()
+    df = eb.load_newsgroup()
 
 
+.. parsed-literal::
+
+    Data loaded successfully
 
 
-.. raw:: html
-
-    <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-      <thead>
-        <tr style="text-align: right;">
-          <th></th>
-          <th>data</th>
-          <th>target</th>
-          <th>target_names</th>
-          <th>layer1</th>
-          <th>layer2</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>0</th>
-          <td>From: lerxst@wam.umd.edu (where's my thing)\nS...</td>
-          <td>7</td>
-          <td>rec.autos</td>
-          <td>rec</td>
-          <td>autos</td>
-        </tr>
-        <tr>
-          <th>1</th>
-          <td>From: guykuo@carson.u.washington.edu (Guy Kuo)...</td>
-          <td>4</td>
-          <td>comp.sys.mac.hardware</td>
-          <td>comp</td>
-          <td>sys.mac.hardware</td>
-        </tr>
-        <tr>
-          <th>2</th>
-          <td>From: twillis@ec.ecn.purdue.edu (Thomas E Will...</td>
-          <td>4</td>
-          <td>comp.sys.mac.hardware</td>
-          <td>comp</td>
-          <td>sys.mac.hardware</td>
-        </tr>
-        <tr>
-          <th>3</th>
-          <td>From: jgreen@amber (Joe Green)\nSubject: Re: W...</td>
-          <td>1</td>
-          <td>comp.graphics</td>
-          <td>comp</td>
-          <td>graphics</td>
-        </tr>
-        <tr>
-          <th>4</th>
-          <td>From: jcm@head-cfa.harvard.edu (Jonathan McDow...</td>
-          <td>14</td>
-          <td>sci.space</td>
-          <td>sci</td>
-          <td>space</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-
-
-For a random sample of the data, create tf-idf features.
-
-.. code:: ipython3
-
-    n = 5000
-    df = df.sample(n=n, replace=False, random_state=22).reset_index(drop=True)
-
-\`eb.text_matrix_and_attributes’ - creates a Y matrix of tf-idf
+``eb.text_matrix_and_attributes`` - creates a Y matrix of tf-idf
 features. It takes in a dataframe and the column which contains the
 data. Further functionality includes: removing general stopwords, adding
 stopwords, removing email addresses, cleaning (lemmatize and remove
@@ -136,13 +54,15 @@ documents a word needs to appear in to be included.
     n = 5000, p = 12804
 
 
-Perform dimension selection using Wasserstein distances, see [1] for
-details
+Perform dimension selection using Wasserstein distances, see `Whiteley
+et al., 2022 <https://arxiv.org/pdf/2208.11665>`__ for details.
 
 .. code:: ipython3
 
-    # ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
-    # print("Selected dimension: {}".format(dim))
+    ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)
+
+.. code:: ipython3
+
     dim = 28
 
 .. code:: ipython3
@@ -158,13 +78,14 @@ details
 PCA and tSNE
 ------------
 
-Now we perform PCA [1].
+Now we perform PCA `Whiteley et al.,
+2022 <https://arxiv.org/pdf/2208.11665>`__.
 
 .. code:: ipython3
 
     zeta = p**-.5 * eb.embed(Y, d=dim, version='full')
 
-Apply t-SNE
+Apply t-SNE.
 
 .. code:: ipython3
 
@@ -207,10 +128,12 @@ Plot PCA on the LHS and PCA + t-SNE on the RHS
         node_labels = df['target_names'].tolist(), 
         c = target_colour,
         title = ['PCA','tSNE'],
+        
         add_legend=True, 
         max_legend_cols = 6,
-       figsize = (15,6),
-       bbox_to_anchor= (.5,-.15),
+        figsize = (15,6),
+        move_legend = (.5,-.15),
+        # tick_labels = True, 
         # Apply other matplotlib settings
         s=10,
     )
@@ -218,15 +141,14 @@ Plot PCA on the LHS and PCA + t-SNE on the RHS
 
 
 
-.. image:: newsgroup_files/newsgroup_23_0.png
+.. image:: newsgroup_files/newsgroup_21_0.png
 
 
-Hierarchical clustering with dot products [2]
----------------------------------------------
+Hierarchical clustering with dot products, `Gray et al., 2024 <https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf>`__
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-First we do this for the centroids of each topic and plot the
-dendrogram. Then we do HC on the whole dataset and visualise the output
-tree.
+First we do HC for the centroids of each topic and plot the dendrogram.
+Then we do HC on the whole dataset and visualise the output tree.
 
 On centroids
 ------------
@@ -238,7 +160,6 @@ Find centroids
     idxs = [np.where(np.array(df['target']) == t)[0]
             for t in sorted(df['target'].unique())]
     t_zeta = np.array([np.mean(zeta[idx, :], axis=0) for idx in idxs])
-    t_Y = np.array([np.mean(Y[idx, :],axis = 0) for idx in idxs]).reshape(len(sorted(df['target'].unique())),p)
 
 Topic HC clustering
 
@@ -252,14 +173,13 @@ Plot dendrogram
 .. code:: ipython3
 
     plt.title("Hierarchical Clustering Dendrogram")
-    # plot the top three levels of the dendrogram
     eb.plot_dendrogram(t_dp_hc, dot_product_clustering=True, orientation='left',
                        labels=sorted(df['target_names'].unique()))
     plt.show()
 
 
 
-.. image:: newsgroup_files/newsgroup_32_0.png
+.. image:: newsgroup_files/newsgroup_30_0.png
 
 
 On documents
@@ -271,7 +191,7 @@ On documents
     dp_hc.fit(zeta);
 
 Use construct tree graph from hierarchical clustering, epsilon is set to
-zero as we don’t want to prune the tree
+zero as we don’t want to prune the tree.
 
 .. code:: ipython3
 
@@ -288,20 +208,40 @@ zero as we don’t want to prune the tree
 
 .. parsed-literal::
 
-    <pyemb.hc.ConstructTree at 0x718de98d9360>
+    <pyemb.hc.ConstructTree at 0x74ee20fbf280>
 
 
 
 .. code:: ipython3
 
-    tree.plot(labels = list(df["target_names"]), colours = target_colour, node_size=25, forceatlas_iter=0)
+    tree.plot(labels = list(df["target_names"]), colours = target_colour, node_size=25, forceatlas_iter=100)
 
 
 
-.. image:: newsgroup_files/newsgroup_37_0.png
+.. parsed-literal::
+
+    100%|██████████| 100/100 [00:11<00:00,  9.00it/s]
+
+
+.. parsed-literal::
+
+    BarnesHut Approximation  took  6.12  seconds
+    Repulsion forces  took  4.49  seconds
+    Gravitational forces  took  0.04  seconds
+    Attraction forces  took  0.03  seconds
+    AdjustSpeedAndApplyForces step  took  0.20  seconds
+
+
+
+.. image:: newsgroup_files/newsgroup_35_2.png
 
 
 References
 ----------
 
+-  Whiteley, N., Gray, A. and Rubin-Delanchy, P., 2022. Statistical
+   exploration of the Manifold Hypothesis.
 
+-  Gray, A., Modell, A., Rubin-Delanchy, P. and Whiteley, N., 2024.
+   Hierarchical clustering with dot products recovers hidden tree
+   structure. Advances in Neural Information Processing Systems, 36.

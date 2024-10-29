@@ -10,12 +10,12 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
 
     Parameters
     ----------
-    embedding : numpy.ndarray (n*T, d) or (T, n, d)
+    embedding : numpy.ndarray ``(n*T, d)`` or ``(T, n, d)``
         The dynamic embedding.
     n : int
         The number of nodes.
     T : int (optional)
-        The number of time points (> 1 animates the embedding).
+        The number of time points (> 1 animates the embedding). 
     node_labels : list of length n (optional)
         The labels of the nodes (time-invariant).
     return_df : bool (optional)
@@ -62,7 +62,6 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
     return fig
 
 
-import matplotlib.pyplot as plt
 
 def snapshot_plot(
     embedding,
@@ -74,17 +73,22 @@ def snapshot_plot(
     
     ## Plotting parameters
     max_cols=4,
-    add_legend=False,
     title = None,
+    title_fontsize = 20,
     sharex=False,
     sharey=False,
+    tick_labels = False, 
+    xaxis_label = "",
+    yaxis_label = "",
+    axis_fontsize = 12,
     figsize_scale = 5,
     figsize = None,
     
     ## Legend parameters
-    bbox_to_anchor=(0.5,-.1),
+    add_legend = False,
+    move_legend = (0.5,-.1),
     loc = 'lower center',
-    max_legend_cols=4,
+    max_legend_cols = 4,
 
     ## Scatter plot parameters
     **kwargs,
@@ -97,40 +101,50 @@ def snapshot_plot(
     embedding: np.ndarray or list of np.ndarray
         The embedding to plot.
     n: int  (optional)
-        The number of nodes in the graph. Should be provided if the embedding is a single numpy array and n is not the first dimension of the array.
+        The number of nodes in the graph. Should be provided if the embedding is a single numpy array and ``n`` is not the first dimension of the array.
     node_labels: list (optional) 
         The labels of the nodes. Default is None.
     c: list or dict (optional)
-        The colors of the nodes. If a list is provided, it should be a list of length n. If a dictionary is provided, it should map each unique label to a colour.
+        The colors of the nodes. If a list is provided, it should be a list of length ``n``. If a dictionary is provided, it should map each unique label to a colour.
     idx_of_interest: list (optional)   
-        The indices which to plot. For example if embedding is a list, idx_of_interest can be used to plot only a subset of the embeddings. By default, all embeddings are plotted.
+        The indices which to plot. For example if embedding is a list, ``idx_of_interest`` can be used to plot only a subset of the embeddings. By default, all embeddings are plotted.
+        
     max_cols: int (optional)
-        The maximum number of columns in the plot. Default is 4.
-    add_legend: bool (optional)    
-        Whether to add a legend to the plot. Default is False.
+        The maximum number of columns in the plot. Default is ``4``.
     title: str (optional)  
-        The title of the plot. If a list is provided, each element will be the title of a subplot. Default is None.
+        The title of the plot. If a list is provided, each element will be the title of a subplot. Default is ``None``.
+    title_fontsize: int (optional)
+        The fontsize of the title. Default is ``20``.
     sharex: bool (optional)    
-        Whether to share the x-axis across subplots. Default is False.
+        Whether to share the x-axis across subplots. Default is ``False``.
     sharey: bool (optional)    
-        Whether to share the y-axis across subplots. Default is False.
+        Whether to share the y-axis across subplots. Default is ``False``.
+    tick_labels: bool (optional)    
+        Whether to show tick labels. Default is ``False``.  
+    xaxis_label: str (optional) 
+        The x-axis label. Default is ``None``.
+    yaxis_label: str (optional) 
+        The y-axis label. Default is ``None``.
     figsize_scale: int (optional)  
-        The scale of the figure size. Default is 5.
+        The scale of the figure size. Default is ``5``.
     figsize: tuple (optional)  
-        The figure size. Default is None. 
-    bbox_to_anchor: tuple (optional) 
-        The bbox_to_anchor parameter for the legend. Default is (0.5,-.1).
+        The figure size. Default is ``None``. 
+        
+    add_legend: bool (optional)    
+        Whether to add a legend to the plot. Default is ``False``.
     loc: str (optional)    
-        The location of the legend. Default is 'lower center'.
+        The anchor point for where the legend will be placed. Default is ``lower center``.
+    move_legend: tuple (optional) 
+        This adjusts the exact coordinates of the anchor point. Default is ``(0.5,-.1)``.
     max_legend_cols: int (optional)    
-        The maximum number of columns in the legend. Default is 4.
+        The maximum number of columns in the legend. Default is ``4``.
     kwargs: dict (optional)    
         Additional keyword arguments for the scatter plot.
     
     Returns 
     ------- 
     
-    fig: matplotlib.figure.Figure   
+    matplotlib.figure.Figure   
         The figure object.
     """ 
     
@@ -165,14 +179,19 @@ def snapshot_plot(
     # Create subplots
     fig, axs = plt.subplots(figsize=figsize, sharex=sharex, sharey=sharey, ncols=num_cols, nrows=num_rows)
     axs = axs.flatten() if num_rows > 1 or num_cols > 1 else [axs]
+    
+    fig.suptitle(title if title and isinstance(title, str) else f"", fontsize=title_fontsize)
 
     for t_idx, t in enumerate(idx_of_interest):
         subplot = axs[t_idx]
         scatter = subplot.scatter(embedding[t, :, 0], embedding[t, :, 1], c=plot_colours, label=node_labels, **kwargs)
-        subplot.set_title(title[t_idx] if title and isinstance(title, list) and len(title) == len(idx_of_interest) else title or f"")
+        subplot.set_title(title[t_idx] if title and isinstance(title, list) and len(title) == len(idx_of_interest) else f"", fontsize=title_fontsize)
         subplot.grid(alpha=.2)
-        subplot.tick_params(labelleft=False, labelbottom=False)  # Hide tick labels but keep the gridlines
-
+        subplot.tick_params(labelleft=tick_labels, labelbottom=tick_labels)  # Hide tick labels but keep the gridlines
+    # Add labels to this subplot
+        subplot.set_xlabel(xaxis_label, fontsize=axis_fontsize)
+        subplot.set_ylabel(yaxis_label, fontsize=axis_fontsize)
+        
 
     ## Hide any unused subplots
     for idx in range(len(idx_of_interest), num_rows * num_cols):
@@ -192,13 +211,23 @@ def snapshot_plot(
             colour_dict = {num_to_label[label] :num_to_colours[label] for label in np.unique(plot_colours)}
 
         legend_handles = [plt.Line2D([0], [0], marker='o', color=colour_dict[l], linestyle='None', label=l) for l in legend_labels]
-        fig.legend(handles=legend_handles,ncols = min(len(legend_labels), max_legend_cols), loc=loc, bbox_to_anchor=bbox_to_anchor)
+        fig.legend(handles=legend_handles,ncols = min(len(legend_labels), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
 
     return fig
 
 def get_fig_legend_handles_labels(fig):
     """ 
-    Get the legend handles and labels from a figure.    
+    Get the legend handles and labels from a figure.   
+    
+    Parameters  
+    ----------  
+    fig: matplotlib.figure.Figure
+        The figure object.  
+        
+    Returns 
+    ------- 
+    list, list
+        The handles and labels of the legend 
     """
     
     handles = []

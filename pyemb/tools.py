@@ -16,11 +16,11 @@ def to_laplacian(A, regulariser=0):
     A : scipy.sparse.csr_matrix
         The adjacency matrix.
     regulariser : float
-        The regulariser to be added to the degrees of the nodes. If 'auto', the regulariser is set to the mean of the degrees.
+        The regulariser to be added to the degrees of the nodes. If ``auto``, the regulariser is set to the mean of the degrees.
 
     Returns
     -------
-    L : scipy.sparse.csr_matrix
+    scipy.sparse.csr_matrix
         The Laplacian matrix.
     """
 
@@ -49,10 +49,8 @@ def recover_subspaces(embedding, attributes):
 
     Returns
     -------
-    partition_embeddings : dict
-        The embeddings of the partitions.
-    partition_attributes : dict
-        The attributes of the nodes in the partitions.
+    dict, dict
+        The embeddings and attributes of the partitions.
     """
 
     partitions = list(set([x["partition"] for x in attributes]))
@@ -87,10 +85,8 @@ def select(embedding, attributes, select_attributes):
 
     Returns
     -------
-    selected_X : numpy.ndarray
-        The selected embedding.
-    selected_attributes : list of lists
-        The attributes of the selected nodes.
+    numpy.ndarray, list of lists
+        The selected embedding and its attributes.
     """
     if not isinstance(select_attributes, list):
         select_attributes = [select_attributes]
@@ -121,7 +117,7 @@ def degree_correction(embedding):
 
     Returns
     -------
-    embedding_dc : numpy.ndarray
+    numpy.ndarray
         The degree-corrected embedding.
     """
 

@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Planaria single-cell" href="planaria.html" />
-    <link rel="prev" title="Lyon school graph" href="lyon.html" /> 
+    <link rel="prev" title="School contact graph" href="lyon.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,18 +49,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../inst_over.html">Installation and Overview</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mimic.html">MIMIC-III</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lyon.html">Lyon school graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mimic.html#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html">School contact graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html#references">References</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">20Newsgroup documents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#data-load">Data load</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pca-and-tsne">PCA and tSNE</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hierarchical-clustering-with-dot-products-2">Hierarchical clustering with dot products [2]</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hierarchical-clustering-with-dot-products-gray-et-al-2024">Hierarchical clustering with dot products, Gray et al., 2024</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#on-centroids">On centroids</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#on-documents">On documents</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="planaria.html">Planaria single-cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planaria.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
@@ -94,102 +96,28 @@
              
   <section id="newsgroup-documents">
 <h1>20Newsgroup documents<a class="headerlink" href="#newsgroup-documents" title="Link to this heading"></a></h1>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
-<p>In this notebook, we will demonstrate use on the 20Newsgroup data. Each
+<p>This sections aims to use the packages functionality on text data. This
+includes creating a amtrix of tf-idf features, PCA and hierarchical
+clustering. For this, we will demonstrate on a sample of the
+<a class="reference external" href="https://qwone.com/~jason/20Newsgroups/">20Newsgroup data</a>. Each
 document is associated with 1 of 20 newsgroup topics, organized at two
 hierarchical levels.</p>
-</section>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
 <section id="data-load">
 <h2>Data load<a class="headerlink" href="#data-load" title="Link to this heading"></a></h2>
 <p>Import data and create dataframe.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newsgroups</span> <span class="o">=</span> <span class="n">fetch_20newsgroups</span><span class="p">()</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newsgroups</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newsgroups</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span>
-<span class="n">df</span><span class="p">[</span><span class="s2">&quot;target_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">newsgroups</span><span class="p">[</span><span class="s2">&quot;target_names&quot;</span><span class="p">][</span><span class="n">row</span><span class="p">])</span>
-<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;layer1&#39;</span><span class="p">,</span> <span class="s1">&#39;layer2&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">load_newsgroup</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">loaded</span> <span class="n">successfully</span>
 </pre></div>
 </div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>data</th>
-      <th>target</th>
-      <th>target_names</th>
-      <th>layer1</th>
-      <th>layer2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>From: lerxst@wam.umd.edu (where's my thing)\nS...</td>
-      <td>7</td>
-      <td>rec.autos</td>
-      <td>rec</td>
-      <td>autos</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>From: guykuo@carson.u.washington.edu (Guy Kuo)...</td>
-      <td>4</td>
-      <td>comp.sys.mac.hardware</td>
-      <td>comp</td>
-      <td>sys.mac.hardware</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>From: twillis@ec.ecn.purdue.edu (Thomas E Will...</td>
-      <td>4</td>
-      <td>comp.sys.mac.hardware</td>
-      <td>comp</td>
-      <td>sys.mac.hardware</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>From: jgreen@amber (Joe Green)\nSubject: Re: W...</td>
-      <td>1</td>
-      <td>comp.graphics</td>
-      <td>comp</td>
-      <td>graphics</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>From: jcm@head-cfa.harvard.edu (Jonathan McDow...</td>
-      <td>14</td>
-      <td>sci.space</td>
-      <td>sci</td>
-      <td>space</td>
-    </tr>
-  </tbody>
-</table>
-</div><p>For a random sample of the data, create tf-idf features.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">5000</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>`eb.text_matrix_and_attributes’ - creates a Y matrix of tf-idf
+<p><code class="docutils literal notranslate"><span class="pre">eb.text_matrix_and_attributes</span></code> - creates a Y matrix of tf-idf
 features. It takes in a dataframe and the column which contains the
 data. Further functionality includes: removing general stopwords, adding
 stopwords, removing email addresses, cleaning (lemmatize and remove
@@ -207,11 +135,12 @@ documents a word needs to appear in to be included.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">12804</span>
 </pre></div>
 </div>
-<p>Perform dimension selection using Wasserstein distances, see [1] for
-details</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ws, dim = eb.wasserstein_dimension_select(Y, range(40), split=0.5)</span>
-<span class="c1"># print(&quot;Selected dimension: {}&quot;.format(dim))</span>
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">28</span>
+<p>Perform dimension selection using Wasserstein distances, see <a class="reference external" href="https://arxiv.org/pdf/2208.11665">Whiteley
+et al., 2022</a> for details.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ws</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">wasserstein_dimension_select</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">),</span> <span class="n">split</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim</span> <span class="o">=</span> <span class="mi">28</span>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected dimension: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
@@ -223,11 +152,12 @@ details</p>
 </section>
 <section id="pca-and-tsne">
 <h2>PCA and tSNE<a class="headerlink" href="#pca-and-tsne" title="Link to this heading"></a></h2>
-<p>Now we perform PCA [1].</p>
+<p>Now we perform PCA <a class="reference external" href="https://arxiv.org/pdf/2208.11665">Whiteley et al.,
+2022</a>.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">p</span><span class="o">**-</span><span class="mf">.5</span> <span class="o">*</span> <span class="n">eb</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Apply t-SNE</p>
+<p>Apply t-SNE.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
 
 <span class="n">tsne_zeta</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">zeta</span><span class="p">)</span>
@@ -263,23 +193,24 @@ shades of the same colour</p>
     <span class="n">node_labels</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">target_colour</span><span class="p">,</span>
     <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PCA&#39;</span><span class="p">,</span><span class="s1">&#39;tSNE&#39;</span><span class="p">],</span>
+
     <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">max_legend_cols</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-   <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span>
-   <span class="n">bbox_to_anchor</span><span class="o">=</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span><span class="o">-</span><span class="mf">.15</span><span class="p">),</span>
+    <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span>
+    <span class="n">move_legend</span> <span class="o">=</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span><span class="o">-</span><span class="mf">.15</span><span class="p">),</span>
+    <span class="c1"># tick_labels = True,</span>
     <span class="c1"># Apply other matplotlib settings</span>
     <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_23_0.png" src="../_images/newsgroup_23_0.png" />
+<img alt="../_images/newsgroup_21_0.png" src="../_images/newsgroup_21_0.png" />
 </section>
-<section id="hierarchical-clustering-with-dot-products-2">
-<h2>Hierarchical clustering with dot products [2]<a class="headerlink" href="#hierarchical-clustering-with-dot-products-2" title="Link to this heading"></a></h2>
-<p>First we do this for the centroids of each topic and plot the
-dendrogram. Then we do HC on the whole dataset and visualise the output
-tree.</p>
+<section id="hierarchical-clustering-with-dot-products-gray-et-al-2024">
+<h2>Hierarchical clustering with dot products, <a class="reference external" href="https://proceedings.neurips.cc/paper_files/paper/2023/file/6521937507d78f327cd402401be73bf2-Paper-Conference.pdf">Gray et al., 2024</a><a class="headerlink" href="#hierarchical-clustering-with-dot-products-gray-et-al-2024" title="Link to this heading"></a></h2>
+<p>First we do HC for the centroids of each topic and plot the dendrogram.
+Then we do HC on the whole dataset and visualise the output tree.</p>
 </section>
 <section id="on-centroids">
 <h2>On centroids<a class="headerlink" href="#on-centroids" title="Link to this heading"></a></h2>
@@ -287,7 +218,6 @@ tree.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())]</span>
 <span class="n">t_zeta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">zeta</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">])</span>
-<span class="n">t_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:],</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())),</span><span class="n">p</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Topic HC clustering</p>
@@ -297,13 +227,12 @@ tree.</p>
 </div>
 <p>Plot dendrogram</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Hierarchical Clustering Dendrogram&quot;</span><span class="p">)</span>
-<span class="c1"># plot the top three levels of the dendrogram</span>
 <span class="n">eb</span><span class="o">.</span><span class="n">plot_dendrogram</span><span class="p">(</span><span class="n">t_dp_hc</span><span class="p">,</span> <span class="n">dot_product_clustering</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
                    <span class="n">labels</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;target_names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_32_0.png" src="../_images/newsgroup_32_0.png" />
+<img alt="../_images/newsgroup_30_0.png" src="../_images/newsgroup_30_0.png" />
 </section>
 <section id="on-documents">
 <h2>On documents<a class="headerlink" href="#on-documents" title="Link to this heading"></a></h2>
@@ -312,7 +241,7 @@ tree.</p>
 </pre></div>
 </div>
 <p>Use construct tree graph from hierarchical clustering, epsilon is set to
-zero as we don’t want to prune the tree</p>
+zero as we don’t want to prune the tree.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">ConstructTree</span><span class="p">(</span><span class="n">model</span><span class="o">=</span> <span class="n">dp_hc</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">tree</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
@@ -320,16 +249,33 @@ zero as we don’t want to prune the tree</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Constructing</span> <span class="n">tree</span><span class="o">...</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x718de98d9360</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pyemb</span><span class="o">.</span><span class="n">hc</span><span class="o">.</span><span class="n">ConstructTree</span> <span class="n">at</span> <span class="mh">0x74ee20fbf280</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;target_names&quot;</span><span class="p">]),</span> <span class="n">colours</span> <span class="o">=</span> <span class="n">target_colour</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">forceatlas_iter</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;target_names&quot;</span><span class="p">]),</span> <span class="n">colours</span> <span class="o">=</span> <span class="n">target_colour</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">forceatlas_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/newsgroup_37_0.png" src="../_images/newsgroup_37_0.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>100%|██████████| 100/100 [00:11&lt;00:00,  9.00it/s]
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BarnesHut</span> <span class="n">Approximation</span>  <span class="n">took</span>  <span class="mf">6.12</span>  <span class="n">seconds</span>
+<span class="n">Repulsion</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">4.49</span>  <span class="n">seconds</span>
+<span class="n">Gravitational</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.04</span>  <span class="n">seconds</span>
+<span class="n">Attraction</span> <span class="n">forces</span>  <span class="n">took</span>  <span class="mf">0.03</span>  <span class="n">seconds</span>
+<span class="n">AdjustSpeedAndApplyForces</span> <span class="n">step</span>  <span class="n">took</span>  <span class="mf">0.20</span>  <span class="n">seconds</span>
+</pre></div>
+</div>
+<img alt="../_images/newsgroup_35_2.png" src="../_images/newsgroup_35_2.png" />
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Whiteley, N., Gray, A. and Rubin-Delanchy, P., 2022. Statistical
+exploration of the Manifold Hypothesis.</p></li>
+<li><p>Gray, A., Modell, A., Rubin-Delanchy, P. and Whiteley, N., 2024.
+Hierarchical clustering with dot products recovers hidden tree
+structure. Advances in Neural Information Processing Systems, 36.</p></li>
+</ul>
 </section>
 </section>
 
@@ -337,7 +283,7 @@ zero as we don’t want to prune the tree</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="lyon.html" class="btn btn-neutral float-left" title="Lyon school graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lyon.html" class="btn btn-neutral float-left" title="School contact graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="planaria.html" class="btn btn-neutral float-right" title="Planaria single-cell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

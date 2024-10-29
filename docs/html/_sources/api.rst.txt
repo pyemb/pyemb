@@ -34,6 +34,14 @@ Hierarchical Clustering
    :undoc-members:
    :show-inheritance:
 
+Datasets
+---------
+
+.. automodule:: pyemb.datasets
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Matrix and Graph Tools 
 -----------------------
 
