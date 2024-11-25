@@ -1,11 +1,15 @@
 name: Python package
-on: [push]
+
+on: [push, pull_request]
+
 jobs:
     build:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
                 python-version: ["3.10", "3.11", "3.12", "3.13"]
+
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python ${{ matrix.python-version }}
