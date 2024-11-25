@@ -22,5 +22,7 @@ jobs:
               run: python -m build
             - name: Install package
               run: pip install dist/*.whl
+            - name: Install pytest
+              run: pip install pytest
             - name: Run tests
               run: pytest
