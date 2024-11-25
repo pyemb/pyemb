@@ -4,9 +4,10 @@ on: [push]
 
 jobs:
     build:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
                 python-version:
                     ["pypy3.10", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
@@ -19,3 +20,9 @@ jobs:
             # You can test your matrix by printing the current Python version
             - name: Display Python version
               run: python -c "import sys; print(sys.version)"
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+            - name: Run tests
+              run: pytest
