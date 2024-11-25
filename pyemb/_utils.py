@@ -8,9 +8,25 @@ import nltk
 from re import sub, compile
 from textblob import Word
 import networkx as nx
+import warnings
+
+# Use jit optionally - only use if the user has numba installed
+try:
+    import numba as nb
+
+    njit = nb.njit
+
+except ImportError:
+    warnings.warn(
+        "Numba is not installed. JIT compilation will not be available.", UserWarning
+    )
+
+    def njit(func):
+        return func
 
 
 ## ==== For preprocessing the data ==== ##
+
 
 def _extract_node_time_info(edge_list, join_token):
     """
@@ -78,6 +94,7 @@ def _ensure_stopwords_downloaded():
     except LookupError:
         nltk.download("stopwords")
 
+
 def _del_email_address(text):
     """
     Not used by user."""
@@ -95,8 +112,8 @@ def _clean_text_(text):
             for word in sub("[^A-Za-z0-9]+", " ", text).lower().split()
         ]
     )
-    
-    
+
+
 ## ==== For embedding the data ==== ##
 
 
@@ -143,7 +160,7 @@ def _safe_inv_sqrt(a, tol=1e-12):
     return b
 
 
-@nb.njit()
+@njit()
 def _form_omni_matrix(As, n, T):
     """
     Forms the embedding matrix for the omnibus embedding
@@ -229,27 +246,31 @@ def _unfolded_to_list(A):
     As = [A[:, i * n : (i + 1) * n] for i in range(T)]
     return As
 
+
 ## ==== For hierarchical clustering ==== ##
+
 
 def _get_triu(matrix, k=1):
     return matrix[np.triu_indices(matrix.shape[0], k=k)]
 
 
 def _utri2mat(utri):
-    n = int(-1 + np.sqrt(1 + 8*len(utri))) // 2
+    n = int(-1 + np.sqrt(1 + 8 * len(utri))) // 2
     iu1 = np.triu_indices(n)
     ret = np.empty((n, n))
     ret[iu1] = utri
     ret.T[iu1] = utri
     return ret
 
+
 def _is_visited(visited, idx):
     byte = visited[idx >> 3]
     return (byte & (1 << (idx & 7))) != 0
 
+
 def _set_visited(visited, idx):
-    visited[idx >> 3] |= (1 << (idx & 7))
-    
+    visited[idx >> 3] |= 1 << (idx & 7)
+
 
 def _find_cluster_sizes(G_clusters):
     """
@@ -263,8 +284,8 @@ def _find_cluster_sizes(G_clusters):
     """
     return {key: len(value) for key, value in G_clusters.items()}
 
-   
-def _find_value_percentage(data_list):   
+
+def _find_value_percentage(data_list):
     """
     Calculate the percentage of each unique value in a list.
 
@@ -276,11 +297,20 @@ def _find_value_percentage(data_list):
     """
     value_counts = {value: data_list.count(value) for value in set(data_list)}
     total_items = len(data_list)
-    value_percentages = {key: round(value / total_items, 3) for key, value in value_counts.items()}
+    value_percentages = {
+        key: round(value / total_items, 3) for key, value in value_counts.items()
+    }
     return value_percentages
 
 
-def _find_colours(labels, colour_dict, G_clusters=None, colour_threshold=0.5, mixed_colour='black', zero_colour='white'):
+def _find_colours(
+    labels,
+    colour_dict,
+    G_clusters=None,
+    colour_threshold=0.5,
+    mixed_colour="black",
+    zero_colour="white",
+):
     """
     Determine the colour for each cluster.
 
@@ -300,7 +330,9 @@ def _find_colours(labels, colour_dict, G_clusters=None, colour_threshold=0.5, mi
     if G_clusters is None:
         G_clusters = {i: [i] for i in range(len(labels))}
 
-    G_cluster_labels = {key: [labels[i] for i in value] for key, value in G_clusters.items()}
+    G_cluster_labels = {
+        key: [labels[i] for i in value] for key, value in G_clusters.items()
+    }
 
     for k in G_clusters.keys():
         cluster_percentages = _find_value_percentage(G_cluster_labels[k])
@@ -309,7 +341,9 @@ def _find_colours(labels, colour_dict, G_clusters=None, colour_threshold=0.5, mi
         else:
             max_val = max(cluster_percentages.values())
             if max_val >= colour_threshold:
-                plot_colours[k] = colour_dict[max(cluster_percentages, key=cluster_percentages.get)]
+                plot_colours[k] = colour_dict[
+                    max(cluster_percentages, key=cluster_percentages.get)
+                ]
             else:
-                plot_colours[k] = mixed_colour 
+                plot_colours[k] = mixed_colour
     return plot_colours
