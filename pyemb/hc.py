@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 import networkx as nx
-
 from scipy.cluster.hierarchy import cophenet,dendrogram
 from scipy.spatial.distance import squareform
 from scipy.stats import rankdata
@@ -10,10 +9,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
-from fa2_modified import ForceAtlas2
 import matplotlib.patches as mpatches
 
-from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes, _utri2mat, _get_triu
+from ._utils import _is_visited, _set_visited, _find_colours, _find_cluster_sizes, _utri2mat, _get_triu, _requires_dependency
 
 
 ## ========= Dot product based hierarchical clustering ========= ##
@@ -452,6 +450,7 @@ class ConstructTree:
                 self.tree.add_edge(to_merge[1], idx)
         return self
     
+    @_requires_dependency('fa2_modified', 'hc', 'ForceAtlas2')
     def plot(self, 
             labels = None, 
             colours = None, 
@@ -498,13 +497,8 @@ class ConstructTree:
         **kwargs : dict, optional   
             Additional keyword arguments to pass to ``nx.draw``.
         """
-        
-        try:
-            from networkx.drawing.nx_agraph import graphviz_layout
-        except ImportError:
-            raise ImportError(
-                "Graph drawing requires pygraphviz. Please install it using `pip install pygraphviz`, or see https://pygraphviz.github.io/documentation/stable/install.html for more information."
-            )
+        from fa2_modified import ForceAtlas2
+        from networkx.drawing.nx_agraph import graphviz_layout
         
         if self.tree is None:
             raise ValueError("Please fit the tree first.")
@@ -560,8 +554,6 @@ class ConstructTree:
         # Add the legend
         plt.legend(handles=patches, ncols = min(len(colour_dict.keys()), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
         plt.show()
-
-
 
 
 

@@ -2,19 +2,18 @@ from tqdm import tqdm
 import numpy as np
 from scipy import sparse
 import warnings
-import logging
-import numba as nb
-import ot
+
 
 from ._utils import (
     _symmetric_dilation,
     _form_omni_matrix_sparse,
     _form_omni_matrix,
     _unfold_from_snapshots,
+    _requires_dependency
 )
 from .tools import to_laplacian
 
-
+@_requires_dependency("ot", "wasserstein")
 def wasserstein_dimension_select(Y, dims, split=0.5):
     """
     Select the number of dimensions using Wasserstein distances.
@@ -35,6 +34,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     int 
         The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
+    import ot
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
     Y1 = Y[idx]

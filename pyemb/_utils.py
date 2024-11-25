@@ -2,12 +2,59 @@ from collections import Counter
 from scipy import sparse
 import numpy as np
 import pandas as pd
-import numba as nb
 from tqdm import tqdm
-import nltk
 from re import sub, compile
-from textblob import Word
-import networkx as nx
+
+
+try:
+    from numba import njit
+    use_njit = True
+except ImportError:
+    use_njit = False
+
+    # Define a no-op decorator if numba is not installed
+    def njit(func):
+        return func
+
+## ========= Dependency check ========= ##
+
+def _requires_dependency(dependency_name, feature_name, function_name=None):
+    """
+    Decorator that checks for the presence of a required dependency and raises an informative error
+    if it's missing. Optionally checks for a specific function within the package.
+
+    Parameters:
+    - dependency_name: The name of the required package.
+    - feature_name: The feature set name for installation instructions.
+    - function_name: The specific function to check for (optional). If provided, it checks if the function exists within the package.
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                # Try importing the package
+                package = __import__(dependency_name)
+
+                # If a function name is specified, try to access it within the package
+                if function_name:
+                    # This handles importing a specific function or module from the package
+                    getattr(package, function_name)
+                
+            except ImportError as e:
+                raise ImportError(
+                    f"The '{dependency_name}' package is required for this function. "
+                    f"Install it with: pip install pyemb[{feature_name}]"
+                ) from e
+            except AttributeError:
+                raise ImportError(
+                    f"The '{function_name}' function is required from the '{dependency_name}' package. "
+                    f"Install it with: pip install pyemb[{feature_name}]"
+                )
+
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 
 
 ## ==== For preprocessing the data ==== ##
@@ -71,8 +118,9 @@ def _create_node_attributes(nodes, partitions, times, n_nodes, n_times):
     ]
     return attributes
 
-
+@_requires_dependency('nltk', 'nlp')
 def _ensure_stopwords_downloaded():
+    import nltk
     try:
         nltk.data.find("corpora/stopwords")
     except LookupError:
@@ -86,9 +134,11 @@ def _del_email_address(text):
     return pattern.sub("", text)
 
 
+@_requires_dependency('textblob', 'nlp', 'Word')
 def _clean_text_(text):
     """
     Not used by user."""
+    from textblob import Word
     return " ".join(
         [
             Word(word).lemmatize()
@@ -143,7 +193,7 @@ def _safe_inv_sqrt(a, tol=1e-12):
     return b
 
 
-@nb.njit()
+@njit
 def _form_omni_matrix(As, n, T):
     """
     Forms the embedding matrix for the omnibus embedding
