@@ -2,7 +2,6 @@ from collections import Counter
 from scipy import sparse
 import numpy as np
 import pandas as pd
-import numba as nb
 from tqdm import tqdm
 import nltk
 from re import sub, compile
@@ -17,12 +16,19 @@ try:
     njit = nb.njit
 
 except ImportError:
-    warnings.warn(
-        "Numba is not installed. JIT compilation will not be available.", UserWarning
-    )
 
-    def njit(func):
-        return func
+    def njit(func=None):
+        if func is None:
+            return lambda f: njit(f)
+
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                "Numba is not installed. JIT compilation will not be available.",
+                UserWarning,
+            )
+            return func(*args, **kwargs)
+
+        return wrapper
 
 
 ## ==== For preprocessing the data ==== ##
