@@ -1,7 +1,7 @@
-pyemb
-=====
+phd
+===
 
 .. toctree::
    :maxdepth: 4
 
-   pyemb
+   setup

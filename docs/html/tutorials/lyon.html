@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School contact graph &mdash; pyemb  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="20Newsgroup documents" href="newsgroup.html" />
+    <link rel="prev" title="MIMIC-III" href="mimic.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyemb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../inst_over.html">Installation and Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mimic.html">MIMIC-III</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">School contact graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-dataset">Load dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#embed-the-dynamic-network">Embed the dynamic network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#quick-visualisations">Quick visualisations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#a-quick-interactive-and-animated-plot-to-explore-your-embedding">A quick interactive and animated plot to explore your embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualise-embedding-time-point-snapshots-of-interest">Visualise embedding time point snapshots of interest</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#degree-correct-the-embedding">Degree-correct the embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#compare-embedding-methods">Compare embedding methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#independent-spectral-embedding">Independent spectral embedding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#omnibus-embedding-omni">Omnibus embedding (OMNI)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uase">UASE</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#urlse">URLSE</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="newsgroup.html">20Newsgroup documents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planaria.html">Planaria single-cell</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refs.html">Contributors and References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyemb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">School contact graph</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/lyon.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="school-contact-graph">
+<h1>School contact graph<a class="headerlink" href="#school-contact-graph" title="Link to this heading"></a></h1>
+<p>This tutorial aims to explore the different methods to embed a dynamic
+network (URLSE, ISE, OMNI and UASE). To do this, we use a <a class="reference external" href="http://www.sociopatterns.org/datasets/primary-school-temporal-network-data/">temporal
+network</a>
+of contacts between the children and teachers in a French school.</p>
+<section id="load-dataset">
+<h2>Load dataset<a class="headerlink" href="#load-dataset" title="Link to this heading"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">load_lyon</span><span class="p">()</span>
+
+<span class="n">edge_tuples</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">node_labels</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">loaded</span> <span class="n">successfully</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">edge_tuples</span></code> contains an array with three columns, the first column
+is time and the second and third columns are the nodes. The nodes are
+indicated by integers from 0, with the label of corresponding index
+giving their class (or <code class="docutils literal notranslate"><span class="pre">Teachers</span></code>).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">node_labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">edge_tuples</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of nodes: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of time windows: </span><span class="si">{</span><span class="n">T</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">nodes</span><span class="p">:</span> <span class="mi">242</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">time</span> <span class="n">windows</span><span class="p">:</span> <span class="mi">71</span>
+</pre></div>
+</div>
+<p>Transform the edge list into a list of matrices.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">As</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">edge_tuples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)),</span> <span class="p">([</span><span class="n">edge_tuples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">],</span> <span class="p">[</span><span class="n">edge_tuples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">])),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">As</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">sign</span><span class="p">())</span>
+</pre></div>
+</div>
+<section id="embed-the-dynamic-network">
+<h3>Embed the dynamic network<a class="headerlink" href="#embed-the-dynamic-network" title="Link to this heading"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Embed the graph using unfolded regularised Laplacian spectral embedding</span>
+<span class="n">d</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">URLSE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="quick-visualisations">
+<h2>Quick visualisations<a class="headerlink" href="#quick-visualisations" title="Link to this heading"></a></h2>
+<section id="a-quick-interactive-and-animated-plot-to-explore-your-embedding">
+<h3>A quick interactive and animated plot to explore your embedding<a class="headerlink" href="#a-quick-interactive-and-animated-plot-to-explore-your-embedding" title="Link to this heading"></a></h3>
+<p>Click
+<a class="reference external" href="https://edwarddavis1.github.io/example_pyemb_quick_plot/">here</a> to
+view an example of the interactive output of <code class="docutils literal notranslate"><span class="pre">quick_plot()</span></code>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Quick interactive + animated plot of the embedding</span>
+<span class="c1"># fig = eb.quick_plot(URLSE_emb, n, T, node_labels)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualise-embedding-time-point-snapshots-of-interest">
+<h3>Visualise embedding time point snapshots of interest<a class="headerlink" href="#visualise-embedding-time-point-snapshots-of-interest" title="Link to this heading"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">URLSE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;URLSE&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Select snapshots to be shown</span>
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Class time&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">]</span>
+
+<span class="c1"># Plot the snapshots</span>
+<span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">URLSE_emb</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply any further adjustments to the plot</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_14_0.png" src="../_images/lyon_14_0.png" />
+</section>
+<section id="degree-correct-the-embedding">
+<h3>Degree-correct the embedding<a class="headerlink" href="#degree-correct-the-embedding" title="Link to this heading"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">URLSE_emb_dc</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">URLSE_emb</span><span class="p">)</span>
+<span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">URLSE_emb_dc</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">URLSE_fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;URLSE with degree correction&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_16_0.png" src="../_images/lyon_16_0.png" />
+</section>
+</section>
+<section id="compare-embedding-methods">
+<h2>Compare embedding methods<a class="headerlink" href="#compare-embedding-methods" title="Link to this heading"></a></h2>
+<section id="independent-spectral-embedding">
+<h3>Independent spectral embedding<a class="headerlink" href="#independent-spectral-embedding" title="Link to this heading"></a></h3>
+<p>A naive dynamic embedding method where each adjacency matrix is embedded
+independently using spectral embedding.</p>
+<p>As each time point is entirely independent temporal structure is lost,
+which is illustrated by no two time points looking at all alike.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ISE&quot;</span><span class="p">)</span>
+<span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">ISE_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="c1"># Adjust the text size on the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+
+<span class="n">ISE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">ISE_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_19_0.png" src="../_images/lyon_19_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ISE&quot;</span><span class="p">)</span>
+<span class="n">ISE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">ISE_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="c1"># Adjust the text size on the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+
+<span class="n">ISE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">ISE_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_20_0.png" src="../_images/lyon_20_0.png" />
+</section>
+<section id="omnibus-embedding-omni">
+<h3>Omnibus embedding (OMNI)<a class="headerlink" href="#omnibus-embedding-omni" title="Link to this heading"></a></h3>
+<p>The OMNI embedding <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/8215766?casa_token=A8Vz_qKy3WoAAAAA:TcmJnZtU85qQGJCSTh765-qZnj_carcslkH_ZgRl6U1ffI7YvcDF8wtrGfWhImw-GO8O0OT0-pp5">Levin et al.,
+2017</a>
+manages to fix the problem of time points looking completely different,
+as shown by classes remaining in similar places across all time points.</p>
+<p>However, at lunchtime we expect classes to mix, children play with
+children from other classes at lunch time. OMNI fails to show this
+mixing as (e.g. the orange class clearly does not mix).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">OMNI_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;OMNI&quot;</span><span class="p">)</span>
+<span class="n">OMNI_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">OMNI_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">OMNI_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">OMNI_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_22_0.png" src="../_images/lyon_22_0.png" />
+</section>
+<section id="uase">
+<h3>UASE<a class="headerlink" href="#uase" title="Link to this heading"></a></h3>
+<p>Unfoled adjacency spectral embedding (UASE) <a class="reference external" href="https://arxiv.org/abs/2007.10455">Jones et al.,
+2020</a>, <a class="reference external" href="https://proceedings.neurips.cc/paper/2021/hash/5446f217e9504bc593ad9dcf2ec88dda-Abstract.html">Gallagher et al.,
+2021</a>
+was the first of a suite of “unfolded” dynamic embedding methods. Owing
+to its property of stability, UASE is able to show both the clustering
+of classes in classtime as well as the total mixing of classes at
+lunchtime.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">UASE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;UASE&quot;</span><span class="p">)</span>
+<span class="n">UASE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">UASE_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">UASE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">UASE_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_24_0.png" src="../_images/lyon_24_0.png" />
+</section>
+<section id="urlse">
+<h3>URLSE<a class="headerlink" href="#urlse" title="Link to this heading"></a></h3>
+<p>Unfolded regularised Laplacian spectral embedding (URLSE) is essentially
+a regularised version of UASE. URLSE is one of many possible unfolded
+dynamic embedding, all of which feature stability properties <a class="reference external" href="https://arxiv.org/abs/2311.09251">Davis et
+al., 2023</a>. This means that, like
+UASE, this method is able to display the clustering of classes in
+classtime and the mixing of classes at lunchtime.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">URLSE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;URLSE&quot;</span><span class="p">)</span>
+<span class="n">URLSE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">URLSE_emb</span><span class="p">)</span>
+
+<span class="n">points_of_interest</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">63</span><span class="p">]</span>
+<span class="n">point_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Morning&quot;</span><span class="p">,</span> <span class="s2">&quot;Lunch time&quot;</span><span class="p">,</span> <span class="s2">&quot;Afternoon&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">URLSE_fig</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+    <span class="n">URLSE_emb</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">idx_of_interest</span> <span class="o">=</span> <span class="n">points_of_interest</span><span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">point_labels</span><span class="p">,</span>
+    <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">sharex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">sharey</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tick_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/lyon_26_0.png" src="../_images/lyon_26_0.png" />
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Levin, K., Athreya, A., Tang, M., Lyzinski, V. and Priebe, C.E.,
+2017, November. A central limit theorem for an omnibus embedding of
+multiple random dot product graphs. In 2017 IEEE international
+conference on data mining workshops (ICDMW) (pp. 964-967). IEEE.</p></li>
+<li><p>Jones, A. and Rubin-Delanchy, P., 2020. The multilayer random dot
+product graph. arXiv preprint arXiv:2007.10455.</p></li>
+<li><p>Gallagher, I., Jones, A. and Rubin-Delanchy, P., 2021. Spectral
+embedding for dynamic networks with stability guarantees. Advances in
+Neural Information Processing Systems, 34, pp.10158-10170.</p></li>
+<li><p>Davis, E., Gallagher, I., Lawson, D.J. and Rubin-Delanchy, P., 2023.
+A simple and powerful framework for stable dynamic network embedding.
+arXiv preprint arXiv:2311.09251.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mimic.html" class="btn btn-neutral float-left" title="MIMIC-III" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="newsgroup.html" class="btn btn-neutral float-right" title="20Newsgroup documents" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Annie Gray.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

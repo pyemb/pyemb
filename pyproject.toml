@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyemb"
+version = "1.0.0a11"
+description = "EDA for complex data"
+readme = "README.md"
+readme-content-type = "text/markdown"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+keywords = ["EDA", "embedding"]
+authors = [
+    {name = "Annie Gray", email = "annie.gray@bristol.ac.uk"},
+    {name = "Ed Davis", email = "edward.davis@bristol.ac.uk"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "matplotlib>=3.9.1.post1",
+    "matplotlib-inline>=0.1.7",
+    "networkx>=3.3",
+    "nltk>=3.8.1",
+    "numba>=0.60.0",
+    "numpy>=2.0.1",
+    "pandas>=2.2.2",
+    "scikit-learn>=1.5.1",
+    "scipy>=1.14.0",
+    "textblob>=0.18.0.post0",
+    "tqdm>=4.66.4",
+    "POT>=0.9.4",
+    "fa2_modified>=0.3.10",
+    "requests>=2.32.3",
+]
+
+[project.optional-dependencies]
+doc = ["sphinx", "setuptools>=59.6.0"]
+plotting = ["plotly>=5.22.0"]
+hc = ["pygraphviz>=1.13"]
+other = [
+    "asttokens>=2.4.1",
+    "click>=8.1.7",
+    "collection>=0.1.6",
+    "comm>=0.2.2",
+    "debugpy>=1.8.2",
+    "decorator>=5.1.1",
+    "exceptiongroup>=1.2.2",
+    "executing>=2.0.1",
+    "ipykernel>=6.29.5",
+    "ipython>=8.26.0",
+    "jedi>=0.19.1",
+    "joblib>=1.4.2",
+    "jupyter_client>=8.6.2",
+    "jupyter_core>=5.7.2",
+    "parso>=0.8.4",
+    "pexpect>=4.9.0",
+    "platformdirs>=4.2.2",
+    "prompt_toolkit>=3.0.47",
+    "psutil>=6.0.0",
+    "ptyprocess>=0.7.0",
+    "pure_eval>=0.2.3",
+    "Pygments>=2.18.0",
+    "python-dateutil>=2.9.0.post0",
+    "pytz>=2024.1",
+    "pyzmq>=26.0.3",
+    "regex>=2024.7.24"
+]
+
+
+
+[project.urls]
+Documentation = "https://pyemb.github.io/pyemb"
+Repository = "https://github.com/pyemb/pyemb"

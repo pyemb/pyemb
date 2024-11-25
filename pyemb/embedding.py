@@ -22,7 +22,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     Parameters
     ----------
     Y : numpy.ndarray
-        The array of matrices.
+        The array of matrix.
     dims : list of int
         The dimensions to be considered.
     split : float
@@ -30,15 +30,11 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Returns
     -------
-    ws : list of numpy.ndarray
-        The Wasserstein distances between the training and test data for each number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
+    list of numpy.ndarray
+        The Wasserstein distances between the training and test data for each number of dimensions. 
+    int 
+        The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
-
-    try:
-        import ot
-    except ModuleNotFoundError:
-        logging.error("ot not found, please install ot package with 'pip install pot'")
-
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
     Y1 = Y[idx]
@@ -59,10 +55,11 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     for dim in tqdm(dims):
         M = ot.dist((Y1 @ Vt.T[:, :dim]) @ Vt[:dim, :], Y2, metric="euclidean")
         Ws.append(ot.emd2(np.repeat(1 / n1, n1), np.repeat(1 / n2, n2), M))
-
-    print(f"Recommended dimension: {np.argmin(Ws)}, Wasserstein distance {Ws[dim]:.5f}")
-    return Ws
-
+    if not isinstance(dims, list):
+        dims = list(dims)
+    chosen_dim = dims[np.argmin(Ws)]
+    print(f"Recommended dimension: {chosen_dim}, Wasserstein distance {Ws[np.argmin(Ws)]:.5f}")
+    return Ws, int(chosen_dim)
 
 def embed(
     Y,
@@ -83,21 +80,21 @@ def embed(
     d : int
         The number of dimensions to embed into.
     version : str
-        The version of the embedding. Options are 'full' or 'sqrt' (default).
+        Whether to take the square root of the singular values. Options are ``full`` or ``sqrt`` (default).
     return_right : bool
         Whether to return the right embedding.
     flat : bool
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d).
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``.
     make_laplacian : bool
         Whether to use the Laplacian matrix.
     regulariser : float
-        The regulariser to be added to the degrees of the nodes. (only used if make_laplacian=True)
+        The regulariser to be added to the degrees of the nodes. (only used if ``make_laplacian=True``)
 
     Returns
     -------
-    left_embedding : numpy.ndarray
+    numpy.ndarray
         The left embedding.
-    right_embedding : numpy.ndarray
+    numpy.ndarray
         The right embedding.
     """
 
@@ -179,7 +176,7 @@ def eigen_decomp(A, dim=None):
     A : numpy.ndarray
         The matrix to be decomposed.
     dim : int
-        The number of dimensions to be returned.
+        The number of eigenvalues and eigenvectors to be returned. If ``None``, all eigenvalues and eigenvectors are returned.
 
     Returns
     -------
@@ -218,20 +215,20 @@ def ISE(As, d, flat=True, procrustes=False, consistent_orientation=True):
     Parameters
     ----------
     As : numpy.ndarray
-        An adjacency matrix series of shape (T, n, n).
+        An adjacency matrix series of shape ``(T, n, n)``.
     d : int
         Embedding dimension.
     flat : bool, optional
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
     procrustes : bool, optional
-        Whether to align each embedding with the previous embedding. Default is False.
+        Whether to align each embedding with the previous embedding. Default is ``False``.
     consistent_orientation : bool, optional
-        Whether to ensure the eigenvector orientation is consistent. Default is True.
+        Whether to ensure the eigenvector orientation is consistent. Default is ``True``.
 
     Returns
     -------
     numpy.ndarray
-        Dynamic embedding of shape (n*T, d) or (T, n, d).
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
     """
 
     n = As[0].shape[0]
@@ -295,22 +292,22 @@ def UASE(As, d, flat=True, sparse_matrix=False, return_left=False):
     Parameters
     ----------
     As : numpy.ndarray
-        An adjacency matrix series of shape (T, n, n).
+        An adjacency matrix series of shape ``(T, n, n)``.
     d : int
         Embedding dimension.
     flat : bool, optional
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
     sparse_matrix : bool, optional
-        Whether the adjacency matrices are sparse. Default is False.
+        Whether the adjacency matrices are sparse. Default is ``False``.
     return_left : bool, optional
-        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is False.
+        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is ``False``.
 
     Returns
     -------
     numpy.ndarray
-        Dynamic embedding of shape (n*T, d) or (T, n, d).
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
     numpy.ndarray, optional
-        Anchor embedding of shape (n, d) if return_left is True.
+        Anchor embedding of shape ``(n, d)`` if return_left is ``True``.
     """
     # Assume fixed n over time
     n = As[0].shape[0]
@@ -362,24 +359,24 @@ def regularised_ULSE(
     Parameters
     ----------
     As : numpy.ndarray
-        An adjacency matrix series of shape (T, n, n).
+        An adjacency matrix series of shape ``(T, n, n)``.
     d : int
         Embedding dimension.
     regulariser : float, optional
         Regularisation parameter for the Laplacian matrix. By default, this is the average node degree.
     flat : bool, optional
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
     sparse_matrix : bool, optional
-        Whether the adjacency matrices are sparse. Default is False.
+        Whether the adjacency matrices are sparse. Default is ``False``.
     return_left : bool, optional
-        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is False.
+        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is ``False``.
 
     Returns
     -------
     numpy.ndarray
-        Dynamic embedding of shape (n*T, d) or (T, n, d).
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
     numpy.ndarray, optional
-        Anchor embedding of shape (n, d) if return_left is True.
+        Anchor embedding of shape ``(n, d)`` if ``return_left`` is ``True``.
     """
     # Assume fixed n over time
     n = As[0].shape[0]
@@ -426,18 +423,18 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
     Parameters
     ----------
     As : numpy.ndarray
-        Adjacency matrices of shape (T, n, n).
+        Adjacency matrices of shape ``(T, n, n)``.
     d : int
         Embedding dimension.
     flat : bool, optional
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
     sparse_matrix : bool, optional
-        Whether to use sparse matrices. Default is False.
+        Whether to use sparse matrices. Default is ``False``.
 
     Returns
     -------
     numpy.ndarray
-        Dynamic embedding of shape (n*T, d) or (T, n, d).
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
     """
     n = As[0].shape[0]
     T = len(As)
@@ -478,20 +475,20 @@ def dyn_embed(
     Parameters
     ----------
     As : numpy.ndarray or list
-        An adjacency matrix series which is either a numpy array of shape (T, n, n), a list of numpy arrays of shape (n, n), or a series of CSR matrices.
+        An adjacency matrix series which is either a numpy array of shape ``(T, n, n)``, a list of numpy arrays of shape ``(n, n)``, or a series of CSR matrices.
     d : int, optional
-        Embedding dimension. Default is 50.
+        Embedding dimension. Default is ``50``.
     method : str, optional
-        The embedding method to use. Options are "ISE", "ISE PROCRUSTES", "UASE", "OMNI", "ULSE", "URLSE", "RANDOM". Default is "UASE".
-    regulariser : float or "auto", optional
-        Regularisation parameter for the Laplacian matrix. If "auto", the regulariser is set to the average node degree. Default is "auto".
+        The embedding method to use. Options are ``ISE``, ``ISE PROCRUSTES``, ``UASE``, ``OMNI``, ``ULSE``, ``URLSE``, ``RANDOM``. Default is ``UASE``.
+    regulariser : float or ``auto``, optional
+        Regularisation parameter for the Laplacian matrix. If ``auto``, the regulariser is set to the average node degree. Default is ``auto``.
     flat : bool, optional
-        Whether to return a flat embedding (n*T, d) or a 3D embedding (T, n, d). Default is True.
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
 
     Returns
     -------
     numpy.ndarray
-        Dynamic embedding of shape (n*T, d) or (T, n, d).
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
 
     Raises
     ------

@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import plotly.express as px
 import numpy as np
 import pandas as pd
 
@@ -11,13 +10,13 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
 
     Parameters
     ----------
-    embedding : numpy.ndarray (n*T, d) or (T, n, d)
+    embedding : numpy.ndarray ``(n*T, d)`` or ``(T, n, d)``
         The dynamic embedding.
     n : int
         The number of nodes.
-    T : int
-        The number of time points (> 1 animates the embedding).
-    node_labels : list of length n
+    T : int (optional)
+        The number of time points (> 1 animates the embedding). 
+    node_labels : list of length n (optional)
         The labels of the nodes (time-invariant).
     return_df : bool (optional)
         Option to return the plotting dataframe.
@@ -25,6 +24,14 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
         The title of the plot.
 
     """
+    
+    try:
+        import plotly.express as px
+    except ImportError:
+        raise ImportError(
+            "Plotly is not installed. Please install it using `pip install plotly`."
+        )
+    
     if len(embedding.shape) == 3:
         embedding = embedding.reshape((n * T, -1))
 
@@ -55,112 +62,178 @@ def quick_plot(embedding, n, T=1, node_labels=None, **kwargs):
     return fig
 
 
+
 def snapshot_plot(
     embedding,
-    n,
-    node_labels,
-    points_of_interest,
-    point_labels=[],
+    
+    n = None,
+    node_labels = None,
+    c = None,
+    idx_of_interest = None,
+    
+    ## Plotting parameters
     max_cols=4,
-    add_legend=False,
-    legend_adjust=0,
-    max_legend_cols=5,
+    title = None,
+    title_fontsize = 20,
+    sharex=False,
+    sharey=False,
+    tick_labels = False, 
+    xaxis_label = "",
+    yaxis_label = "",
+    axis_fontsize = 12,
+    figsize_scale = 5,
+    figsize = None,
+    
+    ## Legend parameters
+    add_legend = False,
+    move_legend = (0.5,-.1),
+    loc = 'lower center',
+    max_legend_cols = 4,
+
+    ## Scatter plot parameters
     **kwargs,
 ):
-    """
-    Plots the selected embedding snapshots as a grid of scatter plots.
-
-    Parameters
-    ----------
-    embedding : numpy.ndarray (T, n, d) or (n*T, d)
-        The dynamic embedding.
-    n : int
-        The number of nodes.
-    node_labels : list of length n
-        The labels of the nodes (time-invariant).
-    points_of_interest : list of int
-        The time point indices to plot.
-    point_labels : list of str (optional)
-        The labels of the points of interest.
-    max_cols : int (optional)
-        The maximum number of columns in the scatter plot grid.
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
+    """ 
+    Plot a snapshot of an embedding at a given time point.  
+    
+    Parameters  
+    ----------  
+    embedding: np.ndarray or list of np.ndarray
+        The embedding to plot.
+    n: int  (optional)
+        The number of nodes in the graph. Should be provided if the embedding is a single numpy array and ``n`` is not the first dimension of the array.
+    node_labels: list (optional) 
+        The labels of the nodes. Default is None.
+    c: list or dict (optional)
+        The colors of the nodes. If a list is provided, it should be a list of length ``n``. If a dictionary is provided, it should map each unique label to a colour.
+    idx_of_interest: list (optional)   
+        The indices which to plot. For example if embedding is a list, ``idx_of_interest`` can be used to plot only a subset of the embeddings. By default, all embeddings are plotted.
+        
+    max_cols: int (optional)
+        The maximum number of columns in the plot. Default is ``4``.
+    title: str (optional)  
+        The title of the plot. If a list is provided, each element will be the title of a subplot. Default is ``None``.
+    title_fontsize: int (optional)
+        The fontsize of the title. Default is ``20``.
+    sharex: bool (optional)    
+        Whether to share the x-axis across subplots. Default is ``False``.
+    sharey: bool (optional)    
+        Whether to share the y-axis across subplots. Default is ``False``.
+    tick_labels: bool (optional)    
+        Whether to show tick labels. Default is ``False``.  
+    xaxis_label: str (optional) 
+        The x-axis label. Default is ``None``.
+    yaxis_label: str (optional) 
+        The y-axis label. Default is ``None``.
+    figsize_scale: int (optional)  
+        The scale of the figure size. Default is ``5``.
+    figsize: tuple (optional)  
+        The figure size. Default is ``None``. 
+        
+    add_legend: bool (optional)    
+        Whether to add a legend to the plot. Default is ``False``.
+    loc: str (optional)    
+        The anchor point for where the legend will be placed. Default is ``lower center``.
+    move_legend: tuple (optional) 
+        This adjusts the exact coordinates of the anchor point. Default is ``(0.5,-.1)``.
+    max_legend_cols: int (optional)    
+        The maximum number of columns in the legend. Default is ``4``.
+    kwargs: dict (optional)    
+        Additional keyword arguments for the scatter plot.
+    
+    Returns 
+    ------- 
+    
+    matplotlib.figure.Figure   
         The figure object.
-    """
-
-    # Subplot for each time point
-    num_cols = min(len(points_of_interest), max_cols)
-    num_rows = (len(points_of_interest) + num_cols - 1) // num_cols
-    fig, axs = plt.subplots(
-        figsize=(5 * num_cols, 5 * num_rows),
-        sharex=True,
-        sharey=True,
-        ncols=num_cols,
-        nrows=num_rows,
-    )
-
+    """ 
+    
+    ## check everything is in the right format
+    ## and set defaults
+    
+    if isinstance(embedding, list):
+        embedding = np.stack(embedding, axis=0)
+        
+    n = embedding.shape[0] if n is None else n
+    # Handle 2D embeddings
     if len(embedding.shape) == 2:
         T = embedding.shape[0] // n
         embedding = embedding.reshape(T, n, embedding.shape[1])
+    idx_of_interest = list(range(embedding.shape[0])) if idx_of_interest is None else idx_of_interest
+    
+    
+    # Set defaults for node_labels and points_of_interest
+    node_labels = np.zeros(n) if node_labels is None else node_labels
 
-    enc_node_labels = pd.factorize(node_labels)[0]
+    # Determine figure size
+    num_cols = min(len(idx_of_interest), max_cols)
+    num_rows = (len(idx_of_interest) + num_cols - 1) // num_cols
+    figsize = figsize or (figsize_scale * num_cols, figsize_scale * num_rows)
 
-    for t_idx, t in enumerate(points_of_interest):
-        if num_rows == 1:
-            subplot = axs[t_idx]
-        else:
-            t_row = t_idx // num_cols
-            t_col = t_idx % num_cols
-            subplot = axs[t_row, t_col]
+    # Set colors
+    if isinstance(c, dict):
+        plot_colours = [c[l] for l in node_labels]
+    else:
+        plot_colours = c if c is not None else pd.factorize(np.array(node_labels))[0]
 
-        scatter = subplot.scatter(
-            embedding[t, :, 0],
-            embedding[t, :, 1],
-            c=enc_node_labels,
-            **kwargs,
-        )
+    # Create subplots
+    fig, axs = plt.subplots(figsize=figsize, sharex=sharex, sharey=sharey, ncols=num_cols, nrows=num_rows)
+    axs = axs.flatten() if num_rows > 1 or num_cols > 1 else [axs]
+    
+    fig.suptitle(title if title and isinstance(title, str) else f"", fontsize=title_fontsize)
 
-        if len(point_labels) > 0:
-            subplot.set_title(point_labels[t_idx])
-        else:
-            subplot.set_title(f"Time {t}")
+    for t_idx, t in enumerate(idx_of_interest):
+        subplot = axs[t_idx]
+        scatter = subplot.scatter(embedding[t, :, 0], embedding[t, :, 1], c=plot_colours, label=node_labels, **kwargs)
+        subplot.set_title(title[t_idx] if title and isinstance(title, list) and len(title) == len(idx_of_interest) else f"", fontsize=title_fontsize)
+        subplot.grid(alpha=.2)
+        subplot.tick_params(labelleft=tick_labels, labelbottom=tick_labels)  # Hide tick labels but keep the gridlines
+    # Add labels to this subplot
+        subplot.set_xlabel(xaxis_label, fontsize=axis_fontsize)
+        subplot.set_ylabel(yaxis_label, fontsize=axis_fontsize)
+        
 
-        subplot.grid(alpha=0.2)
-        subplot.set_xticklabels([])
-        subplot.set_yticklabels([])
-
-    # Hide any unused subplots
-    if len(points_of_interest) < num_rows * num_cols:
-        for idx in range(len(points_of_interest), num_rows * num_cols):
-            fig.delaxes(axs.flatten()[idx])
-
+    ## Hide any unused subplots
+    for idx in range(len(idx_of_interest), num_rows * num_cols):
+        fig.delaxes(axs[idx])
+    
     if add_legend:
-        # Extract and print colormap
-        colormap = scatter.get_cmap()
-        norm = scatter.norm
-        unique_enc_labels = np.unique(enc_node_labels)
-        colors = [colormap(norm(label)) for label in unique_enc_labels]
-
+        legend_labels = sorted(list(set(node_labels)))
+        colour_dict = {node_labels[i]: c for i, c in enumerate(plot_colours)}
         # Add legend
-        handles = []
-        labels = []
-        for label, color in zip(np.unique(node_labels), colors):
-            handles.append(
-                plt.Line2D(
-                    [0], [0], marker="o", color=color, linestyle="None", label=label
-                )
-            )
-            labels.append(label)
+        legend_handles = []
+        if c is None: 
+            # Extract and print colormap
+            colormap = scatter.get_cmap()
+            norm = scatter.norm
+            num_to_colours = {label: colormap(norm(label)) for label in np.unique(plot_colours)}
+            num_to_label = {value: key for key, value in colour_dict.items()}
+            colour_dict = {num_to_label[label] :num_to_colours[label] for label in np.unique(plot_colours)}
 
-        fig.legend(
-            handles,
-            labels,
-            loc="lower center",
-            ncol=min(len(labels), max_legend_cols),
-            bbox_to_anchor=(0.5, legend_adjust),
-        )
+        legend_handles = [plt.Line2D([0], [0], marker='o', color=colour_dict[l], linestyle='None', label=l) for l in legend_labels]
+        fig.legend(handles=legend_handles,ncols = min(len(legend_labels), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
 
     return fig
+
+def get_fig_legend_handles_labels(fig):
+    """ 
+    Get the legend handles and labels from a figure.   
+    
+    Parameters  
+    ----------  
+    fig: matplotlib.figure.Figure
+        The figure object.  
+        
+    Returns 
+    ------- 
+    list, list
+        The handles and labels of the legend 
+    """
+    
+    handles = []
+    labels = []
+    for ax in fig.axes:
+        h, l = ax.get_legend_handles_labels()
+        handles.extend(h)
+        labels.extend(l)
+    return handles, labels
