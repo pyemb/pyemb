@@ -3,7 +3,6 @@ import numpy as np
 from scipy import sparse
 import warnings
 import logging
-import numba as nb
 import ot
 
 from ._utils import (
