@@ -4,6 +4,5 @@ pyemb is a toolkit for anaylsing complex datasets, such as high-dimensional data
 
 To install the package, you can use pip: `pip install pyemb`
 
-
-
+Code has been tested for python versions 3.10 to 3.13 on Ubuntu and Mac. 
 
