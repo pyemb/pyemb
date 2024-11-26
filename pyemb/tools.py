@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-from scipy import linalg
+from scipy import linalg, sparse
 from copy import deepcopy
-from scipy import sparse
 
 from ._utils import _safe_inv_sqrt
 

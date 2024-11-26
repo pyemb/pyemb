@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import networkx as nx
 from copy import deepcopy
 from tqdm import tqdm
-import nltk
+
 
 from ._utils import (
     _symmetric_dilation,
@@ -18,6 +18,7 @@ from ._utils import (
     _create_node_attributes,
     _extract_node_time_info,
     _unfolded_to_list,
+    _requires_dependency
 )
 
 
@@ -345,7 +346,6 @@ def to_networkx(A, attributes, symmetric=None):
         nx.set_node_attributes(G_nx, {i + n0: {"bipartite": 1} for i in range(n1)})
     return G_nx
 
-
 def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     """
     Create a matrix from a time series.
@@ -377,7 +377,7 @@ def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     attributes = [[{"name": i} for i in ids], [{"time": i} for i in times]]
     return Y, attributes
 
-
+@_requires_dependency('nltk', 'nlp')
 def text_matrix_and_attributes(
     data,
     column_name,
@@ -413,6 +413,7 @@ def text_matrix_and_attributes(
         The matrix created from the text data. The attributes of the nodes.
         The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.
     """
+    import nltk
 
     _ensure_stopwords_downloaded()
 
