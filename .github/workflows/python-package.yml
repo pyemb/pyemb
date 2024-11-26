@@ -8,7 +8,7 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+                python-version: ["3.10", "3.11", "3.12", "3.13"]
 
         steps:
             - uses: actions/checkout@v4
@@ -29,7 +29,9 @@ jobs:
               run: pip install dist/*.whl
             - name: Install package (Windows)
               if: runner.os == 'Windows'
-              run: pip install dist\*.whl
+              run: |
+                  cd dist
+                  for %%w in (*.whl) do pip install %%w
             - name: Install pytest
               run: pip install pytest
             - name: Run tests
