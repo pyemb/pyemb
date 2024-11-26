@@ -18,6 +18,7 @@ from ._utils import (
     _create_node_attributes,
     _extract_node_time_info,
     _unfolded_to_list,
+    _requires_dependency
 )
 
 
