@@ -14,6 +14,7 @@
 
 ** To implement
 - [ ] A load of Ian's network generation functions from spectral_embedding
+- [ ] Forgot to add return_left to dyn_embed
 
 
 

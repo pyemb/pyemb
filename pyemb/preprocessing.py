@@ -7,7 +7,19 @@ from copy import deepcopy
 from tqdm import tqdm
 
 
-from ._utils import _symmetric_dilation, _count_based_on_keys, _ensure_stopwords_downloaded, _del_email_address, _clean_text_, _transform_edge_data, _create_adjacency_matrix, _create_node_attributes, _extract_node_time_info, _unfolded_to_list, _requires_dependency
+from ._utils import (
+    _symmetric_dilation,
+    _count_based_on_keys,
+    _ensure_stopwords_downloaded,
+    _del_email_address,
+    _clean_text_,
+    _transform_edge_data,
+    _create_adjacency_matrix,
+    _create_node_attributes,
+    _extract_node_time_info,
+    _unfolded_to_list,
+)
+
 
 def graph_from_dataframes(
     tables,
@@ -25,8 +37,8 @@ def graph_from_dataframes(
     tables : pandas.DataFrame or list of pandas.DataFrames
         Dataframe of relationships or list of dataframes. The column names of the dataframe(s) indicate the partition of the entities therein.
     relationship_cols : list of lists
-        The pairs of partitions we are interested in. This can be one of two formats. Either, a list of pairs of partitions, e.g. ``[['A','B'], ['C','B']]`` and each pair is looked for in each table. 
-        This allows for the case where the same relationships appear in different table.   
+        The pairs of partitions we are interested in. This can be one of two formats. Either, a list of pairs of partitions, e.g. ``[['A','B'], ['C','B']]`` and each pair is looked for in each table.
+        This allows for the case where the same relationships appear in different table.
         Or, ``len(relationship_cols) == len(tables)`` and the pairs of paritions to create relationships from for each table are given in the corresponding index of the list.
     same_attribute : bool
         Whether the entities in the columns are from the same attribute. This allows for intra-partition relationships.
@@ -47,17 +59,17 @@ def graph_from_dataframes(
         The attributes of the nodes. The first list contains the attributes
         of the nodes in the rows. The second list contains
         the attributes of the nodes in the columns.
-        
-    Examples    
-    --------    
-    >>> import pyemb as eb  
-    >>> # Create dataframes 
-    >>> df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})    
-    >>> df2 = pd.DataFrame({'A': [1, 2, 3], 'C': [7, 8, 9]})    
-    >>> # Create graph from dataframes  
-    >>> A, attributes = eb.graph_from_dataframes([df1, df2], [['A', 'B'], ['A', 'C']]) 
-    >>> print(A.todense())    
-    >>> print(attributes)       
+
+    Examples
+    --------
+    >>> import pyemb as eb
+    >>> # Create dataframes
+    >>> df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    >>> df2 = pd.DataFrame({'A': [1, 2, 3], 'C': [7, 8, 9]})
+    >>> # Create graph from dataframes
+    >>> A, attributes = eb.graph_from_dataframes([df1, df2], [['A', 'B'], ['A', 'C']])
+    >>> print(A.todense())
+    >>> print(attributes)
     """
     # Ensure data and relationship_cols are in list format
     # add valueerror if not in the correct format
@@ -95,10 +107,9 @@ def graph_from_dataframes(
         nodes, partitions, times, len(nodes), len(times)
     )
     As = _unfolded_to_list(A.tocsr())
-    if len(As) ==1:
+    if len(As) == 1:
         As = As[0]
     return As, attributes
-
 
 
 def _create_edge_list(
@@ -161,7 +172,7 @@ def _create_edge_list(
                 pair_data["P2"] = partition_pair[1]
 
                 edge_list.append(pair_data)
-        
+
     return pd.concat(edge_list)
 
 
@@ -186,7 +197,7 @@ def find_subgraph(A, attributes, subgraph_attributes):
     -------
     scipy.sparse.csr_matrix, list of lists
         The matrix and attributes of the subgraph.
-        
+
     """
 
     if not isinstance(subgraph_attributes[0], list):
@@ -350,7 +361,7 @@ def time_series_matrix_and_attributes(data, time_col, drop_nas=True):
     Returns
     -------
     numpy.ndarray, list of lists
-        The matrix created from the time series and the attributes of the nodes. 
+        The matrix created from the time series and the attributes of the nodes.
         The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.
     """
     data = data.sort_values(by=time_col)
@@ -398,7 +409,7 @@ def text_matrix_and_attributes(
     Returns
     -------
     numpy.ndarray, list of lists
-        The matrix created from the text data. The attributes of the nodes. 
+        The matrix created from the text data. The attributes of the nodes.
         The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.
     """
     import nltk
@@ -429,4 +440,3 @@ def text_matrix_and_attributes(
     col_attrs = [{"term": i} for i in vectorizer.get_feature_names_out()]
 
     return Y, [row_attrs, col_attrs]
-
