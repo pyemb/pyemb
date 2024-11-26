@@ -31,7 +31,7 @@ jobs:
               if: runner.os == 'Windows'
               run: |
                   cd dist
-                  for %%w in (*.whl) do pip install %%w
+                  Get-ChildItem -Filter *.whl | ForEach-Object { pip install $_.FullName }
             - name: Install pytest
               run: pip install pytest
             - name: Run tests
