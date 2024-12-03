@@ -175,6 +175,40 @@ def test_embed_invalid_version():
         embed(A, d=3, version="invalid_version")
 
 
-# TODO: eigen_decomp()
+from pyemb.embedding import eigen_decomp
+
+
+@pytest.mark.parametrize("matrix_type", ["dense", "sparse"])
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+@pytest.mark.parametrize("k", [1, 3, 5])
+def test_eigen_decomp(matrix_type, dtype, k, generate_matrix):
+    """
+    Test the eigen_decomp function with various matrix types, data types, and values of k.
+    Ensures that the function returns the correct number of eigenvalues and eigenvectors.
+    """
+    A = generate_matrix(matrix_type, dtype)
+    eigenvalues, eigenvectors = eigen_decomp(A, k)
+    assert len(eigenvalues) == k
+    assert eigenvectors.shape == (A.shape[0], k)
+
+
+def test_eigen_decomp_invalid_matrix():
+    """
+    Test the eigen_decomp function with an invalid matrix type.
+    Ensures that the function raises a ValueError.
+    """
+    with pytest.raises(ValueError):
+        eigen_decomp("invalid_matrix", 3)
+
+
+def test_eigen_decomp_invalid_k():
+    """
+    Test the eigen_decomp function with an invalid value of k.
+    Ensures that the function raises a ValueError.
+    """
+    A = np.random.rand(10, 10)
+    with pytest.raises(ValueError):
+        eigen_decomp(A, -1)
+
 
 # TODO: test OMNI when numba is/is not installed?
