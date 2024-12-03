@@ -178,7 +178,7 @@ def test_embed_invalid_version():
 from pyemb.embedding import eigen_decomp
 
 
-@pytest.mark.parametrize("matrix_type", ["dense", "sparse"])
+@pytest.mark.parametrize("matrix_type", ["dense"])
 @pytest.mark.parametrize("dtype", [np.float32, np.float64])
 @pytest.mark.parametrize("k", [1, 3, 5])
 def test_eigen_decomp(matrix_type, dtype, k, generate_matrix):

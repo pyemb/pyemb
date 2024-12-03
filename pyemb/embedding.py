@@ -199,9 +199,13 @@ def eigen_decomp(A, dim=None):
     eigenvalues = eigenvalues[idx]
     eigenvectors = eigenvectors[:, idx]
 
-    if dim is not None:
-        eigenvalues = eigenvalues[:dim]
-        eigenvectors = eigenvectors[:, :dim]
+    if not isinstance(dim, int) or dim <= 0:
+        raise ValueError("dim must be a positive integer")
+    if dim > len(eigenvalues):
+        raise ValueError("dim must be smaller than the number of eigenvalues")
+
+    eigenvalues = eigenvalues[:dim]
+    eigenvectors = eigenvectors[:, :dim]
 
     return eigenvalues, eigenvectors
 
