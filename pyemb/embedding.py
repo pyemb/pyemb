@@ -30,8 +30,8 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     Returns
     -------
     list of numpy.ndarray
-        The Wasserstein distances between the training and test data for each number of dimensions. 
-    int 
+        The Wasserstein distances between the training and test data for each number of dimensions.
+    int
         The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
     n = Y.shape[0]
@@ -57,8 +57,11 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
     if not isinstance(dims, list):
         dims = list(dims)
     chosen_dim = dims[np.argmin(Ws)]
-    print(f"Recommended dimension: {chosen_dim}, Wasserstein distance {Ws[np.argmin(Ws)]:.5f}")
+    print(
+        f"Recommended dimension: {chosen_dim}, Wasserstein distance {Ws[np.argmin(Ws)]:.5f}"
+    )
     return Ws, int(chosen_dim)
+
 
 def embed(
     Y,
