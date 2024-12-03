@@ -113,6 +113,7 @@ def embed(
     if d > n:
         raise ValueError("d must be smaller than the number of nodes")
 
+    is_series = False
     if (
         isinstance(Y, list)
         or (isinstance(Y, np.ndarray) and sparse.issparse(Y[0]))

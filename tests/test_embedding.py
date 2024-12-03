@@ -88,3 +88,93 @@ def test_wasserstein_dimension_select_invalid_split():
     dims = range(1, 10)
     with pytest.raises(ValueError):
         wasserstein_dimension_select(Y, dims, split=1.5)
+
+
+from pyemb.embedding import embed
+
+
+@pytest.fixture
+def generate_matrix():
+    def _generate_matrix(matrix_type, dtype):
+        if matrix_type == "dense":
+            return np.random.rand(10, 10).astype(dtype)
+        elif matrix_type == "sparse":
+            return sparse.random(10, 10, density=0.1, format="csr", dtype=dtype)
+
+    return _generate_matrix
+
+
+@pytest.mark.parametrize(
+    "version, return_right, flat, make_laplacian, expected_shape",
+    [
+        ("sqrt", False, True, False, (10, 3)),
+        ("sqrt", True, True, False, (10, 3)),
+        ("full", False, True, False, (10, 3)),
+        ("full", True, True, False, (10, 3)),
+        ("sqrt", False, False, False, (10, 3)),
+        ("sqrt", True, False, False, (10, 3)),
+        ("full", False, False, False, (10, 3)),
+        ("full", True, False, False, (10, 3)),
+        ("sqrt", False, True, True, (10, 3)),
+        ("sqrt", True, True, True, (10, 3)),
+        ("full", False, True, True, (10, 3)),
+        ("full", True, True, True, (10, 3)),
+    ],
+)
+@pytest.mark.parametrize("matrix_type", ["dense", "sparse"])
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+def test_embed(
+    version,
+    return_right,
+    flat,
+    make_laplacian,
+    expected_shape,
+    matrix_type,
+    dtype,
+    generate_matrix,
+):
+    """
+    Test the embed function with various parameters, matrix types, and data types.
+    Ensures that the function returns an embedding with the expected shape.
+    """
+    A = generate_matrix(matrix_type, dtype)
+    embedding = embed(
+        A,
+        d=3,
+        version=version,
+        return_right=return_right,
+        flat=flat,
+        make_laplacian=make_laplacian,
+    )
+
+    if return_right:
+        left_embedding, right_embedding = embedding
+        assert left_embedding.shape == expected_shape
+        assert right_embedding.shape == expected_shape
+    else:
+        assert embedding.shape == expected_shape
+
+
+def test_embed_invalid_dimension():
+    """
+    Test the embed function with an invalid dimension.
+    Ensures that the function raises a ValueError.
+    """
+    A = np.random.rand(10, 10)
+    with pytest.raises(ValueError):
+        embed(A, d=-1)
+
+
+def test_embed_invalid_version():
+    """
+    Test the embed function with an invalid version.
+    Ensures that the function raises a ValueError.
+    """
+    A = np.random.rand(10, 10)
+    with pytest.raises(ValueError):
+        embed(A, d=3, version="invalid_version")
+
+
+# TODO: eigen_decomp()
+
+# TODO: test OMNI when numba is/is not installed?
