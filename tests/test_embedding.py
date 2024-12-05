@@ -209,6 +209,3 @@ def test_eigen_decomp_invalid_k():
     A = np.random.rand(10, 10)
     with pytest.raises(ValueError):
         eigen_decomp(A, -1)
-
-
-# TODO: test OMNI when numba is/is not installed?
