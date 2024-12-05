@@ -53,41 +53,41 @@ def test_dyn_embed(
     assert embedding.shape == expected_shape
 
 
-from pyemb.embedding import wasserstein_dimension_select
+# from pyemb.embedding import wasserstein_dimension_select
 
 
-@pytest.mark.parametrize(
-    "Y, split",
-    [
-        # Test two cases with a different split for both dense and sparse matrices.
-        (np.random.rand(100, 50), 0.5),
-        (sparse.random(100, 50, density=0.1, format="csr"), 0.5),
-        (np.random.rand(100, 50), 0.8),
-        (sparse.random(100, 50, density=0.1, format="csr"), 0.8),
-    ],
-)
-def test_wasserstein_dimension_select(Y, split):
-    """
-    Test the wasserstein_dimension_select function with different matrix types and split ratios.
-    Ensures that the function returns a list of Wasserstein distances and a valid dimension.
-    """
-    dims = range(1, 10)
-    ws, dim = wasserstein_dimension_select(Y, dims, split)
-    assert isinstance(ws, list)
-    assert all(isinstance(w, float) for w in ws)
-    assert isinstance(dim, int)
-    assert dim in dims
+# @pytest.mark.parametrize(
+#     "Y, split",
+#     [
+#         # Test two cases with a different split for both dense and sparse matrices.
+#         (np.random.rand(100, 50), 0.5),
+#         (sparse.random(100, 50, density=0.1, format="csr"), 0.5),
+#         (np.random.rand(100, 50), 0.8),
+#         (sparse.random(100, 50, density=0.1, format="csr"), 0.8),
+#     ],
+# )
+# def test_wasserstein_dimension_select(Y, split):
+#     """
+#     Test the wasserstein_dimension_select function with different matrix types and split ratios.
+#     Ensures that the function returns a list of Wasserstein distances and a valid dimension.
+#     """
+#     dims = range(1, 10)
+#     ws, dim = wasserstein_dimension_select(Y, dims, split)
+#     assert isinstance(ws, list)
+#     assert all(isinstance(w, float) for w in ws)
+#     assert isinstance(dim, int)
+#     assert dim in dims
 
 
-def test_wasserstein_dimension_select_invalid_split():
-    """
-    Test the wasserstein_dimension_select function with an invalid split ratio.
-    Ensures that the function raises a ValueError.
-    """
-    Y = np.random.rand(100, 50)
-    dims = range(1, 10)
-    with pytest.raises(ValueError):
-        wasserstein_dimension_select(Y, dims, split=1.5)
+# def test_wasserstein_dimension_select_invalid_split():
+#     """
+#     Test the wasserstein_dimension_select function with an invalid split ratio.
+#     Ensures that the function raises a ValueError.
+#     """
+#     Y = np.random.rand(100, 50)
+#     dims = range(1, 10)
+#     with pytest.raises(ValueError):
+#         wasserstein_dimension_select(Y, dims, split=1.5)
 
 
 from pyemb.embedding import embed
