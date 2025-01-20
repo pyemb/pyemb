@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from re import sub, compile
+from sklearn.preprocessing import normalize
 
 
 try:
@@ -229,6 +230,73 @@ def _form_omni_matrix_sparse(As, n, T, verbose=False):
                 A[t1 * n : (t1 + 1) * n, t2 * n : (t2 + 1) * n] /= 2
 
     return A
+
+def _form_attributed_matrix(As, Cs, alpha, norm):
+    """
+    Creates an attributed matrix by combining adjacency and attribute matrices.
+
+    Parameters
+    ----------
+    As : list or np.ndarray
+        List or array of adjacency matrices.
+    Cs : list or np.ndarray
+        List or array of attribute matrices.
+    alpha : float
+        Weighting parameter.
+    norm : bool
+        Whether to normalize the attributes.
+
+    Returns
+    -------
+    list
+        List of attributed matrices.
+    """
+    # Ensure consistent formats
+    if isinstance(As, np.ndarray) and As.dtype == object:
+        As = list(As)
+    if isinstance(Cs, np.ndarray) and Cs.dtype == object:
+        Cs = list(Cs)
+
+    # Validate that As and Cs have the same length
+    if len(As) != len(Cs):
+        raise ValueError("The number of adjacency matrices (As) must match the number of attribute matrices (Cs).")
+
+    # Determine if matrices are sparse or dense
+    is_sparse = all(sparse.issparse(A) for A in As) and all(sparse.issparse(C) for C in Cs)
+    is_dense = not is_sparse
+
+    if not (is_sparse or is_dense):
+        raise ValueError("Both 'As' and 'Cs' must be consistently sparse or dense.")
+
+    Acs = []
+    p = Cs[0].shape[1]
+
+
+    # Create the attributed matrix
+    for i in range(len(As)):
+        A = As[i]
+        Ct = Cs[i]
+        if norm:
+            Ct = normalize(Ct, axis=0)
+
+        if sparse.issparse(A) and sparse.issparse(Ct):
+            # Handle sparse matrices
+            top = sparse.hstack([(1 - alpha) * A, alpha * Ct])
+            bottom = sparse.hstack([alpha * Ct.T, sparse.csr_matrix((p, p))])
+            Ac = sparse.vstack([top, bottom])
+
+            Ac = Ac.tocsr()
+
+        else:
+            # Handle dense matrices
+            top = np.hstack([(1 - alpha) * A, alpha * Ct])
+            bottom = np.hstack([alpha * Ct.T, np.zeros((p, p))])
+            Ac = np.vstack([top, bottom])
+
+        Acs.append(Ac)
+
+    return Acs
+
 
 
 def _unfold_from_snapshots(As):

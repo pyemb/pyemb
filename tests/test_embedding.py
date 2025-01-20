@@ -33,6 +33,7 @@ def generate_matrices():
         ("OMNI", True, (50, 3)),
         ("Random", True, (50, 3)),
         ("Random", False, (5, 10, 3)),
+        ("AUASE", True, (50, 3)),
     ],
 )
 @pytest.mark.parametrize("matrix_type", ["dense", "sparse"])
@@ -48,8 +49,18 @@ def test_dyn_embed(
 
     if as_list:
         As = [As[i] for i in range(5)]
+        
 
-    embedding = dyn_embed(As, d=3, method=method, flat=flat)
+    kwargs = {}
+    if method == "AUASE":
+        Cs = generate_matrices(matrix_type, dtype)
+        if as_list:
+            Cs = [Cs[i] for i in range(5)]
+
+        alpha = 0.5
+        kwargs = {"Cs": Cs, "alpha": alpha}
+
+    embedding = dyn_embed(As, d=3, method=method, flat=flat, **kwargs)
     assert embedding.shape == expected_shape
 
 

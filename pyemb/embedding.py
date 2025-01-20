@@ -9,7 +9,8 @@ from ._utils import (
     _form_omni_matrix_sparse,
     _form_omni_matrix,
     _unfold_from_snapshots,
-    _requires_dependency
+    _requires_dependency,
+    _form_attributed_matrix,
 )
 from .tools import to_laplacian
 
@@ -468,6 +469,124 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
             XA[t] = XA_flat[t * n : (t + 1) * n, 0:d]
 
     return XA
+    
+
+def AUASE(As, Cs, d, alpha, norm = True, 
+          flat=True, sparse_matrix=False, return_left=False):
+    """
+    Computes the attributed unfolded adjacency spectral embedding (AUASE).
+
+    Parameters
+    ----------
+    As : numpy.ndarray
+        An adjacency matrix series of shape ``(T, n, n)``.
+    Cs : numpy.ndarray
+        An attribute matrix series of shape ``(T, n, p)``.
+    d : int
+        Embedding dimension.
+    alpha : float
+        Weighting parameter between the adjacency and attribute matrices.
+    norm : bool, optional
+        Whether to normalise the attributes. Default is ``True``.
+    flat : bool, optional
+        Whether to return a flat embedding ``(n*T, d)`` or a 3D embedding ``(T, n, d)``. Default is ``True``.
+    sparse_matrix : bool, optional
+        Whether the adjacency matrices are sparse. Default is ``False``.
+    return_left : bool, optional
+        Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is ``False``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Dynamic embedding of shape ``(n*T, d)`` or ``(T, n, d)``.
+    numpy.ndarray, optional
+        Anchor embedding of shape ``(n, d)`` if return_left is ``True``.
+    """
+    # CHECKS -------------------------------------------
+
+    if not isinstance(d, int) or d <= 0:
+        raise ValueError("d must be a positive integer")
+
+    # check d is smaller than the number of nodes
+    n = As[0].shape[0]
+    if d > n:
+        raise ValueError("d must be smaller than the number of nodes")
+
+    # Make sure each is float
+    if isinstance(As, list) or (isinstance(As, np.ndarray) and len(As.shape) == 1):
+        for t in range(len(As)):
+            if As[t].dtype not in [np.float32, np.float64]:
+                As[t] = As[t].astype(np.float32)
+    else:
+        if As.dtype not in [np.float32, np.float64]:
+            As = As.astype(np.float32)
+
+    if isinstance(Cs, list) or (isinstance(Cs, np.ndarray) and len(Cs.shape) == 1):
+        for t in range(len(Cs)):
+            if Cs[t].dtype not in [np.float32, np.float64]:
+                Cs[t] = Cs[t].astype(np.float32)
+    else:
+        if Cs.dtype not in [np.float32, np.float64]:
+            Cs = Cs.astype(np.float32)
+
+
+    if len(Cs) != len(As):
+        raise ValueError("'Cs' must have the same length as 'As'")
+    if Cs[0].shape[0] != As[0].shape[0]:
+        raise ValueError("'Cs' must have the same number of nodes as 'As'")
+    
+    if isinstance(As, list):
+        As_sparse = all(sparse.issparse(A) for A in As)
+
+    else:
+        As_sparse = sparse.issparse(As[0])
+
+
+
+    if isinstance(Cs, list):
+        Cs_sparse = all(sparse.issparse(C) for C in Cs)
+
+    else:
+        Cs_sparse = sparse.issparse(Cs[0])
+
+    if As_sparse != Cs_sparse:
+        raise ValueError("Both 'As' and 'Cs' must be either sparse or dense")
+    
+    # if both are dense, set sparse_matrix to False
+    if not As_sparse and not Cs_sparse:
+        sparse_matrix = False
+    else:
+        sparse_matrix = True
+    
+    if not (0 <= alpha <= 1):
+        raise ValueError("'alpha' must be between 0 and 1")
+
+    #----------------------------------------------------------------
+
+    n = As[0].shape[0]
+    T = len(As)
+
+    # Construct the rectangular unfolded adjacency
+    Acs = _form_attributed_matrix(As, Cs, alpha, norm)
+
+    XA, YA = UASE(Acs, d, flat = False, sparse_matrix = sparse_matrix, return_left = True)
+
+    if flat:
+        YA_flat = np.zeros((n*T,d))
+        
+        for t in range(T):
+            YA_flat[n*t:n*(t+1),:] = YA[t,:n:]
+        YA = YA_flat
+    else:
+        YA = YA[:, :n, :]
+
+    XA = XA[:n, :]  
+
+    if return_left:
+        return XA, YA
+    else:
+        return YA
+
 
 
 def dyn_embed(
@@ -476,6 +595,7 @@ def dyn_embed(
     method="UASE",
     regulariser="auto",
     flat=True,
+    **kwargs
 ):
     """
     Computes the dynamic embedding using a specified method.
@@ -487,7 +607,7 @@ def dyn_embed(
     d : int, optional
         Embedding dimension. Default is ``50``.
     method : str, optional
-        The embedding method to use. Options are ``ISE``, ``ISE PROCRUSTES``, ``UASE``, ``OMNI``, ``ULSE``, ``URLSE``, ``RANDOM``. Default is ``UASE``.
+        The embedding method to use. Options are ``ISE``, ``ISE PROCRUSTES``, ``UASE``, ``AUASE``, ``OMNI``, ``ULSE``, ``URLSE``, ``RANDOM``. Default is ``UASE``.
     regulariser : float or ``auto``, optional
         Regularisation parameter for the Laplacian matrix. If ``auto``, the regulariser is set to the average node degree. Default is ``auto``.
     flat : bool, optional
@@ -548,6 +668,17 @@ def dyn_embed(
             flat=flat,
             make_laplacian=True,
         )
+    elif method.upper() == "AUASE":
+
+        Cs = kwargs.pop('Cs', None)
+        alpha = kwargs.pop('alpha', None)
+        if alpha is None:
+            raise ValueError("Parameter 'alpha' is required for method 'AUASE'")
+        if Cs is None:
+            raise ValueError("Parameter 'Cs' is required for method 'AUASE'")
+        
+        
+        YA = AUASE(As, Cs, d, alpha, return_left=False, **kwargs)
     elif method.upper() == "RANDOM":
         if flat:
             YA = np.random.normal(size=(As[0].shape[0] * len(As), d))
