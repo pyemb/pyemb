@@ -3,6 +3,8 @@ import numpy as np
 from scipy import sparse
 from pyemb.embedding import dyn_embed
 
+np.random.seed(123)
+
 
 @pytest.fixture
 def generate_matrices():

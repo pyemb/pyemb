@@ -2,6 +2,8 @@ import pyemb as eb
 import pytest
 import numpy as np
 
+np.random.seed(123)
+
 
 @pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int32, np.int64])
 def test_form_omni_matrix(dtype):
