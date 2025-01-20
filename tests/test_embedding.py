@@ -65,7 +65,7 @@ def test_dyn_embed(
 
 
 # from pyemb.embedding import wasserstein_dimension_select
-
+ 
 
 # @pytest.mark.parametrize(
 #     "Y, split",
