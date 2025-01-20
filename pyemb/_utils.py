@@ -8,6 +8,7 @@ from re import sub, compile
 
 try:
     from numba import njit
+
     use_njit = True
 except ImportError:
     use_njit = False
@@ -16,7 +17,9 @@ except ImportError:
     def njit(func):
         return func
 
+
 ## ========= Dependency check ========= ##
+
 
 def _requires_dependency(dependency_name, feature_name, function_name=None):
     """
@@ -28,6 +31,7 @@ def _requires_dependency(dependency_name, feature_name, function_name=None):
     - feature_name: The feature set name for installation instructions.
     - function_name: The specific function to check for (optional). If provided, it checks if the function exists within the package.
     """
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
@@ -38,7 +42,7 @@ def _requires_dependency(dependency_name, feature_name, function_name=None):
                 if function_name:
                     # This handles importing a specific function or module from the package
                     getattr(package, function_name)
-                
+
             except ImportError as e:
                 raise ImportError(
                     f"The '{dependency_name}' package is required for this function. "
@@ -51,10 +55,10 @@ def _requires_dependency(dependency_name, feature_name, function_name=None):
                 )
 
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
-
-
 
 
 ## ==== For preprocessing the data ==== ##
@@ -119,9 +123,11 @@ def _create_node_attributes(nodes, partitions, times, n_nodes, n_times):
     ]
     return attributes
 
-@_requires_dependency('nltk', 'nlp')
+
+@_requires_dependency("nltk", "nlp")
 def _ensure_stopwords_downloaded():
     import nltk
+
     try:
         nltk.data.find("corpora/stopwords")
     except LookupError:
@@ -136,11 +142,12 @@ def _del_email_address(text):
     return pattern.sub("", text)
 
 
-@_requires_dependency('textblob', 'nlp', 'Word')
+@_requires_dependency("textblob", "nlp", "Word")
 def _clean_text_(text):
     """
     Not used by user."""
     from textblob import Word
+
     return " ".join(
         [
             Word(word).lemmatize()

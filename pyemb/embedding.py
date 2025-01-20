@@ -9,9 +9,10 @@ from ._utils import (
     _form_omni_matrix_sparse,
     _form_omni_matrix,
     _unfold_from_snapshots,
-    _requires_dependency
+    _requires_dependency,
 )
 from .tools import to_laplacian
+
 
 @_requires_dependency("ot", "wasserstein")
 def wasserstein_dimension_select(Y, dims, split=0.5):
@@ -20,7 +21,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Parameters
     ----------
-    Y : numpy.ndarray
+    Y : numpy.ndarray (n, p)
         The array of matrix.
     dims : list of int
         The dimensions to be considered.
@@ -29,12 +30,13 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Returns
     -------
-    list of numpy.ndarray
+    Ws: list of numpy.ndarray / None
         The Wasserstein distances between the training and test data for each number of dimensions.
-    int
+    chosen_dim: int
         The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
     import ot
+
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
     Y1 = Y[idx]
