@@ -3,8 +3,6 @@ import numpy as np
 from scipy import sparse
 from pyemb.embedding import dyn_embed
 
-np.random.seed(123)
-
 
 @pytest.fixture
 def generate_matrices():
@@ -55,25 +53,18 @@ def test_dyn_embed(
     assert embedding.shape == expected_shape
 
 
-# try:
-#     import ot
-#     from pyemb.embedding import wasserstein_dimension_select
-# except ImportError:
-#     wasserstein_dimension_select = None
+# from pyemb.embedding import wasserstein_dimension_select
 
 
 # @pytest.mark.parametrize(
 #     "Y, split",
 #     [
+#         # Test two cases with a different split for both dense and sparse matrices.
 #         (np.random.rand(100, 50), 0.5),
 #         (sparse.random(100, 50, density=0.1, format="csr"), 0.5),
 #         (np.random.rand(100, 50), 0.8),
 #         (sparse.random(100, 50, density=0.1, format="csr"), 0.8),
 #     ],
-# )
-# @pytest.mark.xfail(
-#     wasserstein_dimension_select is None,
-#     reason="wasserstein dependencies not installed",
 # )
 # def test_wasserstein_dimension_select(Y, split):
 #     """
@@ -88,36 +79,15 @@ def test_dyn_embed(
 #     assert dim in dims
 
 
-# def test_wasserstein_dimension_select_missing_dependencies():
+# def test_wasserstein_dimension_select_invalid_split():
 #     """
-#     Test the wasserstein_dimension_select function raises ImportError when dependencies are missing.
-#     """
-#     try:
-#         from pyemb.embedding import wasserstein_dimension_select
-
-#     # Make sure that the error is being handled by the function
-#     except ImportError:
-#         pytest.raises(
-#             ImportError,
-#             wasserstein_dimension_select,
-#             np.random.rand(100, 50),
-#             range(1, 10),
-#             0.5,
-#         )
-
-
-# # Test invalid inputs
-# @pytest.mark.xfail(
-#     wasserstein_dimension_select is None,
-#     reason="wasserstein dependencies not installed",
-# )
-# def test_wassterstein_dimension_select_invalid_input():
-#     """
-#     Test the wasserstein_dimension_select function with invalid input.
+#     Test the wasserstein_dimension_select function with an invalid split ratio.
 #     Ensures that the function raises a ValueError.
 #     """
+#     Y = np.random.rand(100, 50)
+#     dims = range(1, 10)
 #     with pytest.raises(ValueError):
-#         wasserstein_dimension_select(np.random.rand(100, 50), 1, 0.5)
+#         wasserstein_dimension_select(Y, dims, split=1.5)
 
 
 from pyemb.embedding import embed

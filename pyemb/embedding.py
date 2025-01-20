@@ -21,7 +21,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Parameters
     ----------
-    Y : numpy.ndarray (n, p)
+    Y : numpy.ndarray
         The array of matrix.
     dims : list of int
         The dimensions to be considered.
@@ -30,9 +30,9 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Returns
     -------
-    Ws: list of numpy.ndarray / None
+    list of numpy.ndarray
         The Wasserstein distances between the training and test data for each number of dimensions.
-    chosen_dim: int
+    int
         The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
     import ot
