@@ -217,7 +217,7 @@ def snapshot_plot(
         fig.legend(handles=legend_handles,ncols = min(len(legend_labels), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
 
     if  not show_plot:
-        plt.close('all')
+        plt.close(fig)
 
     return fig
 
