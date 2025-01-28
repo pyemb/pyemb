@@ -83,6 +83,7 @@ def snapshot_plot(
     axis_fontsize = 12,
     figsize_scale = 5,
     figsize = None,
+    show_plot = True,
     
     ## Legend parameters
     add_legend = False,
@@ -129,6 +130,8 @@ def snapshot_plot(
         The scale of the figure size. Default is ``5``.
     figsize: tuple (optional)  
         The figure size. Default is ``None``. 
+    show_plot: bool (optional)]
+        Whether to show the plot. Default is ``True``.
         
     add_legend: bool (optional)    
         Whether to add a legend to the plot. Default is ``False``.
@@ -212,6 +215,9 @@ def snapshot_plot(
 
         legend_handles = [plt.Line2D([0], [0], marker='o', color=colour_dict[l], linestyle='None', label=l) for l in legend_labels]
         fig.legend(handles=legend_handles,ncols = min(len(legend_labels), max_legend_cols), loc=loc, bbox_to_anchor=move_legend)
+
+    if  not show_plot:
+        plt.close('all')
 
     return fig
 
