@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-pyemb - EDA tools in Python
-============================
+pyemb - EDA of embeddings in Python
+====================================
 
-pyemb is a toolkit for anaylsing complex datasets, such as high-dimensional data, relational databases and networks. It includes functionality for preprocessing, various embedding techniques, hierarchical clustering and visualisation. The aim is to have implementations of a variety of exploratory data analysis tools that can be used across a large array of datasets. 
+pyemb is a toolkit for analysing complex datasets through the lens of embedding. It includes functionality for preprocessing, various embedding techniques, hierarchical clustering and visualisation. The aim is to have implementations of a variety of exploratory data analysis tools that can be used across a large array of datasets. 
 
 .. toctree::
    :maxdepth: 2
