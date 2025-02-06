@@ -49,7 +49,6 @@ def test_dyn_embed(
 
     if as_list:
         As = [As[i] for i in range(5)]
-        
 
     kwargs = {}
     if method == "AUASE":
@@ -65,7 +64,7 @@ def test_dyn_embed(
 
 
 # from pyemb.embedding import wasserstein_dimension_select
- 
+
 
 # @pytest.mark.parametrize(
 #     "Y, split",
@@ -90,15 +89,36 @@ def test_dyn_embed(
 #     assert dim in dims
 
 
-# def test_wasserstein_dimension_select_invalid_split():
-#     """
-#     Test the wasserstein_dimension_select function with an invalid split ratio.
-#     Ensures that the function raises a ValueError.
-#     """
-#     Y = np.random.rand(100, 50)
-#     dims = range(1, 10)
-#     with pytest.raises(ValueError):
-#         wasserstein_dimension_select(Y, dims, split=1.5)
+def test_wasserstein_dimension_select_missing_dependencies():
+    """
+    Test the wasserstein_dimension_select function raises ImportError when dependencies are missing.
+    """
+    try:
+        from pyemb.embedding import wasserstein_dimension_select
+
+    # Make sure that the error is being handled by the function
+    except ImportError:
+        pytest.raises(
+            ImportError,
+            wasserstein_dimension_select,
+            np.random.rand(100, 50),
+            range(1, 10),
+            0.5,
+        )
+
+
+# Test invalid inputs
+@pytest.mark.xfail(
+    wasserstein_dimension_select is None,
+    reason="wasserstein dependencies not installed",
+)
+def test_wassterstein_dimension_select_invalid_input():
+    """
+    Test the wasserstein_dimension_select function with invalid input.
+    Ensures that the function raises a ValueError.
+    """
+    with pytest.raises(ValueError):
+        wasserstein_dimension_select(np.random.rand(100, 50), 1, 0.5)
 
 
 from pyemb.embedding import embed

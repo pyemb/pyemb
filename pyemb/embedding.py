@@ -14,6 +14,7 @@ from ._utils import (
 )
 from .tools import to_laplacian
 
+
 @_requires_dependency("ot", "wasserstein")
 def wasserstein_dimension_select(Y, dims, split=0.5):
     """
@@ -21,7 +22,7 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Parameters
     ----------
-    Y : numpy.ndarray
+    Y : numpy.ndarray (n, p)
         The array of matrix.
     dims : list of int
         The dimensions to be considered.
@@ -30,12 +31,13 @@ def wasserstein_dimension_select(Y, dims, split=0.5):
 
     Returns
     -------
-    list of numpy.ndarray
+    Ws: list of numpy.ndarray / None
         The Wasserstein distances between the training and test data for each number of dimensions.
-    int
+    chosen_dim: int
         The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.
     """
     import ot
+
     n = Y.shape[0]
     idx = np.random.choice(range(n), int(n * split), replace=False)
     Y1 = Y[idx]
@@ -469,10 +471,11 @@ def OMNI(As, d, flat=True, sparse_matrix=False):
             XA[t] = XA_flat[t * n : (t + 1) * n, 0:d]
 
     return XA
-    
 
-def AUASE(As, Cs, d, alpha, norm = True, 
-          flat=True, sparse_matrix=False, return_left=False):
+
+def AUASE(
+    As, Cs, d, alpha, norm=True, flat=True, sparse_matrix=False, return_left=False
+):
     """
     Computes the attributed unfolded adjacency spectral embedding (AUASE).
 
@@ -529,19 +532,16 @@ def AUASE(As, Cs, d, alpha, norm = True,
         if Cs.dtype not in [np.float32, np.float64]:
             Cs = Cs.astype(np.float32)
 
-
     if len(Cs) != len(As):
         raise ValueError("'Cs' must have the same length as 'As'")
     if Cs[0].shape[0] != As[0].shape[0]:
         raise ValueError("'Cs' must have the same number of nodes as 'As'")
-    
+
     if isinstance(As, list):
         As_sparse = all(sparse.issparse(A) for A in As)
 
     else:
         As_sparse = sparse.issparse(As[0])
-
-
 
     if isinstance(Cs, list):
         Cs_sparse = all(sparse.issparse(C) for C in Cs)
@@ -551,17 +551,17 @@ def AUASE(As, Cs, d, alpha, norm = True,
 
     if As_sparse != Cs_sparse:
         raise ValueError("Both 'As' and 'Cs' must be either sparse or dense")
-    
+
     # if both are dense, set sparse_matrix to False
     if not As_sparse and not Cs_sparse:
         sparse_matrix = False
     else:
         sparse_matrix = True
-    
+
     if not (0 <= alpha <= 1):
         raise ValueError("'alpha' must be between 0 and 1")
 
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     n = As[0].shape[0]
     T = len(As)
@@ -569,18 +569,18 @@ def AUASE(As, Cs, d, alpha, norm = True,
     # Construct the rectangular unfolded adjacency
     Acs = _form_attributed_matrix(As, Cs, alpha, norm)
 
-    XA, YA = UASE(Acs, d, flat = False, sparse_matrix = sparse_matrix, return_left = True)
+    XA, YA = UASE(Acs, d, flat=False, sparse_matrix=sparse_matrix, return_left=True)
 
     if flat:
-        YA_flat = np.zeros((n*T,d))
-        
+        YA_flat = np.zeros((n * T, d))
+
         for t in range(T):
-            YA_flat[n*t:n*(t+1),:] = YA[t,:n:]
+            YA_flat[n * t : n * (t + 1), :] = YA[t, :n:]
         YA = YA_flat
     else:
         YA = YA[:, :n, :]
 
-    XA = XA[:n, :]  
+    XA = XA[:n, :]
 
     if return_left:
         return XA, YA
@@ -588,15 +588,7 @@ def AUASE(As, Cs, d, alpha, norm = True,
         return YA
 
 
-
-def dyn_embed(
-    As,
-    d=50,
-    method="UASE",
-    regulariser="auto",
-    flat=True,
-    **kwargs
-):
+def dyn_embed(As, d=50, method="UASE", regulariser="auto", flat=True, **kwargs):
     """
     Computes the dynamic embedding using a specified method.
 
@@ -670,14 +662,13 @@ def dyn_embed(
         )
     elif method.upper() == "AUASE":
 
-        Cs = kwargs.pop('Cs', None)
-        alpha = kwargs.pop('alpha', None)
+        Cs = kwargs.pop("Cs", None)
+        alpha = kwargs.pop("alpha", None)
         if alpha is None:
             raise ValueError("Parameter 'alpha' is required for method 'AUASE'")
         if Cs is None:
             raise ValueError("Parameter 'Cs' is required for method 'AUASE'")
-        
-        
+
         YA = AUASE(As, Cs, d, alpha, return_left=False, **kwargs)
     elif method.upper() == "RANDOM":
         if flat:
