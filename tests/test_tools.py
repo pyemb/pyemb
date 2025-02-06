@@ -2,6 +2,8 @@ import pytest
 import pyemb as eb
 import numpy as np
 
+np.random.seed(123)
+
 
 @pytest.mark.parametrize("emb_type", ["flat", "not flat"])
 def test_degree_correction(emb_type):
