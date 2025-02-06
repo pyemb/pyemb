@@ -1,0 +1,409 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Co-authorship network - Attributed dynamic embedding &mdash; pyemb  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API" href="../api.html" />
+    <link rel="prev" title="Planaria single-cell" href="planaria.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyemb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../inst_over.html">Installation and Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mimic.html">MIMIC-III</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lyon.html">School contact graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newsgroup.html">20Newsgroup documents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planaria.html">Planaria single-cell</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Co-authorship network - Attributed dynamic embedding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-dataset">Load dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#embed-the-dynamic-attributed-network">Embed the dynamic attributed network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refs.html">Contributors and References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyemb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Co-authorship network - Attributed dynamic embedding</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/AUASE.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="co-authorship-network-attributed-dynamic-embedding">
+<h1>Co-authorship network - Attributed dynamic embedding<a class="headerlink" href="#co-authorship-network-attributed-dynamic-embedding" title="Link to this heading"></a></h1>
+<p>This tutorial illustrates an application of attributed unfolded
+adjacency spectral embedding (AUASE) (Ceccherini et al., 2024). We use
+the DBLP dataset (Ley et al., 2009) which is a co-authorship network
+consisting of bibliography data from computer science from 1996 to 2009.
+The attributes are derived from the abstracts and titles of the papers
+published by an author within each time interval. For classification
+tasks, we assign to each author a ground truth label, which is the
+subject where most of their papers are published.</p>
+<p>AUASE produces a dynamic embedding that combines information from the
+network (i.e. edges) and node attributes. The resulting embedding is
+more representative than the UASE embedding as it’s able to embed more
+information in the same space. In this tutorial, we are going to
+visualise AUASE embeddings and show how they outperform UASE ones with a
+classification application.</p>
+<section id="load-dataset">
+<h2>Load dataset<a class="headerlink" href="#load-dataset" title="Link to this heading"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the adjacency matrices</span>
+<span class="n">As</span> <span class="o">=</span> <span class="p">[</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/DBLP/DBLP_adjs/adj_matrix_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">_bin.mat&#39;</span><span class="p">)[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
+
+<span class="c1">#load the attribute martices</span>
+<span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;data/DBLP/DBLP_att/word_count_matrix_*.npz&#39;</span><span class="p">)</span>
+
+<span class="n">Cs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">Cs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sparse</span><span class="o">.</span><span class="n">load_npz</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+<span class="c1"># load labels</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/DBLP/DBLP_labels.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Cs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># number of classes</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">Z</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]))</span><span class="o">-</span><span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of nodes: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of time windows: </span><span class="si">{</span><span class="n">T</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of attributes: </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of classes: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">nodes</span><span class="p">:</span> <span class="mi">10092</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">time</span> <span class="n">windows</span><span class="p">:</span> <span class="mi">9</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">attributes</span><span class="p">:</span> <span class="mi">4291</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">classes</span><span class="p">:</span> <span class="mi">7</span>
+</pre></div>
+</div>
+<p>The data consists of <span class="math notranslate nohighlight">\(T\)</span> binary adjacency matrices
+<span class="math notranslate nohighlight">\(\mathbf{A} \in \mathbb{R}^{n \times n}\)</span>, where there is an edge
+between two nodes if two authors co-authored a publication in that year.
+We also have <span class="math notranslate nohighlight">\(T\)</span> attributes matrices
+<span class="math notranslate nohighlight">\(\mathbf{C} \in \mathbb{R}^{n \times p}\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is the
+total number of words considered, and each row records how many times an
+author used a word in their abstracts and titles. Finally, the label
+<span class="math notranslate nohighlight">\(\mathbf{Z}\)</span> is the subject where an author published most of
+their papers in that year. These labels can change over time.</p>
+</section>
+<section id="embed-the-dynamic-attributed-network">
+<h2>Embed the dynamic attributed network<a class="headerlink" href="#embed-the-dynamic-attributed-network" title="Link to this heading"></a></h2>
+<p>We compare the dynamic network embedding without attributes (UASE) with
+the attributed embedding (AUASE). We use spherical projection for
+visualisation and reduce the embedding to two dimensions using TSNE.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute the embeddings</span>
+<span class="n">d</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">AUASE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">Cs</span><span class="o">=</span> <span class="n">Cs</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;AUASE&quot;</span><span class="p">)</span>
+<span class="n">UASE_emb</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">dyn_embed</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;UASE&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute the degree corrected embeddings</span>
+<span class="n">AUASE_emb_dc</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">AUASE_emb</span><span class="p">)</span>
+<span class="n">UASE_emb_dc</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">degree_correction</span><span class="p">(</span><span class="n">UASE_emb</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An author is inactive in a given year if they didn’t publish any paper
+in that year. When performing TSNE and visualising the embedding, we
+only consider active authors in each year. This is to prevent a big
+cluster at zero in the embedding.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create and index for the active nodes</span>
+
+<span class="n">Z</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">array</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">Z</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="n">Z_years</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">Z</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">Z_years</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">active_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z_years</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">7</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">Z_active</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">values</span> <span class="k">if</span> <span class="n">item</span> <span class="o">!=</span> <span class="mi">7</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">Z</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute the t-SNE embeddings</span>
+
+<span class="n">AUASE_tsne_act</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">AUASE_emb_dc</span><span class="p">[</span><span class="n">active_idx</span><span class="p">])</span>
+<span class="n">UASE_tsne_act</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">UASE_emb_dc</span><span class="p">[</span><span class="n">active_idx</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># split the embeddings by time</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">!=</span> <span class="mi">7</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">Z</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="n">AUASE_tsne_act</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">AUASE_tsne_act</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">ns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">UASE_tsne_act</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">UASE_tsne_act</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">ns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We plot the AUASE and UASE embedding for the last 3 years: 2007, 2008
+and 2009.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get all the time windows</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Z_active</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1"># select the colors</span>
+<span class="n">colours</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">TABLEAU_COLORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+<span class="c1"># create a diciontary that map each unique label to a colour</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">colours</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">)}</span>
+
+<span class="c1"># set the legend</span>
+<span class="n">labels_names</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;Artificial Intelligence&#39;</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;Computer Architecture&#39;</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span><span class="s1">&#39;Computer Network&#39;</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span><span class="s1">&#39;Computer Theory&#39;</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span><span class="s1">&#39;Computer-Human Interaction&#39;</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span><span class="s1">&#39;Data Mining&#39;</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span><span class="s1">&#39;Multi-Media&#39;</span><span class="p">}</span>
+
+<span class="c1"># plot the embeddings</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">6</span>
+    <span class="n">fig_AUASE</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+        <span class="n">AUASE_tsne_act</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">ns</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">node_labels</span><span class="o">=</span><span class="n">Z_active</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="n">t</span><span class="p">]],</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">keys</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">cmap</span>
+    <span class="p">)</span>
+    <span class="n">fig_UASE</span> <span class="o">=</span> <span class="n">eb</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">snapshot_plot</span><span class="p">(</span>
+        <span class="n">UASE_tsne_act</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">ns</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">node_labels</span><span class="o">=</span><span class="n">Z_active</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="n">t</span><span class="p">]],</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">keys</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+        <span class="n">show_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">cmap</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert the Matplotlib figure to an image</span>
+    <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig_AUASE</span><span class="p">)</span>
+    <span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">img_AUASE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">canvas</span><span class="o">.</span><span class="n">buffer_rgba</span><span class="p">())</span>
+
+    <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig_UASE</span><span class="p">)</span>
+    <span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">img_UASE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">canvas</span><span class="o">.</span><span class="n">buffer_rgba</span><span class="p">())</span>
+
+    <span class="c1"># Display the image in the subplot</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_AUASE</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img_UASE</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+    <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span>  <span class="c1"># x and y position in figure coordinates (0.5 centers it horizontally)</span>
+    <span class="s2">&quot;AUASE Embeddings&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+    <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>  <span class="c1"># Horizontal alignment</span>
+    <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>  <span class="c1"># Vertical alignment</span>
+<span class="p">)</span>
+<span class="c1"># Add a title centered between the first and second rows</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+    <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span>  <span class="c1"># x and y position in figure coordinates (0.5 centers it horizontally)</span>
+    <span class="s2">&quot;UASE Embeddings&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+    <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>  <span class="c1"># Horizontal alignment</span>
+    <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>  <span class="c1"># Vertical alignment</span>
+<span class="p">)</span>
+<span class="c1"># add a legend</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+    <span class="n">handles</span><span class="o">=</span> <span class="p">[</span><span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span> <span class="k">for</span> <span class="n">lab</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cmap</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="n">labels_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cmap</span><span class="o">.</span><span class="n">keys</span><span class="p">()],</span>
+    <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower center&#39;</span><span class="p">,</span>
+    <span class="n">ncol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/AUASE_16_0.png" src="../_images/AUASE_16_0.png" />
+<p>AUASE embeddings separate the subject groups better than UASE
+embeddings; we can see this, especially for Computer architecture and
+Data mining. We are going to test this claim by using the embeddings for
+classification.</p>
+</section>
+<section id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Link to this heading"></a></h2>
+<p>We randomly select 50% of the active nodes in each year for training and
+50% for testing. We train an XGBost classifier and report the accuracy
+for each time interval.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># split the embeddings by time</span>
+<span class="n">AUASE_emb_sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">AUASE_emb_dc</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+<span class="n">UASE_emb_sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">UASE_emb_dc</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># train a classifier for each time window</span>
+<span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+
+    <span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">train_idx</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[:</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">test_idx</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">Z_key</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="n">train_idx</span> <span class="o">=</span> <span class="n">train_idx</span><span class="p">[</span><span class="n">Z_key</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">7</span><span class="p">]</span>
+    <span class="n">test_idx</span> <span class="o">=</span> <span class="n">test_idx</span><span class="p">[</span><span class="n">Z_key</span><span class="p">[</span><span class="n">test_idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">7</span><span class="p">]</span>
+
+    <span class="c1"># XGBoost for classification</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">AUASE_emb_sp</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">train_idx</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">AUASE_emb_sp</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">test_idx</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">Z_key</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span>
+    <span class="n">y_test</span> <span class="o">=</span> <span class="n">Z_key</span><span class="p">[</span><span class="n">test_idx</span><span class="p">]</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="n">objective</span><span class="o">=</span><span class="s1">&#39;multi:softprob&#39;</span><span class="p">,</span> <span class="n">num_class</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+    <span class="c1"># Training the model on the training data</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="c1"># Making predictions on the test set</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+    <span class="c1"># Calculating accuracy</span>
+    <span class="n">accuracy_AUASE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># XGBoost for classification</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">UASE_emb_sp</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">train_idx</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">UASE_emb_sp</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">test_idx</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">Z_key</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span>
+    <span class="n">y_test</span> <span class="o">=</span> <span class="n">Z_key</span><span class="p">[</span><span class="n">test_idx</span><span class="p">]</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">XGBClassifier</span><span class="p">(</span><span class="n">objective</span><span class="o">=</span><span class="s1">&#39;multi:softprob&#39;</span><span class="p">,</span> <span class="n">num_class</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+    <span class="c1"># Training the model on the training data</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="c1"># Making predictions on the test set</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+    <span class="c1"># Calculating accuracy</span>
+    <span class="n">accuracy_UASE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">),</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Accuracy at time </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> - AUASE: </span><span class="si">{</span><span class="n">accuracy_AUASE</span><span class="si">}</span><span class="s1"> - UASE: </span><span class="si">{</span><span class="n">accuracy_UASE</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">1996</span> <span class="o">-</span> <span class="mi">2000</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.852</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.686</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2001</span> <span class="o">-</span> <span class="mi">2002</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.773</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.7</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2003</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.713</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.678</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2004</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.881</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.72</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2005</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.792</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.73</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2006</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.784</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.739</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2007</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.801</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.739</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2008</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.792</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.722</span>
+<span class="n">Accuracy</span> <span class="n">at</span> <span class="n">time</span> <span class="mi">2009</span> <span class="o">-</span> <span class="n">AUASE</span><span class="p">:</span> <span class="mf">0.763</span> <span class="o">-</span> <span class="n">UASE</span><span class="p">:</span> <span class="mf">0.703</span>
+</pre></div>
+</div>
+<p>On average, classification on AUASE embedding achieves a 8% higher
+accuracy than classification on UASE, highlighting AUASE’s ability to
+achieve a balanced representation of network features and node
+attributes.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Ceccherini, E., Gallagher, I., Jones, A. and Lawson, D.J., 2024.
+Attributed dynamic network embedding with stability guarantees.
+Unpublished</p></li>
+<li><p>Ley, M. (2009). Dblp: some lessons learned. Proceedings of the VLDB
+Endowment, 2(2):1493–1500</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="planaria.html" class="btn btn-neutral float-left" title="Planaria single-cell" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Annie Gray.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

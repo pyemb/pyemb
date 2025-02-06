@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,19 +7,15 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API &mdash; pyemb  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -54,12 +52,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.find_subgraph"><code class="docutils literal notranslate"><span class="pre">find_subgraph()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.graph_from_dataframes"><code class="docutils literal notranslate"><span class="pre">graph_from_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.largest_cc_of"><code class="docutils literal notranslate"><span class="pre">largest_cc_of()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.text_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">text_matrix_and_attributes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.time_series_matrix_and_attributes"><code class="docutils literal notranslate"><span class="pre">time_series_matrix_and_attributes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.preprocessing.to_networkx"><code class="docutils literal notranslate"><span class="pre">to_networkx()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyemb.embedding">Embedding</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.AUASE"><code class="docutils literal notranslate"><span class="pre">AUASE()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.ISE"><code class="docutils literal notranslate"><span class="pre">ISE()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.OMNI"><code class="docutils literal notranslate"><span class="pre">OMNI()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.UASE"><code class="docutils literal notranslate"><span class="pre">UASE()</span></code></a></li>
@@ -67,7 +65,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.eigen_decomp"><code class="docutils literal notranslate"><span class="pre">eigen_decomp()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.embed"><code class="docutils literal notranslate"><span class="pre">embed()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.regularised_ULSE"><code class="docutils literal notranslate"><span class="pre">regularised_ULSE()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pyemb.embedding.wasserstein_dimension_select"><code class="docutils literal notranslate"><span class="pre">wasserstein_dimension_select()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyemb.plotting">Plotting</a><ul>
@@ -240,7 +237,7 @@ the attributes of the nodes in the columns.</p></li>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyemb</span> <span class="k">as</span> <span class="nn">eb</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pyemb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eb</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create dataframes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]})</span>
@@ -277,32 +274,6 @@ the attributes of the nodes in the columns.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyemb.preprocessing.text_matrix_and_attributes">
-<span class="sig-prename descclassname"><span class="pre">pyemb.preprocessing.</span></span><span class="sig-name descname"><span class="pre">text_matrix_and_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_stopwords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_email_addresses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_stopwords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.preprocessing.text_matrix_and_attributes" title="Link to this definition"></a></dt>
-<dd><p>Create a matrix from a dataframe containing text data. This needs to have one column containing the text data and each row should be a document.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>pandas.DataFrame</em>) – The data to be used to create the matrix.</p></li>
-<li><p><strong>column_name</strong> (<em>str</em>) – The name of the column containing the text data.</p></li>
-<li><p><strong>remove_stopwords</strong> (<em>bool</em>) – Whether to remove stopwords. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>clean_text</strong> (<em>bool</em>) – Whether to clean the text data. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>. This removes symbols and makes everything lower case.</p></li>
-<li><p><strong>remove_email_addresses</strong> (<em>bool</em>) – Whether to remove email addresses. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>update_stopwords</strong> (<em>list</em><em> of </em><em>str</em>) – The list of additional stopwords to be removed. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>kwargs</strong> (<em>dict</em>) – Other arguments to be passed to <code class="docutils literal notranslate"><span class="pre">sklearn.feature_extraction.text.TfidfVectorizer</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The matrix created from the text data. The attributes of the nodes.
-The first list contains the attributes of the nodes in rows. The second list contains the attributes of the nodes in the columns.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray, list of lists</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pyemb.preprocessing.time_series_matrix_and_attributes">
 <span class="sig-prename descclassname"><span class="pre">pyemb.preprocessing.</span></span><span class="sig-name descname"><span class="pre">time_series_matrix_and_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_nas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.preprocessing.time_series_matrix_and_attributes" title="Link to this definition"></a></dt>
 <dd><p>Create a matrix from a time series.</p>
@@ -333,6 +304,33 @@ The first list contains the attributes of the nodes in rows. The second list con
 </section>
 <section id="module-pyemb.embedding">
 <span id="embedding"></span><h2>Embedding<a class="headerlink" href="#module-pyemb.embedding" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyemb.embedding.AUASE">
+<span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">AUASE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">As</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_left</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.AUASE" title="Link to this definition"></a></dt>
+<dd><p>Computes the attributed unfolded adjacency spectral embedding (AUASE).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>As</strong> (<em>numpy.ndarray</em>) – An adjacency matrix series of shape <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">n)</span></code>.</p></li>
+<li><p><strong>Cs</strong> (<em>numpy.ndarray</em>) – An attribute matrix series of shape <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">p)</span></code>.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Embedding dimension.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Weighting parameter between the adjacency and attribute matrices.</p></li>
+<li><p><strong>norm</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to normalise the attributes. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>flat</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return a flat embedding <code class="docutils literal notranslate"><span class="pre">(n*T,</span> <span class="pre">d)</span></code> or a 3D embedding <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">d)</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>sparse_matrix</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the adjacency matrices are sparse. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>return_left</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return the left (anchor) embedding as well as the right (dynamic) embedding. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>numpy.ndarray</em> – Dynamic embedding of shape <code class="docutils literal notranslate"><span class="pre">(n*T,</span> <span class="pre">d)</span></code> or <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">d)</span></code>.</p></li>
+<li><p><em>numpy.ndarray, optional</em> – Anchor embedding of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">d)</span></code> if return_left is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.embedding.ISE">
 <span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">ISE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">As</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">procrustes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistent_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.ISE" title="Link to this definition"></a></dt>
@@ -409,14 +407,14 @@ For more details, see:
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.embedding.dyn_embed">
-<span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">dyn_embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">As</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UASE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regulariser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.dyn_embed" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">dyn_embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">As</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UASE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regulariser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.dyn_embed" title="Link to this definition"></a></dt>
 <dd><p>Computes the dynamic embedding using a specified method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>As</strong> (<em>numpy.ndarray</em><em> or </em><em>list</em>) – An adjacency matrix series which is either a numpy array of shape <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">n)</span></code>, a list of numpy arrays of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">n)</span></code>, or a series of CSR matrices.</p></li>
 <li><p><strong>d</strong> (<em>int</em><em>, </em><em>optional</em>) – Embedding dimension. Default is <code class="docutils literal notranslate"><span class="pre">50</span></code>.</p></li>
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The embedding method to use. Options are <code class="docutils literal notranslate"><span class="pre">ISE</span></code>, <code class="docutils literal notranslate"><span class="pre">ISE</span> <span class="pre">PROCRUSTES</span></code>, <code class="docutils literal notranslate"><span class="pre">UASE</span></code>, <code class="docutils literal notranslate"><span class="pre">OMNI</span></code>, <code class="docutils literal notranslate"><span class="pre">ULSE</span></code>, <code class="docutils literal notranslate"><span class="pre">URLSE</span></code>, <code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">UASE</span></code>.</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The embedding method to use. Options are <code class="docutils literal notranslate"><span class="pre">ISE</span></code>, <code class="docutils literal notranslate"><span class="pre">ISE</span> <span class="pre">PROCRUSTES</span></code>, <code class="docutils literal notranslate"><span class="pre">UASE</span></code>, <code class="docutils literal notranslate"><span class="pre">AUASE</span></code>, <code class="docutils literal notranslate"><span class="pre">OMNI</span></code>, <code class="docutils literal notranslate"><span class="pre">ULSE</span></code>, <code class="docutils literal notranslate"><span class="pre">URLSE</span></code>, <code class="docutils literal notranslate"><span class="pre">RANDOM</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">UASE</span></code>.</p></li>
 <li><p><strong>regulariser</strong> (float or <code class="docutils literal notranslate"><span class="pre">auto</span></code>, optional) – Regularisation parameter for the Laplacian matrix. If <code class="docutils literal notranslate"><span class="pre">auto</span></code>, the regulariser is set to the average node degree. Default is <code class="docutils literal notranslate"><span class="pre">auto</span></code>.</p></li>
 <li><p><strong>flat</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return a flat embedding <code class="docutils literal notranslate"><span class="pre">(n*T,</span> <span class="pre">d)</span></code> or a 3D embedding <code class="docutils literal notranslate"><span class="pre">(T,</span> <span class="pre">n,</span> <span class="pre">d)</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
@@ -505,28 +503,6 @@ For more details, see:
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="pyemb.embedding.wasserstein_dimension_select">
-<span class="sig-prename descclassname"><span class="pre">pyemb.embedding.</span></span><span class="sig-name descname"><span class="pre">wasserstein_dimension_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.embedding.wasserstein_dimension_select" title="Link to this definition"></a></dt>
-<dd><p>Select the number of dimensions using Wasserstein distances.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Y</strong> (<em>numpy.ndarray</em>) – The array of matrix.</p></li>
-<li><p><strong>dims</strong> (<em>list</em><em> of </em><em>int</em>) – The dimensions to be considered.</p></li>
-<li><p><strong>split</strong> (<em>float</em>) – The proportion of the data to be used for training.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>list of numpy.ndarray</em> – The Wasserstein distances between the training and test data for each number of dimensions.</p></li>
-<li><p><em>int</em> – The recommended number of dimensions. The dimension recommended is the one with the smallest Wasserstein distance.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="module-pyemb.plotting">
 <span id="plotting"></span><h2>Plotting<a class="headerlink" href="#module-pyemb.plotting" title="Link to this heading"></a></h2>
@@ -568,7 +544,7 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyemb.plotting.snapshot_plot">
-<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">snapshot_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_of_interest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xaxis_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaxis_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.5,</span> <span class="pre">-0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower</span> <span class="pre">center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_legend_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.snapshot_plot" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyemb.plotting.</span></span><span class="sig-name descname"><span class="pre">snapshot_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_of_interest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sharey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xaxis_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaxis_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.5,</span> <span class="pre">-0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower</span> <span class="pre">center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_legend_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.plotting.snapshot_plot" title="Link to this definition"></a></dt>
 <dd><p>Plot a snapshot of an embedding at a given time point.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -588,6 +564,7 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 <li><p><strong>yaxis_label</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The y-axis label. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>figsize_scale</strong> (<em>int</em><em> (</em><em>optional</em><em>)</em>) – The scale of the figure size. Default is <code class="docutils literal notranslate"><span class="pre">5</span></code>.</p></li>
 <li><p><strong>figsize</strong> (<em>tuple</em><em> (</em><em>optional</em><em>)</em>) – The figure size. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>show_plot</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em><em>]</em>) – Whether to show the plot. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p><strong>add_legend</strong> (<em>bool</em><em> (</em><em>optional</em><em>)</em>) – Whether to add a legend to the plot. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>loc</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The anchor point for where the legend will be placed. Default is <code class="docutils literal notranslate"><span class="pre">lower</span> <span class="pre">center</span></code>.</p></li>
 <li><p><strong>move_legend</strong> (<em>tuple</em><em> (</em><em>optional</em><em>)</em>) – This adjusts the exact coordinates of the anchor point. Default is <code class="docutils literal notranslate"><span class="pre">(0.5,-.1)</span></code>.</p></li>
@@ -696,27 +673,8 @@ If the embedding is dynamic (i.e. T &gt; 1), then the embedding will be animated
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyemb.hc.ConstructTree.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sfdp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forceatlas_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_legend_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.5,</span> <span class="pre">-0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower</span> <span class="pre">center'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.hc.ConstructTree.plot" title="Link to this definition"></a></dt>
-<dd><p>Plot the condensed tree.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<em>list</em><em>, </em><em>optional</em>) – Labels for each leaf node. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><strong>colours</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary of colours for each label. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then leaf nodes are coloured light blue and internal nodes are black.</p></li>
-<li><p><strong>colour_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Used for cluster nodes, colour by a type if <code class="docutils literal notranslate"><span class="pre">num_of_type</span> <span class="pre">/</span> <span class="pre">num_points_in_cluster</span> <span class="pre">&gt;</span> <span class="pre">colour_threshold</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
-<li><p><strong>prog</strong> (<em>str</em><em>, </em><em>optional</em>) – The graphviz program to use for layout. Default is <code class="docutils literal notranslate"><span class="pre">sfdp</span></code>.</p></li>
-<li><p><strong>forceatlas_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations to run the forceatlas2 algorithm. If it is set to zero, forceatlas2 won’t be used. Default is <code class="docutils literal notranslate"><span class="pre">250</span></code>.</p></li>
-<li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The size of the nodes of one data point. Default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
-<li><p><strong>scaling_node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The scaling factor for the size of the cluster nodes: <code class="docutils literal notranslate"><span class="pre">node_size</span> <span class="pre">+</span> <span class="pre">scaling_node_size</span> <span class="pre">*</span> <span class="pre">num_points_in_cluster</span></code>. Default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><strong>add_legend</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to add a legend to the plot. Default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>max_legend_cols</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of columns in the legend. Default is <code class="docutils literal notranslate"><span class="pre">4</span></code>.</p></li>
-<li><p><strong>loc</strong> (<em>str</em><em> (</em><em>optional</em><em>)</em>) – The anchor point for where the legend will be placed. Default is <code class="docutils literal notranslate"><span class="pre">lower</span> <span class="pre">center</span></code>.</p></li>
-<li><p><strong>move_legend</strong> (<em>tuple</em><em> (</em><em>optional</em><em>)</em>) – This adjusts the exact coordinates of the anchor point. Default is <code class="docutils literal notranslate"><span class="pre">(0.5,-.1)</span></code>.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments to pass to <code class="docutils literal notranslate"><span class="pre">nx.draw</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyemb.hc.ConstructTree.plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
