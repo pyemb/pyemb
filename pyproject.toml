@@ -35,7 +35,7 @@ dependencies = [
 doc = ["sphinx", "setuptools>=59.6.0"]
 embed = ["numba>=0.60.0"]
 wasserstein = ["POT>=0.9.4"]
-plotting = ["plotly>=5.22.0",nbformat>=4.2.0]
+plotting = ["plotly>=5.22.0","nbformat>=4.2.0"]
 hc = ["pygraphviz>=1.13", "fa2_modified>=0.3.10"]
 nlp = ["nltk>=3.8.1","textblob>=0.18.0.post0","textblob>=0.18.0.post0"]
 
